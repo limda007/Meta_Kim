@@ -1,0 +1,9 @@
+# Copy this block into ~/.codex/config.toml and replace REPLACE_WITH_REPO_ROOT
+# with the absolute path to this repository.
+#
+# Example:
+# codex mcp add meta-kim-runtime --command node --args "C:\\path\\to\\Meta_Kim\\scripts\\mcp\\meta-runtime-server.mjs"
+
+[mcp_servers.meta_kim_runtime]
+command = "node"
+args = ["REPLACE_WITH_REPO_ROOT/scripts/mcp/meta-runtime-server.mjs"]

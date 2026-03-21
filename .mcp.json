@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "meta-kim-runtime": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "scripts/mcp/meta-runtime-server.mjs"
+      ],
+      "env": {}
+    }
+  }
+}

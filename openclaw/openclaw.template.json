@@ -1,0 +1,73 @@
+{
+  "agents": {
+    "defaults": {
+      "model": "claude-sonnet-4-5"
+    },
+    "list": [
+      {
+        "id": "meta-warden",
+        "default": true,
+        "name": "Meta-Warden: 元部门经理 🔬",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-warden"
+      },
+      {
+        "id": "meta-genesis",
+        "default": false,
+        "name": "Meta-Genesis: 灵魂元 🧬",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-genesis"
+      },
+      {
+        "id": "meta-artisan",
+        "default": false,
+        "name": "Meta-Artisan: 技艺元 🎨",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-artisan"
+      },
+      {
+        "id": "meta-sentinel",
+        "default": false,
+        "name": "Meta-Sentinel: 哨兵元 🛡️",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-sentinel"
+      },
+      {
+        "id": "meta-librarian",
+        "default": false,
+        "name": "Meta-Librarian: 典藏元 📚",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-librarian"
+      },
+      {
+        "id": "meta-conductor",
+        "default": false,
+        "name": "Meta-Conductor: 编排元 🎼",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-conductor"
+      },
+      {
+        "id": "meta-prism",
+        "default": false,
+        "name": "Meta-Prism: 迭代审查员 🔍",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-prism"
+      },
+      {
+        "id": "meta-scout",
+        "default": false,
+        "name": "Meta-Scout: 工具发现者 🔭",
+        "workspace": "__REPO_ROOT__\\openclaw\\workspaces\\meta-scout"
+      }
+    ]
+  },
+  "bindings": [],
+  "tools": {
+    "agentToAgent": {
+      "enabled": true,
+      "allow": [
+        "meta-warden",
+        "meta-genesis",
+        "meta-artisan",
+        "meta-sentinel",
+        "meta-librarian",
+        "meta-conductor",
+        "meta-prism",
+        "meta-scout"
+      ]
+    }
+  }
+}

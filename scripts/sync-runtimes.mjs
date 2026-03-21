@@ -6,8 +6,17 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 const claudeAgentsDir = path.join(repoRoot, ".claude", "agents");
+const claudeSkillPath = path.join(
+  repoRoot,
+  ".claude",
+  "skills",
+  "meta-theory",
+  "SKILL.md"
+);
 const openclawDir = path.join(repoRoot, "openclaw");
 const openclawWorkspacesDir = path.join(openclawDir, "workspaces");
+const openclawSkillsDir = path.join(openclawDir, "skills");
+const sharedSkillsDir = path.join(repoRoot, "shared-skills");
 const templateConfigPath = path.join(openclawDir, "openclaw.template.json");
 const localConfigPath = path.join(openclawDir, "openclaw.local.json");
 const checkOnly = process.argv.includes("--check");
@@ -226,6 +235,7 @@ async function writeGeneratedJson(filePath, value) {
 async function main() {
   const agents = await loadAgents();
   const teamDirectory = buildWorkspaceDirectory(agents);
+  const portableSkill = await fs.readFile(claudeSkillPath, "utf8");
   const changedFiles = [];
 
   for (const agent of agents) {
@@ -258,6 +268,22 @@ async function main() {
   }
   if ((await writeGeneratedJson(localConfigPath, localConfig)).changed) {
     changedFiles.push("openclaw/openclaw.local.json");
+  }
+  if (
+    (await writeGeneratedFile(
+      path.join(sharedSkillsDir, "meta-theory.md"),
+      portableSkill
+    )).changed
+  ) {
+    changedFiles.push("shared-skills/meta-theory.md");
+  }
+  if (
+    (await writeGeneratedFile(
+      path.join(openclawSkillsDir, "meta-theory.md"),
+      portableSkill
+    )).changed
+  ) {
+    changedFiles.push("openclaw/skills/meta-theory.md");
   }
 
   if (checkOnly && changedFiles.length > 0) {

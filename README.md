@@ -1,127 +1,131 @@
-# Meta_Kim — 元兵工厂
+# Meta_Kim
 
-> 基于老金"最小可治理单元"元理论，设计 AI Agent 团队架构的方法论工具箱。
+> A cross-runtime Meta architecture pack built from `meta/meta.md`.
 
-## 快速开始
+Meta_Kim is not an application. It is a portable agent-architecture repository that turns the theory of `元 = 最小可治理单元` into runtime-ready assets for Claude Code, OpenClaw, and Codex.
 
-```bash
-# 1. 克隆项目
-git clone https://github.com/KimYx0207/Meta_Kim.git
-cd Meta_Kim
+## What This Repository Ships
 
-# 2. 安装元技能依赖（可选，推荐）
-bash install-deps.sh
+- Claude Code runtime pack:
+  - `CLAUDE.md`
+  - `.claude/agents/*.md`
+  - `.claude/skills/meta-theory/SKILL.md`
+  - `.claude/settings.json`
+  - `.mcp.json`
+- OpenClaw runtime pack:
+  - `openclaw/workspaces/*`
+  - `openclaw/skills/meta-theory.md`
+  - `openclaw/openclaw.template.json`
+- Codex runtime pack:
+  - `AGENTS.md`
+  - `codex/config.toml.example`
+- Shared infrastructure:
+  - `scripts/sync-runtimes.mjs`
+  - `scripts/validate-project.mjs`
+  - `scripts/mcp/meta-runtime-server.mjs`
+  - `meta/runtime-capability-matrix.md`
 
-# 3. 用 Claude Code 打开本目录
-# 8 个 agent + 1 个 skill 自动可用
-```
+## Canonical Sources
 
-## 核心理论
+- `meta/meta.md`: canonical theory source and vocabulary
+- `.claude/agents/*.md`: canonical agent-definition source
+- `.claude/skills/meta-theory/SKILL.md`: canonical skill-definition source
 
-来源：`meta.md`（老金 2.5 小时直播完整记录）
+Everything else in the repository is either derived from those files or runtime-specific glue.
 
-**元 = 最小可治理单元**，五个标准：
+## Runtime Capability Matrix
 
-1. **独立** — 能独立接收输入并产出
-2. **足够小** — 单一领域职责
-3. **边界清晰** — 不碰其他元的地盘
-4. **可替换** — 换掉不影响其他元
-5. **可复用** — 多个场景都需要
+| Capability | Claude Code | OpenClaw | Codex |
+| --- | --- | --- | --- |
+| Subagents / multi-agent | Native `.claude/agents/` | Native isolated workspaces | Repo-guided delegation surface |
+| Skills | Native `.claude/skills/` | Native installable Markdown skill | Shared skill reference via repo docs |
+| MCP | Native `.mcp.json` | No stable native MCP contract documented in the main runtime docs | Native user-level MCP config |
+| Hooks / guardrails | Native `.claude/settings.json` hooks | Heartbeat and gateway/security config are the nearest equivalent | No repo-native hook file surface |
+| Memory | `CLAUDE.md` and files | Workspace memory files | Repo instructions plus host-managed context |
 
-两个死法：
-- 死法一：什么都不拆，一锅炖
-- 死法二：拆得过碎，碎成渣
+Full details live in `meta/runtime-capability-matrix.md`.
 
-## 包含什么
+## Quick Start
 
-### 8 个可 spawn 的子代理（`.claude/agents/`）
+### Claude Code
 
-通过 Claude Code 的 Agent tool 指定 `subagent_type` spawn：
+1. Open this repository in Claude Code.
+2. The 8 project subagents load from `.claude/agents/`.
+3. The portable Meta_Kim skill loads from `.claude/skills/meta-theory/SKILL.md`.
+4. Project hooks load from `.claude/settings.json`.
+5. The local Meta_Kim MCP server is defined in `.mcp.json`.
+6. Optional: install extra community skills with `bash install-deps.sh`.
 
-| Agent | 中文 | 层级 | 职责 |
-|-------|------|------|------|
-| **meta-warden** | 元部门经理 🔬 | 管理层 | 协调所有元 agent，质量关卡，S/A/B/C/D 评级 |
-| **meta-genesis** | 灵魂元 🧬 | 基础设施 | 设计 SOUL.md（提示词 + 规则基线）|
-| **meta-artisan** | 技艺元 🎨 | 基础设施 | 匹配最优 Skill/Tool 组合，ROI 评估 |
-| **meta-sentinel** | 哨兵元 🛡️ | 基础设施 | 安全规则、Hook 设计、权限边界 |
-| **meta-librarian** | 典藏元 📚 | 基础设施 | 记忆架构、知识持久化、淘汰规则 |
-| **meta-conductor** | 编排元 🎼 | 编排层 | 工作流管线设计（V1/V2/V3/Meta）|
-| **meta-prism** | 迭代审查员 🔍 | 元分析 | 质量法医、AI-Slop 8 签名检测 |
-| **meta-scout** | 工具发现者 🔭 | 元分析 | 外部工具发现、CVE 审计 |
+### Codex
 
-### 1 个方法论 Skill（`.claude/skills/meta-theory/`）
+1. Open the repository in Codex or Codex CLI.
+2. Root `AGENTS.md` is the repository instruction entry point.
+3. Optional: wire the local MCP server by copying `codex/config.toml.example` into `~/.codex/config.toml` and replacing `REPLACE_WITH_REPO_ROOT`.
+4. The portable skill reference is available at `shared-skills/meta-theory.md`.
 
-| Skill | 触发场景 |
-|-------|---------|
-| **meta-theory** | "元理论"、"最小可治理单元"、"拆分验证" |
+### OpenClaw
 
-### 7 个元技能依赖（`install-deps.sh` 安装）
+1. Install dependencies and generate runtime artifacts:
 
-| 元技能 | 来源 | 调用者 | 用途 |
-|--------|------|--------|------|
-| agent-teams-playbook | KimYx0207 | Warden, Conductor | 多 Agent 编排框架 |
-| findskill | KimYx0207 | Artisan, Scout | Skills.sh 生态搜索 |
-| superpowers | obra ⭐89K | 全员 | 纪律性工作流 |
-| everything-claude-code | affaan-m ⭐81K | Artisan, Sentinel, Prism, Scout | subagent 候选池 |
-| planning-with-files | OthmanAdi ⭐16K | Warden, Librarian, Conductor | 文件化规划 |
-| cli-anything | HKUDS ⭐17K | Scout (可选) | GUI→CLI 转换 |
-| skill-creator | anthropics (官方) | Genesis | Skill 测试迭代 |
+   ```bash
+   npm install
+   npm run sync:runtimes
+   ```
 
-## 创建一个 Agent 的完整流程
+2. Merge `openclaw/openclaw.template.json` or the machine-local `openclaw/openclaw.local.json` into your OpenClaw agent configuration.
+3. Install the portable skill:
 
-Warden 作为经理，并行 spawn 子代理：
+   ```bash
+   openclaw skill install ./openclaw/skills/meta-theory.md
+   ```
 
-```
-用户: "我需要一个数据分析 agent"
-  ↓
-Warden (manager): 分析需求，并行派遣:
-  ├→ Genesis:   设计 SOUL.md（人设、信条、规则、思维框架）
-  ├→ Artisan:   匹配最优 Skill/Tool 组合
-  ├→ Sentinel:  设计安全规则 + Hook 配置
-  └→ Librarian: 设计记忆策略 + 淘汰规则
-  ↓（四者并行完成）
-Conductor: 设计工作流阶段集成
-  ↓
-Prism: 质量法医审查（AI-Slop 检测）
-  ↓
-Warden: 整合所有产出 → 完整 agent 配置 → CEO 审批
-```
+4. Point your OpenClaw agent workspaces at `openclaw/workspaces/<agent-id>/`.
+5. Smoke test one agent:
 
-## 基础设施元拆分方案
+   ```bash
+   openclaw agent --local --agent meta-warden -m "Read your SOUL.md first, then introduce the team."
+   ```
 
-9 个能力维度 → 5 个专精元 + 1 编排元：
+## Commands
 
-```
-提示词 + 规则基线  →  Genesis（灵魂元）🧬    [dims 1+7]
-技能 + 工具        →  Artisan（技艺元）🎨    [dims 2+3]
-安全 + 权限        →  Sentinel（哨兵元）🛡️   [dims 8+9]
-记忆 + 知识        →  Librarian（典藏元）📚   [dims 4+5]
-工作流             →  Conductor（编排元）🎼   [dim 6]
-```
+- `npm run sync:runtimes`: regenerate OpenClaw workspaces, shared skill copies, and local OpenClaw config output
+- `npm run test:mcp`: smoke test the local MCP server
+- `npm run validate`: validate canonical sources, generated assets, hooks, and MCP wiring
+- `npm run check`: confirm generated assets are current and validation passes
 
-## 项目结构
+## Project Structure
 
-```
+```text
 Meta_Kim/
-├── CLAUDE.md                          # Claude Code 自动读取
+├── AGENTS.md
+├── CLAUDE.md
 ├── .claude/
-│   ├── agents/                        # 8 个可 spawn 的子代理
-│   │   ├── meta-warden.md             # 经理 — 协调 + 质量标准
-│   │   ├── meta-genesis.md            # 灵魂元 — SOUL.md 设计
-│   │   ├── meta-artisan.md            # 技艺元 — Skill/Tool 匹配
-│   │   ├── meta-sentinel.md           # 哨兵元 — 安全/权限
-│   │   ├── meta-librarian.md          # 典藏元 — 记忆/知识
-│   │   ├── meta-conductor.md          # 编排元 — 工作流
-│   │   ├── meta-prism.md              # 审查员 — 质量法医
-│   │   └── meta-scout.md              # 发现者 — 工具扫描
-│   └── skills/
-│       └── meta-theory/SKILL.md       # 元理论方法论
-├── meta.md                            # 元理论原文（老金直播记录）
-├── install-deps.sh                    # 元技能依赖安装脚本
-├── analysis/                          # 四引擎分析文档（存档）
-└── task_plan.md                       # 执行计划（存档）
+│   ├── agents/
+│   ├── hooks/
+│   ├── settings.json
+│   └── skills/meta-theory/
+├── .mcp.json
+├── codex/config.toml.example
+├── meta/
+│   ├── meta.md
+│   └── runtime-capability-matrix.md
+├── openclaw/
+│   ├── openclaw.template.json
+│   ├── skills/
+│   └── workspaces/
+├── scripts/
+│   ├── mcp/meta-runtime-server.mjs
+│   ├── sync-runtimes.mjs
+│   └── validate-project.mjs
+└── shared-skills/
 ```
 
-## 许可
+## Notes
+
+- This repository was aligned to the documented runtime surfaces for Claude Code, OpenClaw, and Codex as checked on 2026-03-21.
+- OpenClaw docs currently expose both newer `config.yml` references and multi-agent `openclaw.json` examples. Meta_Kim ships the portable identity/workspace layer plus a JSON template because that part is stable across deployments.
+- Generated assets should not be your first edit target. Change the canonical Claude sources first, then regenerate.
+
+## License
 
 MIT
