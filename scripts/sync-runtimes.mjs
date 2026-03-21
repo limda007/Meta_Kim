@@ -13,6 +13,7 @@ const claudeSkillPath = path.join(
   "meta-theory",
   "SKILL.md"
 );
+const codexSkillsDir = path.join(repoRoot, ".codex", "skills");
 const openclawDir = path.join(repoRoot, "openclaw");
 const openclawWorkspacesDir = path.join(openclawDir, "workspaces");
 const openclawSkillsDir = path.join(openclawDir, "skills");
@@ -177,6 +178,29 @@ Default heartbeat policy:
 `;
 }
 
+function buildTools(agent, agents) {
+  const teammates = agents
+    .filter((item) => item.id !== agent.id)
+    .map((item) => `- \`${item.id}\`: ${item.description}`)
+    .join("\n");
+
+  return `# TOOLS.md - ${agent.id}
+
+此文件由 \`npm run sync:runtimes\` 自动生成。
+
+## OpenClaw 运行时约定
+
+- 先读取同目录下的 \`SOUL.md\` 与 \`AGENTS.md\`。
+- 如需协作，优先通过 OpenClaw 原生 agent-to-agent 能力联系队友。
+- 本 workspace 内的可移植 Skill 位于 \`skills/meta-theory/SKILL.md\`。
+- 不要把别的 agent 的职责吞进来；超出边界就委派或升级给 \`meta-warden\`。
+
+## 队友一览
+
+${teammates || "- 无"}
+`;
+}
+
 function buildOpenClawConfig(agents, workspaceRoot) {
   return {
     agents: {
@@ -247,6 +271,11 @@ async function main() {
         path.join(workspaceDir, "HEARTBEAT.md"),
         buildHeartbeat(agent)
       ),
+      writeGeneratedFile(path.join(workspaceDir, "TOOLS.md"), buildTools(agent, agents)),
+      writeGeneratedFile(
+        path.join(workspaceDir, "skills", "meta-theory", "SKILL.md"),
+        portableSkill
+      ),
     ]);
 
     if (writes.some((result) => result.changed)) {
@@ -284,6 +313,14 @@ async function main() {
     )).changed
   ) {
     changedFiles.push("openclaw/skills/meta-theory.md");
+  }
+  if (
+    (await writeGeneratedFile(
+      path.join(codexSkillsDir, "meta-theory.md"),
+      portableSkill
+    )).changed
+  ) {
+    changedFiles.push(".codex/skills/meta-theory.md");
   }
 
   if (checkOnly && changedFiles.length > 0) {

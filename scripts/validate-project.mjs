@@ -62,6 +62,7 @@ async function validateRequiredFiles() {
     "meta/meta.md",
     "meta/runtime-capability-matrix.md",
     ".claude/skills/meta-theory/SKILL.md",
+    ".codex/skills/meta-theory.md",
     "shared-skills/meta-theory.md",
     "openclaw/skills/meta-theory.md",
     "openclaw/openclaw.template.json",
@@ -121,10 +122,21 @@ async function validateOpenClawArtifacts(agentIds) {
   );
 
   for (const agentId of agentIds) {
-    for (const fileName of ["SOUL.md", "AGENTS.md", "HEARTBEAT.md"]) {
+    for (const fileName of ["SOUL.md", "AGENTS.md", "HEARTBEAT.md", "TOOLS.md"]) {
       const workspaceFile = path.join(openclawWorkspacesDir, agentId, fileName);
       assert(await exists(workspaceFile), `Missing OpenClaw workspace file: ${path.relative(repoRoot, workspaceFile)}`);
     }
+    const workspaceSkill = path.join(
+      openclawWorkspacesDir,
+      agentId,
+      "skills",
+      "meta-theory",
+      "SKILL.md"
+    );
+    assert(
+      await exists(workspaceSkill),
+      `Missing OpenClaw workspace skill: ${path.relative(repoRoot, workspaceSkill)}`
+    );
   }
 }
 
@@ -152,6 +164,10 @@ async function validatePortableSkill() {
     path.join(repoRoot, "shared-skills", "meta-theory.md"),
     "utf8"
   );
+  const codexSkill = await fs.readFile(
+    path.join(repoRoot, ".codex", "skills", "meta-theory.md"),
+    "utf8"
+  );
   const openclawSkill = await fs.readFile(
     path.join(repoRoot, "openclaw", "skills", "meta-theory.md"),
     "utf8"
@@ -164,6 +180,10 @@ async function validatePortableSkill() {
   assert(
     openclawSkill === skillSource,
     "openclaw/skills/meta-theory.md is out of sync with the canonical Claude skill."
+  );
+  assert(
+    codexSkill === skillSource,
+    ".codex/skills/meta-theory.md is out of sync with the canonical Claude skill."
   );
 }
 
