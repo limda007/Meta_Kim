@@ -571,9 +571,27 @@ async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readTextFileWithRetry(filePath, attempts = 4) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fs.readFile(filePath, "utf8");
+    } catch (error) {
+      if (error.code === "ENOENT") throw error;
+      const retryable = ["EPERM", "EBUSY", "EACCES"].includes(error.code);
+      if (!retryable || attempt === attempts) throw error;
+      await sleep(60 * attempt);
+    }
+  }
+  return null;
+}
+
 async function readFileIfExists(filePath) {
   try {
-    return await fs.readFile(filePath, "utf8");
+    return await readTextFileWithRetry(filePath);
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;

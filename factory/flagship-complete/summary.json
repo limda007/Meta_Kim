@@ -1,0 +1,399 @@
+{
+  "batchName": "Meta_Kim Flagship Complete",
+  "batchNameZh": "Meta_Kim 20 个旗舰总包",
+  "outDirName": "flagship-complete",
+  "profileBadge": "Full 20-agent unified flagship refinement",
+  "counts": {
+    "flagshipAgents": 20,
+    "claudeAgents": 20,
+    "codexAgents": 20,
+    "openclawWorkspaces": 20
+  },
+  "runtimes": {
+    "claude": "factory/flagship-complete/runtime-packs/claude/agents",
+    "codex": "factory/flagship-complete/runtime-packs/codex/agents",
+    "openclaw": "factory/flagship-complete/runtime-packs/openclaw/workspaces"
+  },
+  "agents": [
+    {
+      "runtimeId": "flagship-game-strategy-office",
+      "sourceAgentId": "game-strategy-office",
+      "industry": "game",
+      "industryZh": "游戏",
+      "department": "strategy-office",
+      "departmentZh": "战略办公室",
+      "agentPath": "factory/flagship-complete/agents/flagship-game-strategy-office.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-game-strategy-office.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-game-strategy-office.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-game-strategy-office",
+      "prioritySpecialists": [
+        "market-cartographer",
+        "segment-strategist",
+        "monetization-strategist",
+        "portfolio-prioritizer",
+        "executive-briefing-lead"
+      ]
+    },
+    {
+      "runtimeId": "flagship-internet-growth-operations",
+      "sourceAgentId": "internet-growth-operations",
+      "industry": "internet",
+      "industryZh": "互联网产品",
+      "department": "growth-operations",
+      "departmentZh": "增长运营",
+      "agentPath": "factory/flagship-complete/agents/flagship-internet-growth-operations.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-internet-growth-operations.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-internet-growth-operations.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-internet-growth-operations",
+      "prioritySpecialists": [
+        "funnel-operator",
+        "retention-strategist",
+        "lifecycle-designer",
+        "channel-optimizer",
+        "performance-marketer"
+      ]
+    },
+    {
+      "runtimeId": "flagship-finance-strategy-office",
+      "sourceAgentId": "finance-strategy-office",
+      "industry": "finance",
+      "industryZh": "金融",
+      "department": "strategy-office",
+      "departmentZh": "战略办公室",
+      "agentPath": "factory/flagship-complete/agents/flagship-finance-strategy-office.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-finance-strategy-office.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-finance-strategy-office.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-finance-strategy-office",
+      "prioritySpecialists": [
+        "thesis-architect",
+        "scenario-planner",
+        "portfolio-prioritizer",
+        "executive-briefing-lead",
+        "ecosystem-mapper"
+      ]
+    },
+    {
+      "runtimeId": "flagship-ai-product-delivery",
+      "sourceAgentId": "ai-product-delivery",
+      "industry": "ai",
+      "industryZh": "AI",
+      "department": "product-delivery",
+      "departmentZh": "产品交付",
+      "agentPath": "factory/flagship-complete/agents/flagship-ai-product-delivery.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-ai-product-delivery.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-ai-product-delivery.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-ai-product-delivery",
+      "prioritySpecialists": [
+        "product-architect",
+        "spec-writer",
+        "qa-strategist",
+        "prototype-lead",
+        "launch-planner"
+      ]
+    },
+    {
+      "runtimeId": "flagship-healthcare-risk-compliance",
+      "sourceAgentId": "healthcare-risk-compliance",
+      "industry": "healthcare",
+      "industryZh": "医疗",
+      "department": "risk-compliance",
+      "departmentZh": "风险合规",
+      "agentPath": "factory/flagship-complete/agents/flagship-healthcare-risk-compliance.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-healthcare-risk-compliance.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-healthcare-risk-compliance.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-healthcare-risk-compliance",
+      "prioritySpecialists": [
+        "risk-mapper",
+        "compliance-interpreter",
+        "incident-reviewer",
+        "policy-drafter",
+        "escalation-chief"
+      ]
+    },
+    {
+      "runtimeId": "flagship-stocks-research-intelligence",
+      "sourceAgentId": "stocks-research-intelligence",
+      "industry": "stocks",
+      "industryZh": "股票",
+      "department": "research-intelligence",
+      "departmentZh": "研究情报",
+      "agentPath": "factory/flagship-complete/agents/flagship-stocks-research-intelligence.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-stocks-research-intelligence.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-stocks-research-intelligence.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-stocks-research-intelligence",
+      "prioritySpecialists": [
+        "source-hunter",
+        "benchmark-analyst",
+        "competitor-watcher",
+        "evidence-auditor",
+        "diligence-coordinator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-investment-research-intelligence",
+      "sourceAgentId": "investment-research-intelligence",
+      "industry": "investment",
+      "industryZh": "投资",
+      "department": "research-intelligence",
+      "departmentZh": "研究情报",
+      "agentPath": "factory/flagship-complete/agents/flagship-investment-research-intelligence.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-investment-research-intelligence.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-investment-research-intelligence.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-investment-research-intelligence",
+      "prioritySpecialists": [
+        "source-hunter",
+        "competitor-watcher",
+        "expert-interview-designer",
+        "evidence-auditor",
+        "diligence-coordinator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-web3-risk-compliance",
+      "sourceAgentId": "web3-risk-compliance",
+      "industry": "web3",
+      "industryZh": "Web3",
+      "department": "risk-compliance",
+      "departmentZh": "风险合规",
+      "agentPath": "factory/flagship-complete/agents/flagship-web3-risk-compliance.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-web3-risk-compliance.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-web3-risk-compliance.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-web3-risk-compliance",
+      "prioritySpecialists": [
+        "risk-mapper",
+        "control-designer",
+        "decision-red-teamer",
+        "security-liaison",
+        "escalation-chief"
+      ]
+    },
+    {
+      "runtimeId": "flagship-media-growth-operations",
+      "sourceAgentId": "media-growth-operations",
+      "industry": "media",
+      "industryZh": "自媒体",
+      "department": "growth-operations",
+      "departmentZh": "增长运营",
+      "agentPath": "factory/flagship-complete/agents/flagship-media-growth-operations.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-media-growth-operations.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-media-growth-operations.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-media-growth-operations",
+      "prioritySpecialists": [
+        "funnel-operator",
+        "retention-strategist",
+        "lifecycle-designer",
+        "community-operator",
+        "performance-marketer"
+      ]
+    },
+    {
+      "runtimeId": "flagship-ecommerce-growth-operations",
+      "sourceAgentId": "ecommerce-growth-operations",
+      "industry": "ecommerce",
+      "industryZh": "电商",
+      "department": "growth-operations",
+      "departmentZh": "增长运营",
+      "agentPath": "factory/flagship-complete/agents/flagship-ecommerce-growth-operations.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-ecommerce-growth-operations.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-ecommerce-growth-operations.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-ecommerce-growth-operations",
+      "prioritySpecialists": [
+        "funnel-operator",
+        "retention-strategist",
+        "lifecycle-designer",
+        "campaign-analyst",
+        "revenue-operator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-education-product-delivery",
+      "sourceAgentId": "education-product-delivery",
+      "industry": "education",
+      "industryZh": "教育",
+      "department": "product-delivery",
+      "departmentZh": "产品交付",
+      "agentPath": "factory/flagship-complete/agents/flagship-education-product-delivery.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-education-product-delivery.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-education-product-delivery.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-education-product-delivery",
+      "prioritySpecialists": [
+        "product-architect",
+        "workflow-designer",
+        "spec-writer",
+        "ux-optimizer",
+        "qa-strategist"
+      ]
+    },
+    {
+      "runtimeId": "flagship-legal-risk-compliance",
+      "sourceAgentId": "legal-risk-compliance",
+      "industry": "legal",
+      "industryZh": "法律",
+      "department": "risk-compliance",
+      "departmentZh": "风险合规",
+      "agentPath": "factory/flagship-complete/agents/flagship-legal-risk-compliance.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-legal-risk-compliance.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-legal-risk-compliance.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-legal-risk-compliance",
+      "prioritySpecialists": [
+        "risk-mapper",
+        "compliance-interpreter",
+        "policy-drafter",
+        "audit-planner",
+        "escalation-chief"
+      ]
+    },
+    {
+      "runtimeId": "flagship-manufacturing-product-delivery",
+      "sourceAgentId": "manufacturing-product-delivery",
+      "industry": "manufacturing",
+      "industryZh": "制造",
+      "department": "product-delivery",
+      "departmentZh": "产品交付",
+      "agentPath": "factory/flagship-complete/agents/flagship-manufacturing-product-delivery.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-manufacturing-product-delivery.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-manufacturing-product-delivery.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-manufacturing-product-delivery",
+      "prioritySpecialists": [
+        "workflow-designer",
+        "spec-writer",
+        "delivery-reviewer",
+        "qa-strategist",
+        "implementation-coordinator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-logistics-growth-operations",
+      "sourceAgentId": "logistics-growth-operations",
+      "industry": "logistics",
+      "industryZh": "物流",
+      "department": "growth-operations",
+      "departmentZh": "增长运营",
+      "agentPath": "factory/flagship-complete/agents/flagship-logistics-growth-operations.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-logistics-growth-operations.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-logistics-growth-operations.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-logistics-growth-operations",
+      "prioritySpecialists": [
+        "funnel-operator",
+        "ops-automation-lead",
+        "campaign-analyst",
+        "revenue-operator",
+        "channel-optimizer"
+      ]
+    },
+    {
+      "runtimeId": "flagship-real-estate-strategy-office",
+      "sourceAgentId": "real-estate-strategy-office",
+      "industry": "real-estate",
+      "industryZh": "房地产",
+      "department": "strategy-office",
+      "departmentZh": "战略办公室",
+      "agentPath": "factory/flagship-complete/agents/flagship-real-estate-strategy-office.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-real-estate-strategy-office.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-real-estate-strategy-office.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-real-estate-strategy-office",
+      "prioritySpecialists": [
+        "market-cartographer",
+        "scenario-planner",
+        "portfolio-prioritizer",
+        "segment-strategist",
+        "executive-briefing-lead"
+      ]
+    },
+    {
+      "runtimeId": "flagship-energy-strategy-office",
+      "sourceAgentId": "energy-strategy-office",
+      "industry": "energy",
+      "industryZh": "能源",
+      "department": "strategy-office",
+      "departmentZh": "战略办公室",
+      "agentPath": "factory/flagship-complete/agents/flagship-energy-strategy-office.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-energy-strategy-office.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-energy-strategy-office.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-energy-strategy-office",
+      "prioritySpecialists": [
+        "market-cartographer",
+        "scenario-planner",
+        "portfolio-prioritizer",
+        "ecosystem-mapper",
+        "executive-briefing-lead"
+      ]
+    },
+    {
+      "runtimeId": "flagship-automotive-product-delivery",
+      "sourceAgentId": "automotive-product-delivery",
+      "industry": "automotive",
+      "industryZh": "汽车",
+      "department": "product-delivery",
+      "departmentZh": "产品交付",
+      "agentPath": "factory/flagship-complete/agents/flagship-automotive-product-delivery.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-automotive-product-delivery.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-automotive-product-delivery.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-automotive-product-delivery",
+      "prioritySpecialists": [
+        "product-architect",
+        "spec-writer",
+        "launch-planner",
+        "delivery-reviewer",
+        "implementation-coordinator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-travel-growth-operations",
+      "sourceAgentId": "travel-growth-operations",
+      "industry": "travel",
+      "industryZh": "旅游与酒店",
+      "department": "growth-operations",
+      "departmentZh": "增长运营",
+      "agentPath": "factory/flagship-complete/agents/flagship-travel-growth-operations.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-travel-growth-operations.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-travel-growth-operations.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-travel-growth-operations",
+      "prioritySpecialists": [
+        "funnel-operator",
+        "retention-strategist",
+        "lifecycle-designer",
+        "community-operator",
+        "revenue-operator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-biotech-research-intelligence",
+      "sourceAgentId": "biotech-research-intelligence",
+      "industry": "biotech",
+      "industryZh": "生物科技",
+      "department": "research-intelligence",
+      "departmentZh": "研究情报",
+      "agentPath": "factory/flagship-complete/agents/flagship-biotech-research-intelligence.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-biotech-research-intelligence.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-biotech-research-intelligence.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-biotech-research-intelligence",
+      "prioritySpecialists": [
+        "source-hunter",
+        "policy-watcher",
+        "data-scout",
+        "evidence-auditor",
+        "diligence-coordinator"
+      ]
+    },
+    {
+      "runtimeId": "flagship-public-sector-strategy-office",
+      "sourceAgentId": "public-sector-strategy-office",
+      "industry": "public-sector",
+      "industryZh": "公共部门",
+      "department": "strategy-office",
+      "departmentZh": "战略办公室",
+      "agentPath": "factory/flagship-complete/agents/flagship-public-sector-strategy-office.md",
+      "claudePath": "factory/flagship-complete/runtime-packs/claude/agents/flagship-public-sector-strategy-office.md",
+      "codexPath": "factory/flagship-complete/runtime-packs/codex/agents/flagship-public-sector-strategy-office.toml",
+      "openclawPath": "factory/flagship-complete/runtime-packs/openclaw/workspaces/flagship-public-sector-strategy-office",
+      "prioritySpecialists": [
+        "market-cartographer",
+        "scenario-planner",
+        "segment-strategist",
+        "partnership-strategist",
+        "executive-briefing-lead"
+      ]
+    }
+  ]
+}

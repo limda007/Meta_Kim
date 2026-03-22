@@ -18,6 +18,45 @@ function dedupe(items) {
   return [...new Set(items)];
 }
 
+const industryNamesZh = {
+  game: "游戏",
+  internet: "互联网产品",
+  finance: "金融",
+  ai: "AI",
+  healthcare: "医疗",
+  stocks: "股票",
+  investment: "投资",
+  web3: "Web3",
+  media: "自媒体",
+  ecommerce: "电商",
+  education: "教育",
+  legal: "法律",
+  manufacturing: "制造",
+  logistics: "物流",
+  "real-estate": "房地产",
+  energy: "能源",
+  automotive: "汽车",
+  travel: "旅游与酒店",
+  biotech: "生物科技",
+  "public-sector": "公共部门",
+};
+
+const departmentNamesZh = {
+  "strategy-office": "战略办公室",
+  "research-intelligence": "研究情报",
+  "product-delivery": "产品交付",
+  "growth-operations": "增长运营",
+  "risk-compliance": "风险合规",
+};
+
+function getChineseBatchName(config) {
+  if (config.batchNameZh) return config.batchNameZh;
+  if (config.outDirName === "flagship-complete") return "Meta_Kim 20 个旗舰总包";
+  const match = config.outDirName.match(/flagship-batch-(\d+)/);
+  if (match) return `Meta_Kim 旗舰批次 ${match[1]}`;
+  return config.batchName;
+}
+
 function normalize(filePath) {
   return path.relative(repoRoot, filePath).replace(/\\/g, "/");
 }
@@ -30,9 +69,27 @@ async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readTextFileWithRetry(filePath, attempts = 4) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fs.readFile(filePath, "utf8");
+    } catch (error) {
+      if (error.code === "ENOENT") throw error;
+      const retryable = ["EPERM", "EBUSY", "EACCES"].includes(error.code);
+      if (!retryable || attempt === attempts) throw error;
+      await sleep(60 * attempt);
+    }
+  }
+  return null;
+}
+
 async function readFileIfExists(filePath) {
   try {
-    return await fs.readFile(filePath, "utf8");
+    return await readTextFileWithRetry(filePath);
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;
@@ -40,7 +97,7 @@ async function readFileIfExists(filePath) {
 }
 
 async function readJson(filePath) {
-  return JSON.parse(await fs.readFile(filePath, "utf8"));
+  return JSON.parse(await readTextFileWithRetry(filePath));
 }
 
 async function writeFile(filePath, content, changedFiles, checkOnly) {
@@ -370,10 +427,96 @@ factory/${config.outDirName}/
 `;
 }
 
+function renderReadmeZh(profiles, config) {
+  const rows = profiles
+    .map(
+      (profile) =>
+        `| ${industryNamesZh[profile.industryId] ?? profile.industry.name} | ${departmentNamesZh[profile.departmentId] ?? profile.department.title} | \`${profile.runtimeId}\` | \`${profile.sourceAgentId}\` |`
+    )
+    .join("\n");
+
+  const title = getChineseBatchName(config);
+  const isComplete = config.outDirName === "flagship-complete";
+
+  return `# ${title}
+
+这个目录放的是 ${profiles.length} 个经过手工强化的旗舰 agent。
+
+${isComplete ? "如果你只想看最强的 20 个成品层，不想在 4 个 batch 之间来回切，直接看这里就行。" : "这个目录是旗舰层中的一个批次，用来分阶段打磨高质量 agent。"}
+
+## 你在这里能看到什么
+
+- 旗舰 agent 源文件
+- Claude Code 运行时包
+- Codex 运行时包
+- OpenClaw workspace 包
+- 机器可读索引：\`index.json\`
+- 机器可读总览：\`summary.json\`
+
+## 收录列表
+
+| 行业 | 部门 | 运行时 ID | 来源部门 seed |
+| --- | --- | --- | --- |
+${rows}
+
+## 目录结构
+
+\`\`\`text
+factory/${config.outDirName}/
+├─ README.md
+├─ README.zh-CN.md
+├─ summary.json
+├─ index.json
+├─ agents/*.md
+└─ runtime-packs/
+   ├─ claude/agents/*.md
+   ├─ codex/agents/*.toml
+   └─ openclaw/
+      ├─ openclaw.template.json
+      └─ workspaces/<agent-id>/*
+\`\`\`
+`;
+}
+
+function buildSummary(profiles, config) {
+  return {
+    batchName: config.batchName,
+    batchNameZh: getChineseBatchName(config),
+    outDirName: config.outDirName,
+    profileBadge: config.profileBadge,
+    counts: {
+      flagshipAgents: profiles.length,
+      claudeAgents: profiles.length,
+      codexAgents: profiles.length,
+      openclawWorkspaces: profiles.length,
+    },
+    runtimes: {
+      claude: `factory/${config.outDirName}/runtime-packs/claude/agents`,
+      codex: `factory/${config.outDirName}/runtime-packs/codex/agents`,
+      openclaw: `factory/${config.outDirName}/runtime-packs/openclaw/workspaces`,
+    },
+    agents: profiles.map((profile) => ({
+      runtimeId: profile.runtimeId,
+      sourceAgentId: profile.sourceAgentId,
+      industry: profile.industryId,
+      industryZh: industryNamesZh[profile.industryId] ?? profile.industry.name,
+      department: profile.departmentId,
+      departmentZh: departmentNamesZh[profile.departmentId] ?? profile.department.title,
+      agentPath: `factory/${config.outDirName}/agents/${profile.runtimeId}.md`,
+      claudePath: `factory/${config.outDirName}/runtime-packs/claude/agents/${profile.runtimeId}.md`,
+      codexPath: `factory/${config.outDirName}/runtime-packs/codex/agents/${profile.runtimeId}.toml`,
+      openclawPath: `factory/${config.outDirName}/runtime-packs/openclaw/workspaces/${profile.runtimeId}`,
+      prioritySpecialists: profile.prioritySpecialists,
+    })),
+  };
+}
+
 export async function buildFlagshipBatch(config) {
   const changedFiles = [];
   const checkOnly = process.argv.includes("--check");
   const outDir = path.join(repoRoot, "factory", config.outDirName);
+  const includeZhReadme = Boolean(config.includeZhReadme);
+  const includeSummary = Boolean(config.includeSummary);
 
   await readJson(path.join(generatedDir, "organization-map.json"));
 
@@ -395,6 +538,22 @@ export async function buildFlagshipBatch(config) {
     changedFiles,
     checkOnly
   );
+  if (includeZhReadme) {
+    await writeFile(
+      path.join(outDir, "README.zh-CN.md"),
+      renderReadmeZh(profiles, config),
+      changedFiles,
+      checkOnly
+    );
+  }
+  if (includeSummary) {
+    await writeFile(
+      path.join(outDir, "summary.json"),
+      `${JSON.stringify(buildSummary(profiles, config), null, 2)}\n`,
+      changedFiles,
+      checkOnly
+    );
+  }
   await writeFile(
     path.join(outDir, "index.json"),
     `${JSON.stringify(
@@ -484,6 +643,8 @@ export async function buildFlagshipBatch(config) {
           path.join(outDir, "runtime-packs", "openclaw", "workspaces", profile.runtimeId, "BOOTSTRAP.md"),
           path.join(outDir, "runtime-packs", "openclaw", "workspaces", profile.runtimeId, "MEMORY.md"),
         ]),
+        ...(includeZhReadme ? [path.join(outDir, "README.zh-CN.md")] : []),
+        ...(includeSummary ? [path.join(outDir, "summary.json")] : []),
       ]).map((item) => path.normalize(item))
     );
     const existing = new Set((await listFilesRecursive(outDir)).map((item) => path.normalize(item)));

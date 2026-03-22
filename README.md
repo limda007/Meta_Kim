@@ -194,10 +194,13 @@ The foundry combines:
 See:
 
 - [`factory/README.md`](factory/README.md)
+- [`factory/README.zh-CN.md`](factory/README.zh-CN.md)
 - [`scripts/generate-industry-agents.mjs`](scripts/generate-industry-agents.mjs)
 - [`factory/generated/industry-coverage-matrix.md`](factory/generated/industry-coverage-matrix.md)
 - [`factory/generated/flagship-20.md`](factory/generated/flagship-20.md)
 - [`factory/flagship-complete/README.md`](factory/flagship-complete/README.md)
+- [`factory/flagship-complete/README.zh-CN.md`](factory/flagship-complete/README.zh-CN.md)
+- [`factory/runtime-packs/README.zh-CN.md`](factory/runtime-packs/README.zh-CN.md)
 - [`factory/flagship-batch-1/README.md`](factory/flagship-batch-1/README.md)
 - [`factory/flagship-batch-2/README.md`](factory/flagship-batch-2/README.md)
 - [`factory/flagship-batch-3/README.md`](factory/flagship-batch-3/README.md)

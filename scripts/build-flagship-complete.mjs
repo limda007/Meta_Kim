@@ -12,5 +12,7 @@ await buildFlagshipBatch({
     "Each flagship remains tied to the same base department seed while carrying sharper ownership, refusal, tool, and handoff rules.",
   ],
   profileBadge: "Full 20-agent unified flagship refinement",
+  includeZhReadme: true,
+  includeSummary: true,
   profiles: flagshipComplete,
 });

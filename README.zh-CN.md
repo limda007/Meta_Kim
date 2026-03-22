@@ -42,6 +42,14 @@ Meta_Kim 不站这个方向。
 
 * * *
 
+## 如果你要看工厂层，直接看这些
+
+- [`factory/README.zh-CN.md`](factory/README.zh-CN.md)
+- [`factory/generated/industry-coverage-matrix.md`](factory/generated/industry-coverage-matrix.md)
+- [`factory/generated/flagship-20.md`](factory/generated/flagship-20.md)
+- [`factory/flagship-complete/README.zh-CN.md`](factory/flagship-complete/README.zh-CN.md)
+- [`factory/runtime-packs/README.zh-CN.md`](factory/runtime-packs/README.zh-CN.md)
+
 ## 这项目到底在立什么
 
 Meta_Kim 想建立的，不是一个“更会说话”的 AI。

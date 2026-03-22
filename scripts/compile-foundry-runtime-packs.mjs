@@ -29,9 +29,27 @@ async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readTextFileWithRetry(filePath, attempts = 4) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fs.readFile(filePath, "utf8");
+    } catch (error) {
+      if (error.code === "ENOENT") throw error;
+      const retryable = ["EPERM", "EBUSY", "EACCES"].includes(error.code);
+      if (!retryable || attempt === attempts) throw error;
+      await sleep(60 * attempt);
+    }
+  }
+  return null;
+}
+
 async function readFileIfExists(filePath) {
   try {
-    return await fs.readFile(filePath, "utf8");
+    return await readTextFileWithRetry(filePath);
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;
@@ -39,7 +57,7 @@ async function readFileIfExists(filePath) {
 }
 
 async function readJson(filePath) {
-  return JSON.parse(await fs.readFile(filePath, "utf8"));
+  return JSON.parse(await readTextFileWithRetry(filePath));
 }
 
 async function writeFile(filePath, content, changedFiles) {
@@ -353,6 +371,59 @@ These runtime packs are generated projections, not hand-maintained source files.
 `;
 }
 
+function buildRuntimeReadmeZh(summary, departments, specialists) {
+  return `# Meta_Kim Foundry 运行时包
+
+这是工厂层生成后的三端运行时总包。
+
+- **${summary.departmentSeeds} 个部门级运行时 agent**
+- **${summary.specialistAgents} 个 specialist 运行时 agent**
+- **${summary.totalAgents} 个运行时 agent 总数**
+
+它会把工厂层内容编译成：
+
+- Claude Code
+- Codex
+- OpenClaw
+
+## 目录结构
+
+\`\`\`text
+factory/runtime-packs/
+├─ README.md
+├─ README.zh-CN.md
+├─ summary.json
+├─ claude/agents/*.md
+├─ codex/agents/*.toml
+└─ openclaw/
+   ├─ openclaw.template.json
+   └─ workspaces/<agent-id>/
+      ├─ SOUL.md
+      ├─ AGENTS.md
+      ├─ TOOLS.md
+      ├─ BOOTSTRAP.md
+      └─ MEMORY.md
+\`\`\`
+
+## 数量
+
+- 部门包：${departments.length}
+- Specialist 包：${specialists.length}
+- 总包：${departments.length + specialists.length}
+
+## 源头文件
+
+真正的主源仍然是：
+
+- \`factory/catalog/foundry-config.mjs\`
+- \`factory/generated/*.json\`
+- \`factory/generated/departments/**\`
+- \`factory/generated/specialists/**\`
+
+这里的运行时包只是生成后的投影文件，不建议手工逐个维护。
+`;
+}
+
 async function main() {
   const changedFiles = [];
   const organizationMap = await readJson(path.join(generatedDir, "organization-map.json"));
@@ -404,6 +475,11 @@ async function main() {
   await writeFile(
     path.join(outDir, "README.md"),
     buildRuntimeReadme(organizationMap.summary, departments, specialists),
+    changedFiles
+  );
+  await writeFile(
+    path.join(outDir, "README.zh-CN.md"),
+    buildRuntimeReadmeZh(organizationMap.summary, departments, specialists),
     changedFiles
   );
   await writeFile(
@@ -495,6 +571,7 @@ async function main() {
     const expected = new Set(
       dedupe([
         path.join(outDir, "README.md"),
+        path.join(outDir, "README.zh-CN.md"),
         path.join(outDir, "summary.json"),
         path.join(outDir, "claude", "manifest.json"),
         path.join(outDir, "codex", "manifest.json"),
