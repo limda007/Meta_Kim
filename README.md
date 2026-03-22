@@ -1,12 +1,17 @@
-# Meta_Kim
-
-[English](README.md) | [简体中文](README.zh-CN.md)
-
-![Runtime](https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw-111827)
-![Method](https://img.shields.io/badge/method-Meta%20-%3E%20Organizational%20Mirroring%20-%3E%20Rhythm%20Orchestration%20-%3E%20Intent%20Amplification-0f766e)
-![License](https://img.shields.io/badge/license-CC%20BY%204.0-f59e0b)
-
 <div align="center">
+
+<h1>Meta_Kim</h1>
+
+<p>
+  <a href="README.md">English</a> |
+  <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p>
+  <img alt="Runtime" src="https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw-111827"/>
+  <img alt="Method" src="https://img.shields.io/badge/method-Meta%20-%3E%20Organizational%20Mirroring%20-%3E%20Rhythm%20Orchestration%20-%3E%20Intent%20Amplification-0f766e"/>
+  <img alt="License" src="https://img.shields.io/badge/license-CC%20BY%204.0-f59e0b"/>
+</p>
 
 **An open-source meta-architecture for intent amplification across Claude Code, Codex, and OpenClaw**
 
@@ -71,6 +76,16 @@ That means:
 - the system first clarifies objective, boundaries, constraints, and deliverables
 - work is routed through governable units instead of one giant undifferentiated context
 - the same underlying discipline holds across Claude Code, Codex, and OpenClaw
+
+At the engineering level, it organizes:
+
+- `agents`: responsibility boundaries and organizational roles
+- `skills`: reusable capability blocks
+- `MCP`: external capability interfaces
+- `hooks`: runtime rules and automation interception
+- `memory`: long-term continuity and context policy
+- `workspaces`: local runtime operating spaces
+- `sync / validate / eval`: synchronization, validation, and acceptance tooling
 
 ## The Meta Philosophy
 
