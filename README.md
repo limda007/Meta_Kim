@@ -219,11 +219,11 @@ You don't need to know the internals. But if you're curious:
 ```mermaid
 flowchart TD
     A[“You describe what you need”] --> B[“System clarifies scope<br/>asks follow-ups if vague”]
-    B --> C[“System searches capabilities<br/>finds existing agents/skills first”]
-    C --> D[“System routes to specialists<br/>only creates new agents when necessary”]
-    D --> E[“Agents execute<br/>with clear ownership boundaries”]
-    E --> F[“Everything gets reviewed<br/>code quality, security, architecture”]
-    F --> G[“Patterns are captured<br/>for reuse next time”]
+    B --> C[“Search existing capabilities<br/>find agents/skills first”]
+    C --> D[“Route to specialists<br/>create new agents only when needed”]
+    D --> E[“Agents execute<br/>clear ownership boundaries”]
+    E --> F[“Review output<br/>quality, security, architecture”]
+    F --> G[“Capture patterns<br/>reuse next time”]
 ```
 
 The default front door is `meta-warden`. The other seven meta agents are backstage specialists, not the public menu.
@@ -331,12 +331,6 @@ Meta_Kim/
 ├─ README.md       English README
 └─ README.zh-CN.md Chinese README
 ```
-
-Local-only ignored folders are not part of the public release surface:
-
-- `docs/`
-- `image/`
-- `node_modules/`
 
 ### Why There Is a `codex/` Folder
 

@@ -223,12 +223,12 @@ Meta_Kim 的核心链路只有一条：
 
 ```mermaid
 flowchart TD
-    A[“你说你要什么”] --> B[“系统先澄清范围<br/>模糊时追问”]
-    B --> C[“系统搜索现有能力<br/>先找已有 agent/skill”]
-    C --> D[“系统分配给专家<br/>只在必要时创建新 agent”]
-    D --> E[“agent 执行<br/>有明确的职责边界”]
-    E --> F[“所有产出都要过审<br/>代码质量、安全、架构”]
-    F --> G[“模式沉淀<br/>下次复用”]
+    A[“你说你要什么”] --> B[“系统澄清范围<br/>模糊时追问”]
+    B --> C[“搜索现有能力<br/>先找已有 agent/skill”]
+    C --> D[“分配给专家<br/>必要时才创建新 agent”]
+    D --> E[“agent 执行<br/>职责边界明确”]
+    E --> F[“审查产出<br/>质量、安全、架构”]
+    F --> G[“沉淀模式<br/>下次复用”]
 ```
 
 默认前门只有一个：`meta-warden`。其它 7 个元 agent 是后台结构，不是面向用户的菜单。
@@ -346,12 +346,6 @@ Meta_Kim/
 └─ README.zh-CN.md 中文 README
 ```
 
-本地私有目录不属于公开发布面：
-
-- `docs/`：作者本地研究稿与文章目录，已忽略
-- `image/`：本地截图和临时导出目录，已忽略
-- `node_modules/`：本地依赖目录，已忽略
-
 ### 为什么会有 `codex/`
 
 Codex 的配置分两层：
@@ -375,7 +369,7 @@ Codex 的配置分两层：
 你改了主源 agent、skill、运行时配置之后执行。
 作用是把主源重新同步成 Claude Code / Codex / OpenClaw 三端镜像。
 
-### `npm run discover:global`（新增）
+### `npm run discover:global`
 
 扫描并索引你全局安装的能力（跨三个运行时）：
 
