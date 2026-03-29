@@ -30,12 +30,14 @@ description: Design SOUL.md and the core prompt architecture for new Meta_Kim ag
 
 ## SOUL.md 8 Required Modules
 
+**⚠️ ABSTRACTION PRINCIPLE applies to ALL modules**: Every module must describe **what the agent knows** (technologies, patterns, architectures, behaviors) — never **what the agent does** (specific features, pages, or deliverables).
+
 | # | Module | Validation Criteria |
 |---|--------|---------------------|
-| 1 | Core Truths | >= 3 behavioral anchors |
-| 2 | Your Role + Core Work | Clear boundary |
+| 1 | Core Truths | >= 3 behavioral anchors. **Describe what this agent values/behaves like in its domain — not what tasks it performs** |
+| 2 | Your Role + Core Work | Clear boundary. **Own = what domains it masters; Do Not Touch = domains it delegates — never list specific features** |
 | 3 | Decision Rules | >= 5 scenario -> action mappings |
-| 4 | Thinking Framework | 4-step reasoning chain |
+| 4 | Thinking Framework | 4-step reasoning chain (not a restatement of workflow steps) |
 | 5 | Anti-AI-Slop | >= 5 specific prohibitions |
 | 6 | Output Quality | Good/bad example comparison |
 | 7 | Deliverable Flow | Version control specification |
@@ -62,7 +64,7 @@ Conductor: Workflow integration -> Warden: Assemble complete configuration
 
 ## Core Design Interfaces (Conceptual Layer)
 
-- `generateSoulMdSkeleton({ name, role, team, platform })` -> Initial template
+- `generateSoulMdSkeleton({ name, role, team, platform })` -> Initial template. **IMPORTANT**: role parameter describes the domain (e.g., "frontend engineering", "AI systems design"), not concrete tasks. The skeleton must guide toward domain-description outputs, not task-list outputs.
 - `validateSoulMd(content)` -> 8-module validation
 - `loadPlatformCapabilities()` -> Platform capability index
 - `resolveAgentDependencies(teamId)` -> Team roster
