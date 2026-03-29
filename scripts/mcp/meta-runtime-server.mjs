@@ -88,8 +88,8 @@ async function loadAgents() {
 async function loadRuntimeData() {
   const [agents, metaTheory, runtimeMatrix, sharedSkill] = await Promise.all([
     loadAgents(),
-    fs.readFile(path.join(repoRoot, "meta", "meta.md"), "utf8"),
-    fs.readFile(path.join(repoRoot, "meta", "runtime-capability-matrix.md"), "utf8"),
+    fs.readFile(path.join(repoRoot, "docs", "meta.md"), "utf8"),
+    fs.readFile(path.join(repoRoot, "docs", "runtime-capability-matrix.md"), "utf8"),
     fs.readFile(path.join(repoRoot, "shared-skills", "meta-theory.md"), "utf8")
   ]);
 

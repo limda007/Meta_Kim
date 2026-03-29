@@ -140,12 +140,6 @@ async function validateRequiredFiles() {
     "openclaw/openclaw.template.json",
     "codex/config.toml.example",
     "contracts/workflow-contract.json",
-    "factory/department-call-protocol.json",
-    "factory/organization-map.json",
-    "factory/agent-library/agent-index.json",
-    "factory/flagship-complete/index.json",
-    "factory/flagship-complete/summary.json",
-    "factory/runtime-packs/summary.json",
     "scripts/mcp/meta-runtime-server.mjs",
     "scripts/eval-meta-agents.mjs",
     "scripts/prepare-openclaw-local.mjs"
@@ -500,7 +494,7 @@ async function validatePackageJson() {
   );
   assert(pkg.dependencies?.["@modelcontextprotocol/sdk"], "package.json is missing @modelcontextprotocol/sdk.");
   assert(pkg.dependencies?.zod, "package.json is missing zod.");
-  assert(pkg.license === "CC-BY-4.0", "package.json license must be CC-BY-4.0.");
+  assert(pkg.license === "MIT", "package.json license must be MIT.");
 }
 
 async function validateGitignore() {
@@ -543,6 +537,10 @@ async function validateMcpSelfTest() {
 }
 
 async function validateFactoryRelease() {
+  const factoryRoot = path.join(repoRoot, "factory");
+  if (!(await exists(factoryRoot))) {
+    return;
+  }
   const legacyPaths = [
     "factory/generated",
     "factory/catalog",
@@ -818,10 +816,10 @@ async function main() {
   await validateMcpSelfTest();
   pass("MCP self-test passed");
 
-  // 12. Factory release artifacts
+  // 12. Factory release artifacts (skipped if factory/ not in public repo)
   step(current++, TOTAL, "Checking factory release artifacts", "100 departments / 1000 specialists / 20 flagship / 1100 runtime packs");
   await validateFactoryRelease();
-  pass("Factory artifacts count and content match expectations");
+  pass("Factory artifacts validated (or skipped — not in public repo)");
 
   console.log("\n========================================");
   console.log(`  All ${TOTAL} checks passed`);

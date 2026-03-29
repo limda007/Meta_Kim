@@ -53,9 +53,9 @@ When Conductor is used for real business workflows rather than purely theoretica
 
 Conductor must lock down these 4 rules before entering the Planning Gate:
 
-1. **One run = one department = one thing**
-2. **One run can only have one primary deliverable**
-3. **All worker tasks must serve the same delivery chain**
+1. **One run = one department = 一件事** (一次 run = 一个部门 = 一件事)
+2. **One run can only have one primary deliverable** (唯一主交付物)
+3. **All worker tasks must serve the same delivery chain** (handoff对象)
 4. **Without delivery chain closure, no clearance**
 
 If the manager's draft stuffs multiple unrelated goals into the same round — for example, "the same department simultaneously doing a daily report, a poster, a research report, and recruitment copy, with no shared primary deliverable" — Conductor must not help smooth it over; it must directly judge `Requires Re-scheduling`.
@@ -96,7 +96,7 @@ Every worker must be organized into the following 8 fields:
 - `Reference Direction`
 - `Handoff Target`
 - `Length Expectation`
-- `Visual/Material Strategy`
+- `Visual/Material Strategy` (视觉/素材策略)
 
 Missing any one item means clearance to the execution phase is denied. Especially:
 

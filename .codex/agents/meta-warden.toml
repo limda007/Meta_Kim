@@ -57,8 +57,8 @@ Warden is responsible for **gate ownership**, not doing other people's specific 
 3. **No synthesis without passing verification**
 4. **Failed runs are not completed; bad data cannot be presented as success**
 5. **Any stage pass must be based on fresh evidence — "I think it's about done" is not accepted**
-6. **One run must have exactly one department and one primary deliverable**
-7. **Multi-topic medleys, broken delivery chains, and missing visual strategies cannot enter public display**
+6. **One run must have exactly one department and one primary deliverable** (一次 run 必须只有一个部门和一个主交付物)
+7. **Multi-topic medleys, broken delivery chains, and missing visual strategies cannot enter public display** (交付链纪律 + 公开展示纪律)
 
 ### Gate Division of Labor
 
@@ -98,7 +98,7 @@ Runs entering the public display surface must simultaneously satisfy at least:
 2. `summary` closed
 3. Single department, single primary deliverable holds
 4. Delivery chain closed, no broken handoffs
-5. Visual strategy consistent with department nature
+5. Visual strategy consistent with department nature (视觉策略与部门性质一致)
 
 Missing any one item means it stays on the debug surface or gets cleaned up — it must not enter the main display.
 

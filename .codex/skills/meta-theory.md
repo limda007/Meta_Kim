@@ -533,8 +533,8 @@ IF no matching agent found → trigger Type B (creation pipeline)
 
    | Agent Source | Invocation Method |
    |-------------|-------------------|
-   | **Global agent** | `Agent(subagent_type="<agent's name field>")` |
-   | **Project-specific agent** | `Agent(name="<project-agent-filename>", prompt="...")` or describe the task directly |
+   | **Global agent** | `Agent(subagent_type='<agent's name field>')` |
+   | **Project-specific agent** | `Agent(name='<project-agent-filename>', prompt='...')` or describe the task directly |
    | **MCP-provided agent** | Use MCP tools (per platform convention) |
 
 4. **Example** (for reference only; actual invocation is based on Fetch results):
@@ -545,8 +545,8 @@ IF no matching agent found → trigger Type B (creation pipeline)
    - Global has frontend-developer (match score 2)
 
    Then invoke:
-   Agent(subagent_type="code-reviewer", prompt="Review this code...")
-   Agent(subagent_type="frontend-developer", prompt="Implement this component...")
+   Agent(subagent_type='code-reviewer', prompt="Review this code...")
+   Agent(subagent_type='frontend-developer', prompt="Implement this component...")
    ```
 
 **Do not hardcode agent names!** Different users' global environments may not have specific agents.
