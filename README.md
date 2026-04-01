@@ -34,6 +34,22 @@ The result: fewer broken multi-file changes, clearer agent responsibilities, and
 - Discipline: one department, one primary deliverable, one closed handoff chain
 - The long-term source of truth mostly lives in `.claude/` and `contracts/workflow-contract.json`
 
+## Why It Gets Lighter Over Time
+
+One of the most interesting things about Meta_Kim is not that it is cheapest on day one, but that:
+
+**it gradually turns expensive temporary reasoning into reusable long-term capability assets.**
+
+In practice that means:
+
+- **the early phase is heavier**: you are still building agents, skills, hooks, tools, contracts, memory, and review / verification discipline
+- **later runs get lighter**: repeated work no longer has to rediscover capabilities, redraw boundaries, or relearn the same lesson from scratch
+- **what shrinks is not all token usage, but repeated token usage**: recurring or familiar task families become much cheaper on average
+
+The more precise statement is:
+
+**Meta_Kim is not trying to make every single run as cheap as possible. It is trying to convert temporary reasoning cost into one-time capability-building cost that can be reused later.**
+
 ## What This Project Is
 
 Meta_Kim is not mainly about making AI write more code. It is about reducing the failure modes that show up when AI touches complex work:
