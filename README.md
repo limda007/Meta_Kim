@@ -669,7 +669,27 @@ Codex and OpenClaw use their own native mechanisms for equivalent behavior.
 - **Codex CLI** (optional, only needed for `eval:agents`)
 - **OpenClaw CLI** (optional, only needed for `npm run prepare:openclaw-local`)
 
-### First-Time Setup
+### One-Click Setup (Recommended)
+
+```bash
+git clone <repo-url>
+cd Meta_Kim
+node setup.mjs
+```
+
+| Usage | Description |
+| --- | --- |
+| `node setup.mjs` | First-time install |
+| `node setup.mjs --update` | Update installed skills and dependencies |
+| `node setup.mjs --check` | Check environment only, no install |
+
+> Pure Node.js script — works on Windows / macOS / Linux without bash.
+
+---
+
+### Manual Setup (Step by Step)
+
+The following steps are equivalent to `node setup.mjs`, for those who prefer fine-grained control.
 
 #### 1. Clone and install dependencies
 
@@ -809,7 +829,9 @@ The system routes each request through the matching governance stage.
 
 | Command | When to use it | What it does |
 | --- | --- | --- |
-| `npm install` | first setup | installs Node dependencies |
+| `node setup.mjs` | **first setup** | **one-click install (recommended)** |
+| `node setup.mjs --update` | when skills/deps need updating | one-click update |
+| `npm install` | manual setup | installs Node dependencies |
 | `npm run sync:runtimes` | after editing canonical source | rebuilds runtime mirrors |
 | `npm run check:runtimes` | when you only want a diff check | verifies mirrors are current without rewriting |
 | `npm run deps:install` | first Claude ecosystem setup | installs 9 global meta-skills |

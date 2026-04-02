@@ -671,7 +671,27 @@ Codex 和 OpenClaw 使用各自原生机制实现等效行为。
 - **Codex CLI**（可选，仅在运行 `eval:agents` 时需要）
 - **OpenClaw CLI**（可选，仅在运行 `npm run prepare:openclaw-local` 时需要）
 
-### 第一次上手，按这个顺序来
+### 一键安装（推荐）
+
+```bash
+git clone <repo-url>
+cd Meta_Kim
+node setup.mjs
+```
+
+| 用法 | 说明 |
+| --- | --- |
+| `node setup.mjs` | 首次安装 |
+| `node setup.mjs --update` | 更新已安装的 skills 和依赖 |
+| `node setup.mjs --check` | 仅检查环境，不安装 |
+
+> 纯 Node.js 脚本，Windows / macOS / Linux 通用，不依赖 bash。
+
+---
+
+### 手动安装（逐步）
+
+以下步骤与 `node setup.mjs` 等效，适合需要精细控制的场景。
 
 #### 1. 克隆并安装依赖
 
@@ -814,7 +834,9 @@ node scripts/agent-health-report.mjs
 
 | 命令 | 什么时候用 | 作用 |
 | --- | --- | --- |
-| `npm install` | 首次拉仓库 | 安装 Node 依赖 |
+| `node setup.mjs` | **首次拉仓库** | **一键安装（推荐）** |
+| `node setup.mjs --update` | 依赖/技能需要更新时 | 一键更新 |
+| `npm install` | 手动安装时 | 安装 Node 依赖 |
 | `npm run sync:runtimes` | 改完主源后 | 重建三端镜像 |
 | `npm run check:runtimes` | 不想写文件时 | 只检查镜像是否最新 |
 | `npm run deps:install` | 第一次配置 Claude 生态 | 安装 9 个全局元技能 |
