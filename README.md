@@ -13,7 +13,7 @@
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw-111827"/>
   <img alt="Stars" src="https://img.shields.io/github/stars/KimYx0207/Meta_Kim?style=flat&logo=github"/>
   <img alt="Forks" src="https://img.shields.io/github/forks/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v1.4.7-7c3aed"/>
+  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v1.5.0-7c3aed"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green"/>
 </p>
 
@@ -729,13 +729,15 @@ node setup.mjs
 | `node setup.mjs --update` | Update installed skills and dependencies |
 | `node setup.mjs --check`  | Check environment only, no install       |
 
+`node setup.mjs` runs environment checks, `npm install`, installs the 9 global meta-skills, runs `validate`, and performs the MCP self-test. It does not rewrite repo-local runtime mirrors or rebuild the global capability index; those maintainer steps are covered below.
+
 > Pure Node.js script — works on Windows / macOS / Linux without bash.
 
 ---
 
 ### Manual Setup (Step by Step)
 
-The following steps are equivalent to `node setup.mjs`, for those who prefer fine-grained control.
+The following is the fuller maintainer flow. It covers the core work `node setup.mjs` does, and also adds runtime-mirror sync, global capability discovery, and optional portable global `meta-theory` sync.
 
 #### 1. Clone and install dependencies
 
@@ -803,7 +805,38 @@ If you want to inspect CLI detection first, run:
 npm run probe:clis
 ```
 
-#### 5. Run the integrity validation
+#### 5. Optional: sync the portable global `meta-theory` skill
+
+```bash
+npm run show:global:meta-theory-targets
+npm run sync:global:meta-theory
+```
+
+This syncs the canonical `.claude/skills/meta-theory/` into your user-level runtime homes:
+
+- `~/.claude/skills/meta-theory`
+- `~/.openclaw/skills/meta-theory`
+- `~/.codex/skills/.disabled/meta-theory` (standby by default, not directly active)
+
+If you only want to check for drift, use:
+
+```bash
+npm run check:global:meta-theory
+```
+
+If you want the Codex global `meta-theory` skill active instead of parked under `.disabled/`, use:
+
+```bash
+npm run sync:global:meta-theory:codex-active
+```
+
+If you need to override the resolved runtime homes explicitly, set:
+
+- `META_KIM_CLAUDE_HOME` or `CLAUDE_HOME`
+- `META_KIM_OPENCLAW_HOME` or `OPENCLAW_HOME`
+- `META_KIM_CODEX_HOME` or `CODEX_HOME`
+
+#### 6. Run the integrity validation
 
 ```bash
 npm run validate
@@ -819,7 +852,15 @@ This checks:
 - Codex agent definitions
 - hooks, MCP config, and package scripts
 
-#### 6. Run runtime smoke only when you need it
+#### 7. Run the MCP self-test
+
+```bash
+npm run test:mcp
+```
+
+This self-tests `meta-runtime-server`, and it is also part of what `node setup.mjs` runs by default.
+
+#### 8. Run runtime smoke only when you need it
 
 ```bash
 npm run eval:agents
@@ -856,7 +897,7 @@ If you have a recorded run artifact and want to validate the actual packet chain
 npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
 ```
 
-#### 7. Prepare OpenClaw locally only if you plan to use it
+#### 9. Prepare OpenClaw locally only if you plan to use it
 
 ```bash
 npm run prepare:openclaw-local
@@ -864,7 +905,7 @@ npm run prepare:openclaw-local
 
 You only need this when you want to run the OpenClaw side on your own machine.
 
-#### 8. Run a health check
+#### 10. Run a health check
 
 ```bash
 node scripts/agent-health-report.mjs
@@ -872,7 +913,7 @@ node scripts/agent-health-report.mjs
 
 This gives you a quick view of version, frontmatter completeness, boundary definitions, workspace files, and skill sync status across all 8 agents.
 
-#### 9. Start using it (in Claude Code)
+#### 11. Start using it (in Claude Code)
 
 You can simply say:
 
@@ -896,21 +937,27 @@ The system routes each request through the matching governance stage.
 | ---------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
 | `node setup.mjs`                       | **first setup**                            | **one-click install (recommended)**                             |
 | `node setup.mjs --update`              | when skills/deps need updating                   | one-click update                                                      |
+| `node setup.mjs --check`               | when you want an environment preflight          | checks the environment only, without installing                        |
 | `npm install`                          | manual setup                                     | installs Node dependencies                                            |
 | `npm run sync:runtimes`                | after editing canonical source                   | rebuilds runtime mirrors                                              |
 | `npm run check:runtimes`               | when you only want a diff check                  | verifies mirrors are current without rewriting                        |
+| `npm run show:global:meta-theory-targets` | before touching user-level runtime homes       | prints the resolved global `meta-theory` sync targets                 |
+| `npm run sync:global:meta-theory`      | after changing canonical `meta-theory`           | syncs the global Claude/OpenClaw skill and parks Codex in standby     |
+| `npm run check:global:meta-theory`     | when you want a read-only drift check            | verifies the global `meta-theory` mirrors without rewriting           |
+| `npm run sync:global:meta-theory:codex-active` | when you want Codex global `meta-theory` active | writes the Codex global skill into the active path instead of `.disabled/` |
 | `npm run deps:install`                 | first Claude ecosystem setup                     | installs 9 global meta-skills                                         |
 | `npm run deps:update`                  | when skill dependencies need updating            | updates installed meta-skills                                         |
 | `npm run discover:global`              | first setup and after adding global capabilities | rebuilds the global capability index                                  |
 | `npm run probe:clis`                   | when CLI availability is unclear                 | probes Claude / Codex / OpenClaw CLIs                                 |
 | `npm run test:mcp`                     | after changing MCP-related code                  | self-tests `meta-runtime-server`                                    |
+| `npm run test:meta-theory`             | after changing `meta-theory`, contracts, or its tests | runs `tests/meta-theory/*.test.mjs`                               |
 | `npm run validate`                     | before committing                                | runs static integrity validation                                      |
 | `npm run validate:run -- <run.json>`   | when you want to verify a recorded real run      | validates packet lineage, summary/public-ready truthfulness, and finding closure |
 | `npm run check`                        | when you want a quick static pass                | runs `check:runtimes + validate`                                    |
 | `npm run eval:agents`                  | for fast runtime smoke                           | runs CLI/config/hook/runtime-registry smoke without LLM prompt checks |
 | `npm run eval:agents:live`             | when you want live runtime acceptance            | runs the slower Claude / Codex / OpenClaw prompt-backed evaluation    |
-| `npm run verify:all`                   | before release or after bigger changes           | runs `check + lightweight eval + tests`                             |
-| `npm run verify:all:live`              | before runtime-sensitive releases                | runs `check + live eval + tests`                                    |
+| `npm run verify:all`                   | before release or after bigger changes           | runs `check + check:global:meta-theory + lightweight eval + tests` |
+| `npm run verify:all:live`              | before runtime-sensitive releases                | runs `check + check:global:meta-theory + live eval + tests`        |
 | `node scripts/agent-health-report.mjs` | when you want an overview                        | generates a health report for all 8 agents                            |
 
 **Windows / PATH:** a Node process started from a GUI app or editor task may inherit a shorter `PATH` than your terminal. If `eval:agents` cannot find a CLI, first check `%APPDATA%\\npm\\`, then `where.exe`, and if needed set absolute paths through:
@@ -926,10 +973,12 @@ If you are changing agents, skills, README files, or runtime-facing config, the 
 1. edit canonical `.claude/` sources or shared documentation
 2. if the change affects run discipline, gates, or deliverable policy, update `contracts/workflow-contract.json`
 3. run `npm run sync:runtimes`
-4. run `npm run discover:global`
-5. run `npm run validate`
-6. run `npm run eval:agents` when smoke-level runtime acceptance matters
-7. only run `npm run eval:agents:live` when you truly need live prompt-backed acceptance
+4. if you changed canonical `meta-theory` and you maintain user-level runtime homes, run `npm run sync:global:meta-theory`
+5. run `npm run discover:global`
+6. run `npm run validate`
+7. if MCP runtime wiring changed, run `npm run test:mcp`
+8. run `npm run eval:agents` when smoke-level runtime acceptance matters
+9. only run `npm run eval:agents:live` when you truly need live prompt-backed acceptance
 
 That keeps the three runtime projections aligned.
 
@@ -973,7 +1022,7 @@ No. It is the long-form theory manuscript mirrored from the canonical skill refe
 
 Use the repository tree section in this README.
 
-### 9. I want the runtime differences. What should I read?
+### 10. I want the runtime differences. What should I read?
 
 Internal note: runtime parity reference lives under `docs/` and is not part of the public surface.
 

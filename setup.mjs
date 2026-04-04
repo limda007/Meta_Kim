@@ -9,7 +9,7 @@
  */
 
 import { execSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, rmSync, readdirSync, cpSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync, readdirSync, cpSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir, platform, tmpdir } from 'node:os'
 
@@ -35,6 +35,11 @@ const SKILLS = [
   // Anthropic 官方 (subdir)
   { name: 'skill-creator', repo: 'anthropics/skills', subdir: 'skills/skill-creator' },
 ]
+
+const packageJsonPath = join(PROJECT_DIR, 'package.json')
+const packageVersion = existsSync(packageJsonPath)
+  ? JSON.parse(readFileSync(packageJsonPath, 'utf8')).version || 'dev'
+  : 'dev'
 
 // ── Helpers ─────────────────────────────────────────────
 
@@ -311,7 +316,7 @@ function testMcp() {
 function banner() {
   console.log(`
 ${C.bold}${C.cyan}╔══════════════════════════════════════════╗
-║       Meta_Kim 一键安装 v1.2.0           ║
+║       Meta_Kim 一键安装 v${packageVersion.padEnd(8)}║
 ╚══════════════════════════════════════════╝${C.reset}
 ${C.dim}  模式: ${checkOnly ? '仅检查' : updateMode ? '更新' : '安装'}${C.reset}
 ${C.dim}  平台: ${platform()} | Node ${process.versions.node}${C.reset}

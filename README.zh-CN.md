@@ -13,7 +13,7 @@
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw-111827"/>
   <img alt="Stars" src="https://img.shields.io/github/stars/KimYx0207/Meta_Kim?style=flat&logo=github"/>
   <img alt="Forks" src="https://img.shields.io/github/forks/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v1.4.7-7c3aed"/>
+  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v1.5.0-7c3aed"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green"/>
 </p>
 
@@ -731,13 +731,15 @@ node setup.mjs
 | `node setup.mjs --update` | 更新已安装的 skills 和依赖 |
 | `node setup.mjs --check` | 仅检查环境，不安装 |
 
+`node setup.mjs` 会依次做环境检查、`npm install`、9 个全局元技能安装、`validate`，以及 MCP 自测。它不会重写仓库内 runtime 镜像，也不会生成全局能力索引；这些维护步骤见下面的手动流程。
+
 > 纯 Node.js 脚本，Windows / macOS / Linux 通用，不依赖 bash。
 
 ---
 
 ### 手动安装（逐步）
 
-以下步骤与 `node setup.mjs` 等效，适合需要精细控制的场景。
+下面是更完整的维护者手动流程。它覆盖了 `node setup.mjs` 的核心安装动作，并额外补上 runtime 镜像同步、全局能力发现和全局 meta-theory 便携技能同步。
 
 #### 1. 克隆并安装依赖
 
@@ -808,7 +810,38 @@ npm run discover:global
 npm run probe:clis
 ```
 
-#### 5. 做项目完整性校验
+#### 5. 可选：同步全局 meta-theory 便携技能
+
+```bash
+npm run show:global:meta-theory-targets
+npm run sync:global:meta-theory
+```
+
+这一步会把 canonical 的 `.claude/skills/meta-theory/` 同步到用户级 runtime home：
+
+- `~/.claude/skills/meta-theory`
+- `~/.openclaw/skills/meta-theory`
+- `~/.codex/skills/.disabled/meta-theory`（默认是 standby，不直接激活）
+
+如果你只想检查有没有漂移，用：
+
+```bash
+npm run check:global:meta-theory
+```
+
+如果你希望 Codex 的全局 meta-theory 直接处于启用态，而不是放在 `.disabled/` 里，用：
+
+```bash
+npm run sync:global:meta-theory:codex-active
+```
+
+需要显式指定用户级 runtime home 时，可设置：
+
+- `META_KIM_CLAUDE_HOME` 或 `CLAUDE_HOME`
+- `META_KIM_OPENCLAW_HOME` 或 `OPENCLAW_HOME`
+- `META_KIM_CODEX_HOME` 或 `CODEX_HOME`
+
+#### 6. 做项目完整性校验
 
 ```bash
 npm run validate
@@ -824,7 +857,15 @@ npm run validate
 - Codex agents 是否有效
 - hooks / MCP / package scripts 是否配置正确
 
-#### 6. 需要时再跑轻量运行时 smoke
+#### 7. 跑一次 MCP 自测
+
+```bash
+npm run test:mcp
+```
+
+这一步会自测 `meta-runtime-server`，也是 `node setup.mjs` 默认会执行的一项检查。
+
+#### 8. 需要时再跑轻量运行时 smoke
 
 ```bash
 npm run eval:agents
@@ -861,7 +902,7 @@ npm run verify:all:live
 npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
 ```
 
-#### 7. OpenClaw 本地运行前，额外准备一次
+#### 9. OpenClaw 本地运行前，额外准备一次
 
 ```bash
 npm run prepare:openclaw-local
@@ -869,7 +910,7 @@ npm run prepare:openclaw-local
 
 只有你准备在本机真正跑 OpenClaw 时才需要这一步。
 
-#### 8. 快速健康度检查
+#### 10. 快速健康度检查
 
 ```bash
 node scripts/agent-health-report.mjs
@@ -877,7 +918,7 @@ node scripts/agent-health-report.mjs
 
 可以快速看 8 个 agent 的版本号、frontmatter 完整性、边界定义、workspace 文件和 skill 同步状态。
 
-#### 9. 开始使用（Claude Code）
+#### 11. 开始使用（Claude Code）
 
 你可以直接说：
 
@@ -901,21 +942,27 @@ node scripts/agent-health-report.mjs
 | --- | --- | --- |
 | `node setup.mjs` | **首次拉仓库** | **一键安装（推荐）** |
 | `node setup.mjs --update` | 依赖/技能需要更新时 | 一键更新 |
+| `node setup.mjs --check` | 想先做环境体检时 | 只检查环境，不安装 |
 | `npm install` | 手动安装时 | 安装 Node 依赖 |
 | `npm run sync:runtimes` | 改完主源后 | 重建三端镜像 |
 | `npm run check:runtimes` | 不想写文件时 | 只检查镜像是否最新 |
+| `npm run show:global:meta-theory-targets` | 想确认会写到哪些用户级目录 | 打印 Claude / OpenClaw / Codex 的全局 meta-theory 同步目标 |
+| `npm run sync:global:meta-theory` | 改了 canonical `meta-theory` 后 | 同步用户级 Claude/OpenClaw 技能，并把 Codex 默认放到 standby 目录 |
+| `npm run check:global:meta-theory` | 不想改用户级文件时 | 只检查全局 meta-theory 是否和 canonical 同步 |
+| `npm run sync:global:meta-theory:codex-active` | 希望 Codex 全局技能直接启用时 | 把 Codex 的全局 meta-theory 写到活动目录而不是 `.disabled/` |
 | `npm run deps:install` | 第一次配置 Claude 生态 | 安装 9 个全局元技能 |
 | `npm run deps:update` | 依赖需要更新时 | 更新已安装的元技能 |
 | `npm run discover:global` | 首次安装后、装了新全局能力后 | 生成全局能力索引 |
 | `npm run probe:clis` | 怀疑 CLI 没配好时 | 探测 Claude / Codex / OpenClaw CLI |
 | `npm run test:mcp` | 改了 MCP 相关逻辑时 | 自测 `meta-runtime-server` |
+| `npm run test:meta-theory` | 改了 `meta-theory` skill / contract / tests 时 | 跑 `tests/meta-theory/*.test.mjs` |
 | `npm run validate` | 每次准备提交前 | 做静态完整性校验 |
 | `npm run validate:run -- <run.json>` | 要校验真实 run 产物链时 | 检查 packet 对齐、finding closure、summary/public-ready 是否真实 |
 | `npm run check` | 想快速做一轮静态检查 | `check:runtimes + validate` |
 | `npm run eval:agents` | 要快速做一轮 runtime smoke 时 | 做 CLI / 配置 / hook / registry 级别的轻量检查，不跑 LLM prompt 验收 |
 | `npm run eval:agents:live` | 要做真实 live 运行时验收时 | 运行较慢的 Claude / Codex / OpenClaw prompt 验收 |
-| `npm run verify:all` | 发布前 / 大改后 | `check + 轻量 eval + tests` |
-| `npm run verify:all:live` | runtime 敏感发布前 | `check + live eval + tests` |
+| `npm run verify:all` | 发布前 / 大改后 | `check + check:global:meta-theory + 轻量 eval + tests` |
+| `npm run verify:all:live` | runtime 敏感发布前 | `check + check:global:meta-theory + live eval + tests` |
 | `node scripts/agent-health-report.mjs` | 想看总体健康度时 | 生成 8 个 agent 的健康报告 |
 
 **Windows / PATH：** 从图形界面或编辑器里启动任务时，Node 子进程继承到的 `PATH` 有时比你单独开的终端更短。遇到 `eval:agents` 找不到 CLI 时，优先检查 `%APPDATA%\\npm\\`、`where.exe` 结果，仍不行就设置绝对路径环境变量：
@@ -931,14 +978,16 @@ node scripts/agent-health-report.mjs
 1. 改 `.claude/` 主源或公共说明文件
 2. 如果改动涉及调度纪律、闸门或交付合约，同时更新 `contracts/workflow-contract.json`
 3. 跑 `npm run sync:runtimes`
-4. 跑 `npm run discover:global`
-5. 跑 `npm run validate`
-6. 需要 smoke 级运行时验收时，再跑 `npm run eval:agents`
-7. 只有明确需要 live prompt 验收时，再跑 `npm run eval:agents:live`
+4. 如果改了 canonical `meta-theory`，并且你维护用户级 runtime home，再跑 `npm run sync:global:meta-theory`
+5. 跑 `npm run discover:global`
+6. 跑 `npm run validate`
+7. 如果改了 MCP runtime 相关逻辑，再跑 `npm run test:mcp`
+8. 需要 smoke 级运行时验收时，再跑 `npm run eval:agents`
+9. 只有明确需要 live prompt 验收时，再跑 `npm run eval:agents:live`
 
 这样最不容易把三端镜像改乱。
 
-## 新手最常见的 9 个问题
+## 新手最常见的 10 个问题
 
 ### 1. 我必须同时安装 Claude Code、Codex、OpenClaw 吗？
 
@@ -978,7 +1027,7 @@ node scripts/agent-health-report.mjs
 
 直接读本 README 里的仓库结构树即可。
 
-### 9. 我想看三端能力差异，应该读什么？
+### 10. 我想看三端能力差异，应该读什么？
 
 内部说明：运行时一致性参考在 `docs/` 下，不属于公开内容。
 
