@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Documentation
 
-- State that **Meta_Kim** (`node setup.mjs`) is the canonical install path for **KimYx0207/findskill** (maintained/optimized on top of public baselines); discourage parallel duplicate installs and note that labels like `find-skills` often name the same capability family (`README.md`, `README.zh-CN.md`, `CLAUDE.md`).
+- State that **Meta_Kim** (`node setup.mjs`) is the canonical install path for **KimYx0207/findskill** (maintained/optimized on top of public baselines); discourage parallel duplicate installs and note that labels like `find-skills` often name the same capability family (`README.md`, `README.zh-CN.md`, `README.ko-KR.md`, `README.ja-JP.md`, `CLAUDE.md`).
 
 ### Fixed
 
