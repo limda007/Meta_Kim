@@ -167,6 +167,7 @@ flowchart LR
 - メンテは **`.claude/` と `contracts/workflow-contract.json` から**
 - `.codex/`、`openclaw/` の多くは生成物またはランタイム用
 - 編集後は `npm run sync:runtimes` 等で再同期
+- **Claude Code**: ガバナンスの手引きは **`/meta-theory`** で `meta-theory` スキルを読み込む（正典 [`.claude/skills/meta-theory/SKILL.md`](.claude/skills/meta-theory/SKILL.md)）。エージェントのデフォルト前门は `meta-warden`、スキルはディスパッチャ。詳細は英語 [README.md § In Claude Code](README.md#meta-theory-skill-en)。
 
 ### OpenClaw の例
 
@@ -201,21 +202,28 @@ flowchart LR
 
 ## 開発ガバナンスの背骨（八段階）
 
-複雑な仕事（マルチファイル・複数能力など）は八段階スパインに乗ります。段階は**2 行×4**で読みやすく（下表と同じ順）。
+複雑な仕事（マルチファイル・複数能力など）は八段階スパインに乗ります。段階は**2 行×4**で読みやすく（下表と同じ順）。Mermaid の `TB`+横並び `subgraph` は左右に並ぶことがあるため、上下二段を確実にするには `LR` を二つに分けます。
+
+**上行 1–4 段（明確化 → 実行）**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph upper["1–4 段"]
-    direction LR
-    S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
-  end
-  subgraph lower["5–8 段"]
-    direction LR
-    S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
-  end
-  S4 --> S5
+flowchart LR
+  S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
+```
+
+</div>
+
+**接続:** `4 Execution` → `5 Review`
+
+**下行 5–8 段（審査 → 進化）**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
 ```
 
 </div>
@@ -231,6 +239,8 @@ flowchart LR
 
 </div>
 
+<div align="center">
+
 | 段階 | 目的（要約） |
 | ---- | ------------ |
 | Critical | 推測の前に要件を明確化 |
@@ -242,31 +252,50 @@ flowchart LR
 | Verification | 修正が実際に着地したか |
 | Evolution | パターン・傷・再利用知を記録 |
 
+</div>
+
 補足規則（正典）: 純粋な `Q / Query` のみエージェントバイパス可。実行可能タスクにはオーナー必須。Thinking はプロトコル先行。独立タスクは並列を検討。
 
 ## 八段階スパインと業務ワークフローは別物
 
 混同しやすいので、二層は**別語彙**として並べます。業務フェーズはスパインの段階名を**置き換えません**。
 
+プロジェクト内には次の二層のワークフロー語彙があります（[README.zh-CN.md](README.zh-CN.md) の対照表と同じ構造）:
+
+<div align="center">
+
+| 層 | 定義の所在 | 役割 |
+| --- | --- | --- |
+| **八段階スパイン** | `meta-theory` / `dev-governance.md` | 複雑開発タスクの正典実行鎖 |
+| **業務 10 フェーズ** | `contracts/workflow-contract.json` | 部門 run の契約語彙・表示・成果物規律 |
+
+</div>
+
 <a id="meta-kim-diagram-two-layers-ja"></a>
 
-**図:** 上段が**実行スパイン**（八段階）、下段が**部門 run 契約**（業務十フェーズ）。並行する語彙であり、業務がスパインの段階を改名するわけではありません。
+**図:** 上段が**実行スパイン**（八段階）、下段が**部門 run 契約**（業務十フェーズ）。並行する語彙であり、業務がスパインの段階を改名するわけではありません。`TB`+横 `subgraph` 二つは左右に並ぶことがあるため、`LR` を二つに分けて上下を固定します。
+
+**上行：八段階スパイン（実行背骨）**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph Spine["八段階スパイン（実行背骨）"]
-    direction LR
-    A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
-    A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
-  end
-  subgraph Biz["十フェーズ業務契約（部門 run）"]
-    direction LR
-    B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
-    B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
-    B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
-  end
+flowchart LR
+  A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
+  A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
+```
+
+</div>
+
+**下行：十フェーズ業務契約（部門 run）**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
+  B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
+  B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
 ```
 
 </div>
@@ -342,6 +371,8 @@ flowchart LR
 
 ## 八つのメタエージェント
 
+<div align="center">
+
 | エージェント | 主な役割 |
 | ------------ | -------- |
 | `meta-warden` | 既定入口・仲裁・最終総合 |
@@ -352,6 +383,8 @@ flowchart LR
 | `meta-librarian` | メモリと連続性 |
 | `meta-prism` | 品質・ドリフト・アンチスロップ |
 | `meta-scout` | 外部能力の発見と評価 |
+
+</div>
 
 **公開の前門は `meta-warden`。**
 
@@ -379,12 +412,16 @@ npx --yes github:KimYx0207/Meta_Kim meta-kim
 
 **UI 言語を固定し、環境チェックのみ（書き込み・インストールなし）:** `--lang` は `en` / `zh-CN` / `ja-JP` / `ko-KR`。
 
+<div align="center">
+
 | UI 言語 | コマンド |
 | --- | --- |
 | English | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang en --check` |
 | 简体中文 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang zh-CN --check` |
 | 日本語 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ja-JP --check` |
 | 한국어 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ko-KR --check` |
+
+</div>
 
 **従来どおり clone 後:**
 
@@ -394,8 +431,11 @@ cd Meta_Kim
 node setup.mjs
 ```
 
+<div align="center">
+
 | 使い方 | 説明 |
 | --- | --- |
+| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | `node setup.mjs` と同等。手動 `git clone` / `cd` を省略 |
 | `node setup.mjs` | 対話式セットアップ（言語選択 → インストール/アップデート/チェック） |
 | `node setup.mjs --lang en` | 言語選択をスキップ、UI は English |
 | `node setup.mjs --lang zh-CN` | 言語選択をスキップ、UI は简体中文 |
@@ -404,6 +444,8 @@ node setup.mjs
 | `node setup.mjs --update` | 全スキルと依存関係を更新 |
 | `node setup.mjs --check` | 環境 + 依存関係 + ランタイム間同期チェック |
 | `node setup.mjs --silent` | 非対話モード（CI/スクリプト用） |
+
+</div>
 
 ウィザードの全体フローと `--check` の意味は上表のとおり。長文手順は [README.md の Quick Start / Manual setup](README.md#quick-start-clone-to-working-in-5-minutes) を参照。
 
@@ -423,6 +465,8 @@ npm run validate
 
 ## よく使う npm スクリプト（抜粋）
 
+<div align="center">
+
 | コマンド | 用途 |
 | -------- | ---- |
 | `npm run validate` | リポジトリ整合性（契約・エージェント・workspace・MCP 自己検証など） |
@@ -433,6 +477,10 @@ npm run validate
 | `npm run validate:run -- <run.json>` | 記録された run アーティファクトの検証 |
 | `npm run doctor:governance` | 契約・フック・鏡像・サンプル validate:run の狭いヘルスチェック |
 | `npm run verify:all` | 本番前の広いスタック（グローバル meta-theory 同期状況にも依存） |
+
+</div>
+
+全文のコマンド一覧は英語正典 [README.md — Commands](README.md#commands) を参照。
 
 ## コードナレッジグラフ（graphify）
 
@@ -458,18 +506,30 @@ npm run graphify:update
 
 ## リポジトリ構造（要約）
 
-```text
-Meta_Kim/
-├─ .claude/        正典: エージェント・スキル・フック
-├─ .codex/         Codex 用ミラー
-├─ .agents/        Codex プロジェクト skill ミラー
-├─ openclaw/       OpenClaw workspace・スキル
-├─ contracts/      ガバナンス契約
-├─ scripts/        同期・検証・MCP
-├─ README.md / README.zh-CN.md / README.ja-JP.md / README.ko-KR.md
-├─ CLAUDE.md / AGENTS.md
-└─ …
-```
+（ツリー表示は環境によってずれることがあります。下表は [README.zh-CN.md](README.zh-CN.md) の「项目结构」と同じ粒度です。）
+
+<div align="center">
+
+| パス | 説明 |
+| --- | --- |
+| `.claude/` | 正典: agents、skills、hooks、settings |
+| `.codex/` | Codex custom agents ミラー |
+| `.agents/` | Codex プロジェクト skill ミラー |
+| `codex/` | Codex グローバル設定の例 |
+| `openclaw/` | OpenClaw workspaces、skills、テンプレート |
+| `contracts/` | ランタイム治理契約 |
+| `docs/` | 内部メモ等、追跡済み runtime ドキュメント少量 |
+| `scripts/` | 同期・検証・MCP・ヘルス |
+| `shared-skills/` | ランタイム横断の skill ミラー |
+| `README.md` | 英語主 README |
+| `README.zh-CN.md` | 简体中文 |
+| `README.ja-JP.md` | 日本語 |
+| `README.ko-KR.md` | 한국어 |
+| `CLAUDE.md` | Claude Code 入口 |
+| `AGENTS.md` | Codex 入口 |
+| `CHANGELOG.md` | 変更履歴 |
+
+</div>
 
 手で編集するのは主に `.claude/` と `contracts/`。`.codex/` や `openclaw/workspaces/*` は通常 `sync:runtimes` で生成。
 

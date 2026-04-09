@@ -258,6 +258,12 @@ The practical takeaway is simple:
 
 Claude Code automatically reads `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, and `.mcp.json`. Just open the project and talk.
 
+<a id="meta-theory-skill-en"></a>
+
+##### meta-theory skill
+
+The **meta-theory** skill is the portable governance playbook ([`.claude/skills/meta-theory/SKILL.md`](.claude/skills/meta-theory/SKILL.md)). It is **user-invocable**: in Claude Code, type **`/meta-theory`** to load it. The skill separates **meta architecture** (agent boundaries, collaboration, governance) from **project technical architecture** (stack, modules, code layout), classifies the request into flows A–E, and routes work along the eight-stage spine (**Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution**). It is a **dispatcher**, not a substitute for execution agents: substantive work still goes to named agents (for example **`meta-warden`** as the default agent front door).
+
 #### In Codex
 
 Codex reads `AGENTS.md`, `.codex/agents/`, `.agents/skills/`, and uses `codex/config.toml.example` as the MCP wiring example. Important: **Codex is a read / execute runtime, not the canonical editing runtime**. Edit `.claude/` first, then sync to Codex with `npm run sync:runtimes`.
@@ -333,21 +339,28 @@ Remove any one of these and the method is incomplete.
 
 For **complex work** (multi-file, cross-module, or requiring multiple capabilities), Meta_Kim follows an eight-stage spine. The early chain lines up with the **four iron rules**: clarify before guessing, search before assuming, plan before rushing, verify before trusting, with **Thinking** in the middle to shape the deck and delivery shell.
 
-The eight stages read compactly as **two rows of four** (same order as the table below).
+The eight stages read compactly as **two rows of four** (same order as the table below). (A single `flowchart TB` with two horizontal `subgraph` blocks is often laid out **side by side** by Mermaid; two stacked `LR` diagrams below guarantee a true top/bottom pair.)
+
+**Row 1 — stages 1–4 (clarify → execute)**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph upper["Stages 1–4 (clarify → execute)"]
-    direction LR
-    S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
-  end
-  subgraph lower["Stages 5–8 (review → evolve)"]
-    direction LR
-    S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
-  end
-  S4 --> S5
+flowchart LR
+  S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
+```
+
+</div>
+
+**Between rows:** stage 4 `Execution` → stage 5 `Review`
+
+**Row 2 — stages 5–8 (review → evolve)**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
 ```
 
 </div>
@@ -367,6 +380,8 @@ flowchart LR
 
 </div>
 
+<div align="center">
+
 | Stage            | Purpose           | Plain-English meaning                                            |
 | ---------------- | ----------------- | ---------------------------------------------------------------- |
 | `Critical`     | Clarify           | confirm what the user actually wants before guessing             |
@@ -377,6 +392,8 @@ flowchart LR
 | `Meta-Review`  | Review the review | make sure the review standard itself is sound                    |
 | `Verification` | Close the loop    | confirm the fix really landed                                    |
 | `Evolution`    | Learn             | keep patterns, scars, and reusable knowledge                     |
+
+</div>
 
 - `Critical > Guessing`
 - `Fetch > Assuming`
@@ -409,30 +426,40 @@ This distinction matters because it is one of the easiest ways to misunderstand 
 
 There are two layers of workflow language in the project:
 
+<div align="center">
+
 | Layer                                | Defined in                              | Purpose                                                                                 |
 | ------------------------------------ | --------------------------------------- | --------------------------------------------------------------------------------------- |
 | **8-stage spine**              | `meta-theory` / `dev-governance.md` | canonical execution chain for complex development work                                  |
 | **10-phase business workflow** | `contracts/workflow-contract.json`    | run-contract language, display language, and deliverable discipline for department runs |
 
+</div>
+
 <a id="meta-kim-diagram-two-layers-en"></a>
 
-**Diagram:** one figure, two stacked rows — top row is the **execution spine** (8-stage), bottom row is the **department run contract** (10 business phases). They are parallel vocabularies; business phases do not rename spine stages.
+**Diagram:** top row is the **execution spine** (8-stage), bottom row is the **department run contract** (10 business phases). They are parallel vocabularies; business phases do not rename spine stages. (Same Mermaid caveat as elsewhere: `TB` + two horizontal `subgraph` blocks often render **side by side**; two stacked `LR` diagrams below fix that.)
+
+**Row 1 — 8-stage spine (execution backbone)**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph Spine["8-stage spine (execution backbone)"]
-    direction LR
-    A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
-    A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
-  end
-  subgraph Biz["10-phase business contract (department run)"]
-    direction LR
-    B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
-    B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
-    B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
-  end
+flowchart LR
+  A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
+  A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
+```
+
+</div>
+
+**Row 2 — 10-phase business contract (department run)**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
+  B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
+  B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
 ```
 
 </div>
@@ -576,6 +603,8 @@ Under the readable 8-stage flow, the project design also uses a hidden governanc
 
 Common state layers include:
 
+<div align="center">
+
 | State layer              | Typical values                                                      | Primary owner   | Why it exists                                                  |
 | ------------------------ | ------------------------------------------------------------------- | --------------- | -------------------------------------------------------------- |
 | `stageState`           | `Critical -> ... -> Evolution`                                    | Conductor       | track canonical stage progression                              |
@@ -584,6 +613,8 @@ Common state layers include:
 | `surfaceState`         | `debug-surface / internal-ready / public-ready`                   | Warden          | decide whether a run is displayable                            |
 | `capabilityState`      | `covered / partial / gap / escalated`                             | Scout + Artisan | make capability coverage explicit                              |
 | `agentInvocationState` | `idle / discovered / matched / dispatched / returned / escalated` | meta-theory     | enforce search-first delegation instead of lazy self-execution |
+
+</div>
 
 This skeleton is intentionally **hidden**:
 
@@ -619,12 +650,16 @@ The Verification stage does not only decide pass or fail. It also decides whethe
 
 Meta_Kim treats rollback as a layered response:
 
+<div align="center">
+
 | Rollback level   | Trigger                                               | Action                                                                        |
 | ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
 | File-level       | a regression is isolated to one file                  | restore that file to the last known good state                                |
 | Sub-task level   | one sub-task broke adjacent paths                     | rollback only that sub-task’s file set                                       |
 | Partial rollback | some sub-tasks succeeded and some failed              | keep the successful work, rollback the failed portion, then re-enter Thinking |
 | Full rollback    | cross-module contamination or invalidated assumptions | stash uncommitted changes and return to Stage 1 with a revised scope          |
+
+</div>
 
 The simple mental model is:
 
@@ -642,6 +677,8 @@ In Meta_Kim, `Evolution` is not just a conversational summary. Structural learni
 
 Typical outputs and storage locations are:
 
+<div align="center">
+
 | Output                     | Storage location                                           | Meaning                                       |
 | -------------------------- | ---------------------------------------------------------- | --------------------------------------------- |
 | Reusable patterns          | `memory/patterns/{pattern-name}.md`                      | preserve repeatable solutions                 |
@@ -650,6 +687,8 @@ Typical outputs and storage locations are:
 | Agent boundary adjustments | `.claude/agents/{agent}.md`                              | usually followed by `npm run sync:runtimes` |
 | Rhythm optimizations       | `contracts/workflow-contract.json` or Conductor defaults | improve the next dispatch cycle               |
 | Capability gap records     | `memory/capability-gaps.md`                              | keep unresolved gaps visible to Scout         |
+
+</div>
 
 If an Evolution artifact has no explicit storage location, it does not count as captured learning.
 
@@ -666,11 +705,15 @@ Each run must now also emit an explicit `writebackDecision`:
 
 ## When You Need This
 
+<div align="center">
+
 | Your situation                                    | Without Meta_Kim                                           | With Meta_Kim                                                                                    |
 | ------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | “Refactor the auth module across 6 files”       | AI jumps in, changes files, breaks things in other modules | clarifies scope first, assigns the right roles, reviews cross-module impact                      |
 | “Design a new agent for my project”             | you get a generic template that does not fit your domain   | the system asks what you need, checks existing agents first, and only creates one when necessary |
 | “My agents keep stepping on each other’s toes” | confusion, duplicated work, nobody knows who owns what     | clear ownership boundaries, governance flow, quality gates                                       |
+
+</div>
 
 **If you mostly edit one file at a time, you probably do not need this.** Meta_Kim helps when work spans files, modules, or capability boundaries.
 
@@ -720,6 +763,8 @@ Optional **soft comment-review gate**: set `META_KIM_SOFT_COMMENT_REVIEW=1`. Whe
 
 ## The eight meta agents
 
+<div align="center">
+
 | Agent              | Main job                                          | Human shorthand               |
 | ------------------ | ------------------------------------------------- | ----------------------------- |
 | `meta-warden`    | default entry, arbitration, final synthesis       | project manager / coordinator |
@@ -730,6 +775,8 @@ Optional **soft comment-review gate**: set `META_KIM_SOFT_COMMENT_REVIEW=1`. Whe
 | `meta-librarian` | memory and continuity                             | knowledge keeper              |
 | `meta-prism`     | quality review, drift detection, anti-slop checks | quality forensic reviewer     |
 | `meta-scout`     | external capability discovery and evaluation      | scout and evaluator           |
+
+</div>
 
 If you are a normal user, remember just one thing:
 
@@ -824,25 +871,30 @@ My agents keep overlapping responsibilities. Fix the organizational structure.
 
 ## Repository Structure
 
-```text
-Meta_Kim/
-├─ .claude/        Canonical source: agents, skills, hooks, settings
-├─ .codex/         Codex custom agent mirrors
-├─ .agents/        Codex project-level skill mirror
-├─ codex/          Codex global config example
-├─ openclaw/       OpenClaw workspaces, skills, config templates
-├─ contracts/      Runtime governance contracts
-├─ docs/           Internal/private notes plus selected tracked runtime docs
-├─ scripts/        Sync, validation, discovery, MCP, health scripts
-├─ shared-skills/  Shared skill mirrors across runtimes
-├─ README.md
-├─ README.zh-CN.md
-├─ README.ja-JP.md
-├─ README.ko-KR.md
-├─ CLAUDE.md
-├─ AGENTS.md
-└─ CHANGELOG.md
-```
+(Tree-style ASCII can misalign in some viewers; this table matches the repo layout.)
+
+<div align="center">
+
+| Path | Description |
+| --- | --- |
+| `.claude/` | Canonical source: agents, skills, hooks, settings |
+| `.codex/` | Codex custom agent mirrors |
+| `.agents/` | Codex project-level skill mirror |
+| `codex/` | Codex global config example |
+| `openclaw/` | OpenClaw workspaces, skills, config templates |
+| `contracts/` | Runtime governance contracts |
+| `docs/` | Internal/private notes plus selected tracked runtime docs |
+| `scripts/` | Sync, validation, discovery, MCP, health scripts |
+| `shared-skills/` | Shared skill mirrors across runtimes |
+| `README.md` | English primary README (many anchor links assume this file) |
+| `README.zh-CN.md` | Simplified Chinese |
+| `README.ja-JP.md` | Japanese |
+| `README.ko-KR.md` | Korean |
+| `CLAUDE.md` | Claude Code project entry |
+| `AGENTS.md` | Codex project entry |
+| `CHANGELOG.md` | Changelog |
+
+</div>
 
 ### Files You Should Usually Edit
 
@@ -892,6 +944,8 @@ So:
 
 Meta_Kim ships 8 hook command scripts in `.claude/settings.json` (the `Stop` event runs two of them in sequence):
 
+<div align="center">
+
 | Hook                           | Type                   | Purpose                                                             |
 | ------------------------------ | ---------------------- | ------------------------------------------------------------------- |
 | `block-dangerous-bash.mjs`   | PreToolUse/Bash        | block destructive commands (`rm -rf`, `DROP TABLE`, force-push) |
@@ -902,6 +956,8 @@ Meta_Kim ships 8 hook command scripts in `.claude/settings.json` (the `Stop` eve
 | `subagent-context.mjs`       | SubagentStart          | inject project context into spawned subagents                       |
 | `stop-console-log-audit.mjs` | Stop                   | audit modified files for `console.log` before the session ends    |
 | `stop-completion-guard.mjs`  | Stop                   | optional weak guard against premature “done” (off unless env set)   |
+
+</div>
 
 Codex and OpenClaw use their own native mechanisms for equivalent behavior.
 
@@ -948,7 +1004,7 @@ npm run graphify:check
 
 ## Quick Start (Clone to Working in 5 Minutes)
 
-**How to read on from here:** finish **One-Click / Manual Setup** below, then continue with [Runtime Entry Points](#runtime-entry-points) → [How To Use It](#how-to-use-it) → [Commands](#commands). Sections **above** Quick Start cover intent, [Meta Architecture diagrams](#meta-kim-visual-maps-en), and governance spine; deeper charts link from [Development Governance Spine](#complex-spine-en) and [Workflow Relation Map](#task-routing-en).
+**How to read on from here:** complete **One-Click / Manual Setup** below, then follow [Runtime Entry Points](#runtime-entry-points) → [How To Use It](#how-to-use-it) → [Commands](#commands). Everything **before** this Quick Start section explains product intent, [Meta Architecture diagrams](#meta-kim-visual-maps-en), and the governance spine; for deeper charts use [Development Governance Spine](#complex-spine-en) and [Workflow Relation Map](#task-routing-en). **In Claude Code**, invoke the governance playbook with **`/meta-theory`** ([meta-theory skill](#meta-theory-skill-en)).
 
 ### Prerequisites
 
@@ -969,12 +1025,16 @@ npx --yes github:KimYx0207/Meta_Kim meta-kim
 
 **UI language + check only (no writes, no install):** `--lang` matches `setup.mjs`: `en`, `zh-CN`, `ja-JP`, `ko-KR`.
 
+<div align="center">
+
 | UI language | Command |
 | --- | --- |
 | English | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang en --check` |
 | 简体中文 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang zh-CN --check` |
 | 日本語 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ja-JP --check` |
 | 한국어 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ko-KR --check` |
+
+</div>
 
 **Classic flow** (clone, then enter the directory):
 
@@ -983,6 +1043,8 @@ git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
 node setup.mjs
 ```
+
+<div align="center">
 
 | Usage                              | Description                                              |
 | ---------------------------------- | -------------------------------------------------------- |
@@ -995,6 +1057,8 @@ node setup.mjs
 | `node setup.mjs --update`          | Update all skills and dependencies                       |
 | `node setup.mjs --check`           | Environment + dependency + cross-runtime sync check      |
 | `node setup.mjs --silent`          | Non-interactive (CI / scripts)                           |
+
+</div>
 
 Wizard flow and `--check` behavior are summarized in the table above; for the full narrative see [Manual setup (step by step)](#manual-install-en) below.
 
@@ -1204,6 +1268,8 @@ The system routes each request through the matching governance stage.
 
 ## Commands
 
+<div align="center">
+
 | Command                                  | When to use it                                   | What it does                                                          |
 | ---------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
 | `npx --yes github:KimYx0207/Meta_Kim meta-kim` | **without cloning first**                  | same as `node setup.mjs` (`npx` fetches this repo)                    |
@@ -1240,6 +1306,8 @@ The system routes each request through the matching governance stage.
 | `npm run verify:all`                   | before release or after bigger changes           | runs `check + check:global:meta-theory + lightweight eval + tests` |
 | `npm run verify:all:live`              | before runtime-sensitive releases                | runs `check + check:global:meta-theory + live eval + tests`        |
 | `node scripts/agent-health-report.mjs` | when you want an overview                        | generates a health report for all 8 agents                            |
+
+</div>
 
 **Windows / PATH:** a Node process started from a GUI app or editor task may inherit a shorter `PATH` than your terminal. If `eval:agents` cannot find a CLI, first check `%APPDATA%\\npm\\`, then `where.exe`, and if needed set absolute paths through:
 

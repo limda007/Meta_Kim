@@ -167,6 +167,7 @@ flowchart LR
 - 유지보수는 **`.claude/`와 `contracts/workflow-contract.json`에서 시작**
 - `.codex/`, `openclaw/` 대부분은 생성물 또는 런타임 전용
 - 편집 후 `npm run sync:runtimes` 등으로 재동기화
+- **Claude Code**: 거버넌스 플레이북은 **`/meta-theory`**로 `meta-theory` 스킬을 불러 옵니다(정본 [`.claude/skills/meta-theory/SKILL.md`](.claude/skills/meta-theory/SKILL.md)). 기본 에이전트 정문은 `meta-warden`, 스킬은 디스패처 역할입니다. 자세한 내용은 영문 [README.md · In Claude Code](README.md#meta-theory-skill-en).
 
 ### OpenClaw 예시
 
@@ -201,21 +202,28 @@ flowchart LR
 
 ## 개발 거버넌스 척추(8단계)
 
-복잡한 작업(멀티 파일·다중 역량 등)은 8단계 척추를 따릅니다. 단계는 **2행×4**로 읽기 쉽게(아래 표와 같은 순).
+복잡한 작업(멀티 파일·다중 역량 등)은 8단계 척추를 따릅니다. 단계는 **2행×4**로 읽기 쉽게(아래 표와 같은 순). Mermaid에서 `TB`+가로 `subgraph` 둘은 나란히 배치되는 경우가 많아, 진짜 위·아래 두 줄이 되도록 `LR` 다이어그램을 둘로 나눕니다.
+
+**상단 1–4단계 (명확화 → 실행)**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph upper["1–4 단계"]
-    direction LR
-    S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
-  end
-  subgraph lower["5–8 단계"]
-    direction LR
-    S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
-  end
-  S4 --> S5
+flowchart LR
+  S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
+```
+
+</div>
+
+**연결:** `4 Execution` → `5 Review`
+
+**하단 5–8단계 (검토 → 진화)**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
 ```
 
 </div>
@@ -231,6 +239,8 @@ flowchart LR
 
 </div>
 
+<div align="center">
+
 | 단계 | 목적(요약) |
 | ---- | ---------- |
 | Critical | 추측 전 요구 명확화 |
@@ -242,31 +252,50 @@ flowchart LR
 | Verification | 수정이 실제로 반영되었는지 |
 | Evolution | 패턴·흉터·재사용 지식 기록 |
 
+</div>
+
 보충 규칙(정본): 순수 `Q / Query`만 에이전트 우회 가능. 실행 가능 작업에는 오너 필수. Thinking은 프로토콜 우선. 독립 작업은 병렬 검토.
 
 ## 8단계 척추와 비즈니스 워크플로는 다름
 
 두 층은 **별도 어휘**입니다. 비즈니스 페이즈가 척추 단계 이름을 **바꾸지 않습니다**.
 
+프로젝트에는 다음 두 층의 워크플로 어휘가 공존합니다([README.zh-CN.md](README.zh-CN.md) 대조표와 동일 구조):
+
+<div align="center">
+
+| 층 | 정의 위치 | 역할 |
+| --- | --- | --- |
+| **8단계 척추** | `meta-theory` / `dev-governance.md` | 복잡 개발 작업의 정본 실행 사슬 |
+| **비즈니스 10 페이즈** | `contracts/workflow-contract.json` | 부서 run 계약·표시·산출물 규율 |
+
+</div>
+
 <a id="meta-kim-diagram-two-layers-ko"></a>
 
-**그림:** 한 그림에 두 줄 — 위는 **실행 척추**(8단계), 아래는 **부서 run 계약**(비즈니스 10페이즈). 병렬 어휘이며 비즈니스가 척추 단계를 개명하지 않습니다.
+**그림:** 위는 **실행 척추**(8단계), 아래는 **부서 run 계약**(비즈니스 10페이즈). 병렬 어휘이며 비즈니스가 척추 단계를 개명하지 않습니다. `TB`+가로 `subgraph` 두 개는 나란히 그려질 수 있어, 위·아래를 확실히 하려고 `LR` 다이어그램을 둘로 나눕니다.
+
+**상단: 8단계 척추(실행 척추)**
 
 <div align="center">
 
 ```mermaid
-flowchart TB
-  subgraph Spine["8-stage spine (실행 척추)"]
-    direction LR
-    A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
-    A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
-  end
-  subgraph Biz["10-phase business contract (부서 run)"]
-    direction LR
-    B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
-    B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
-    B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
-  end
+flowchart LR
+  A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
+  A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
+```
+
+</div>
+
+**하단: 10페이즈 비즈니스 계약(부서 run)**
+
+<div align="center">
+
+```mermaid
+flowchart LR
+  B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
+  B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
+  B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
 ```
 
 </div>
@@ -342,6 +371,8 @@ flowchart LR
 
 ## 여덟 메타 에이전트
 
+<div align="center">
+
 | 에이전트 | 주요 역할 |
 | -------- | --------- |
 | `meta-warden` | 기본 진입·중재·최종 종합 |
@@ -352,6 +383,8 @@ flowchart LR
 | `meta-librarian` | 메모리·연속성 |
 | `meta-prism` | 품질·드리프트·안티 슬롭 |
 | `meta-scout` | 외부 역량 발견·평가 |
+
+</div>
 
 **공개 정문은 `meta-warden`.**
 
@@ -379,12 +412,16 @@ npx --yes github:KimYx0207/Meta_Kim meta-kim
 
 **UI 언어 고정 + 환경 점검만 (쓰기·설치 없음):** `--lang` 은 `en` / `zh-CN` / `ja-JP` / `ko-KR`.
 
+<div align="center">
+
 | UI 언어 | 명령 |
 | --- | --- |
 | English | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang en --check` |
 | 简体中文 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang zh-CN --check` |
 | 日本語 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ja-JP --check` |
 | 한국어 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ko-KR --check` |
+
+</div>
 
 **clone 후:**
 
@@ -394,8 +431,11 @@ cd Meta_Kim
 node setup.mjs
 ```
 
+<div align="center">
+
 | 사용법 | 설명 |
 | --- | --- |
+| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | `node setup.mjs` 와 동일. 수동 `git clone` / `cd` 생략 |
 | `node setup.mjs` | 대화형 설정 (언어 선택 → 설치/업데이트/확인) |
 | `node setup.mjs --lang en` | 언어 선택 생략, UI English |
 | `node setup.mjs --lang zh-CN` | 언어 선택 생략, UI 简体中文 |
@@ -404,6 +444,8 @@ node setup.mjs
 | `node setup.mjs --update` | 모든 스킬과 의존성 업데이트 |
 | `node setup.mjs --check` | 환경 + 의존성 + 런타임 간 동기화 확인 |
 | `node setup.mjs --silent` | 비대화형 모드 (CI/스크립트용) |
+
+</div>
 
 마법사 전체 흐름과 `--check` 의미는 위 표와 같습니다. 긴 설명은 [README.md Quick Start / Manual setup](README.md#quick-start-clone-to-working-in-5-minutes)을 보세요.
 
@@ -421,9 +463,11 @@ npm run validate
 
 전역 역량 색인: `npm run discover:global` (로컬 절대 경로 포함 → 보통 커밋하지 않음)
 
-전체 절차·명령 표는 [README.md Quick Start / Commands](README.md#quick-start-clone-to-working-in-5-minutes)를 보세요.
+전체 절차·명령 표는 영어 정본 [README.md — Commands](README.md#commands)를 보세요.
 
 ## 자주 쓰는 npm 스크립트(발췌)
+
+<div align="center">
 
 | 명령 | 용도 |
 | ---- | ---- |
@@ -435,6 +479,8 @@ npm run validate
 | `npm run validate:run -- <run.json>` | 기록된 run 아티팩트 검증 |
 | `npm run doctor:governance` | 계약·훅·미러·샘플 validate:run 좁은 헬스체크 |
 | `npm run verify:all` | 릴리스 전 넓은 스택(전역 meta-theory 동기 상태에도 의존) |
+
+</div>
 
 ## 코드 지식 그래프 (graphify)
 
@@ -460,18 +506,30 @@ npm run graphify:update
 
 ## 저장소 구조(요약)
 
-```text
-Meta_Kim/
-├─ .claude/        정본: 에이전트·스킬·훅
-├─ .codex/         Codex 미러
-├─ .agents/        Codex 프로젝트 skill 미러
-├─ openclaw/       OpenClaw workspace·스킬
-├─ contracts/      거버넌스 계약
-├─ scripts/        동기화·검증·MCP
-├─ README.md / README.zh-CN.md / README.ja-JP.md / README.ko-KR.md
-├─ CLAUDE.md / AGENTS.md
-└─ …
-```
+（트리는 뷰어에 따라 어긋날 수 있습니다. 아래 표는 [README.zh-CN.md](README.zh-CN.md)「项目结构」과 같은 단위입니다.）
+
+<div align="center">
+
+| 경로 | 설명 |
+| --- | --- |
+| `.claude/` | 정본: agents, skills, hooks, settings |
+| `.codex/` | Codex custom agents 미러 |
+| `.agents/` | Codex 프로젝트 skill 미러 |
+| `codex/` | Codex 글로벌 설정 예시 |
+| `openclaw/` | OpenClaw workspaces, skills, 템플릿 |
+| `contracts/` | 런타임 거버넌스 계약 |
+| `docs/` | 내부 메모 등, 추적 runtime 문서 소량 |
+| `scripts/` | 동기화·검증·MCP·헬스 |
+| `shared-skills/` | 런타임 간 공유 skill 미러 |
+| `README.md` | 영어 주 README |
+| `README.zh-CN.md` | 简体中文 |
+| `README.ja-JP.md` | 日本語 |
+| `README.ko-KR.md` | 한국어 |
+| `CLAUDE.md` | Claude Code 진입 |
+| `AGENTS.md` | Codex 진입 |
+| `CHANGELOG.md` | 변경 기록 |
+
+</div>
 
 직접 편집은 주로 `.claude/`와 `contracts/`. `.codex/`, `openclaw/workspaces/*`는 보통 `sync:runtimes`로 생성됩니다.
 

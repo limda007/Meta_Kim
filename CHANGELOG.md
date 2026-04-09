@@ -2,12 +2,23 @@
 
 All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
-## [Unreleased]
+## [1.2.2] - 2026-04-03
 
 ### Documentation
 
+- Align **README.ja-JP.md** and **README.ko-KR.md** with **README.md** / **README.zh-CN.md**: shared anchors (`#complex-spine-*`, `#meta-kim-diagram-two-layers-*`, `#task-routing-*`), workflow maps, runtime / eight-agent mini diagrams, and links to English canonical sections where detail stays in `README.md`.
+- Fix **Mermaid** layout: `flowchart TB` with two horizontal `subgraph` blocks often renders **side-by-side**; replace with **stacked `flowchart LR`** pairs for the eight-stage spine (rows 1–4 / 5–8) and for spine vs 10-phase business workflow.
+- Wrap Markdown **tables** in `<div align="center">` across all four READMEs so GitHub / VS Code previews center consistently (including stage tables with `Critical`, Hooks, Commands, etc.).
+- **Repository structure**: replace ASCII tree with **path | description** tables in `README.md`, `README.ja-JP.md`, and `README.ko-KR.md` (match `README.zh-CN.md` granularity); add `codex/`, `docs/`, `shared-skills/`, `CHANGELOG.md` rows where missing.
+- **JA/KO**: add the **two-layer workflow vocabulary** table (8-stage spine vs 10-phase business contract); add **`npx … meta-kim`** row to Quick Start usage tables; link abbreviated npm script lists to **`README.md#commands`** for the full command reference.
 - Document **Meta_Kim** (`node setup.mjs`) as the canonical install path for **KimYx0207/findskill**; four README languages plus `CLAUDE.md` state that **in-repo naming uses `findskill` only** (aligned with `~/.claude/skills/findskill/`).
+- **`npx` one-shot entry**: `npx github:KimYx0207/Meta_Kim meta-kim` documented as equivalent to `node setup.mjs` with per-locale `--check` examples.
+
+### Added
+
+- **Graphify** optional integration: compressed code knowledge graphs for target projects (subgraph extraction, up to ~71× token reduction), `graphify:*` npm scripts, Fetch-stage auto-detection hooks, README sections in all languages.
 
 ### Fixed
 
