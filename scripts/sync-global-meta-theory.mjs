@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Global sync: canonical meta-theory skill + Meta_Kim `.claude/hooks` into runtime homes.
- * Flags: --check, --activate-codex, --print-targets, --skip-global-hooks (skip Claude hooks copy + settings merge).
+ * Global sync: canonical meta-theory skill + Meta_Kim Claude runtime hook assets into runtime homes.
+ * Flags: --check, --print-targets, --skip-global-hooks (skip Claude hooks copy + settings merge).
  */
 
 import { createHash } from "node:crypto";
@@ -10,18 +10,23 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import {
+  canonicalRuntimeAssetsDir,
+  canonicalSkillRoot,
+  resolveTargetContext,
+} from "./meta-kim-sync-config.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
-const sourceDir = path.join(repoRoot, ".claude", "skills", "meta-theory");
+const sourceDir = canonicalSkillRoot;
 const sourceSkillFile = path.join(sourceDir, "SKILL.md");
 
 const checkOnly = process.argv.includes("--check");
-const activateCodex = process.argv.includes("--activate-codex");
 const printTargetsOnly = process.argv.includes("--print-targets");
 const skipGlobalHooks = process.argv.includes("--skip-global-hooks");
+const cliArgs = process.argv.slice(2);
 
-const repoHooksDir = path.join(repoRoot, ".claude", "hooks");
+const repoHooksDir = path.join(canonicalRuntimeAssetsDir, "claude", "hooks");
 
 const runtimeSpecs = {
   claude: {
@@ -50,6 +55,7 @@ let runtimeHomes = {};
 let allowedRoots = [];
 let activeTargets = [];
 let cleanupTargets = [];
+let selectedTargetIds = [];
 
 function assertHomeBound(targetPath) {
   const resolved = path.resolve(targetPath);
@@ -142,41 +148,27 @@ async function resolveRuntimeHome(spec) {
 }
 
 async function resolveTargets() {
+  const targetContext = await resolveTargetContext(cliArgs);
   runtimeHomes = {
     claude: await resolveRuntimeHome(runtimeSpecs.claude),
     openclaw: await resolveRuntimeHome(runtimeSpecs.openclaw),
     codex: await resolveRuntimeHome(runtimeSpecs.codex),
   };
 
+  selectedTargetIds = [...targetContext.activeTargets];
+
   allowedRoots = Object.values(runtimeHomes).map(({ dir }) => path.resolve(dir));
 
-  activeTargets = [
-    {
-      label: "Claude Code global skill",
-      dir: path.join(runtimeHomes.claude.dir, "skills", "meta-theory"),
-    },
-    {
-      label: "OpenClaw global skill",
-      dir: path.join(runtimeHomes.openclaw.dir, "skills", "meta-theory"),
-    },
-    {
-      label: activateCodex ? "Codex global skill" : "Codex standby skill",
-      dir: activateCodex
-        ? path.join(runtimeHomes.codex.dir, "skills", "meta-theory")
-        : path.join(runtimeHomes.codex.dir, "skills", ".disabled", "meta-theory"),
-    },
-  ];
+  activeTargets = selectedTargetIds.map((targetId) => ({
+    targetId,
+    label: `${runtimeSpecs[targetId].label} global skill`,
+    dir: path.join(runtimeHomes[targetId].dir, "skills", "meta-theory"),
+  }));
 
   cleanupTargets = [
     {
       label: "legacy OpenClaw flat skill",
       dir: path.join(runtimeHomes.openclaw.dir, "skills", "meta-theory.md"),
-    },
-    {
-      label: activateCodex ? "Codex standby skill" : "Codex active skill",
-      dir: activateCodex
-        ? path.join(runtimeHomes.codex.dir, "skills", ".disabled", "meta-theory")
-        : path.join(runtimeHomes.codex.dir, "skills", "meta-theory"),
     },
   ];
 }
@@ -255,7 +247,7 @@ function hookCommandNode(absScriptPath) {
   return `node ${JSON.stringify(absScriptPath)}`;
 }
 
-/** Hook blocks matching Meta_Kim canonical .claude/settings.json (absolute script paths). */
+/** Hook blocks matching Meta_Kim canonical runtime asset for Claude settings (absolute script paths). */
 function buildMetaKimHooksTemplate(absHooksDir) {
   const cmd = (name) => ({
     type: "command",
@@ -428,7 +420,7 @@ async function runCheck() {
     }
   }
 
-  if (!skipGlobalHooks) {
+  if (selectedTargetIds.includes("claude") && !skipGlobalHooks) {
     const repoHooksFp = await fingerprintDir(repoHooksDir);
     const globalHooksPath = globalMetaKimHooksDir();
     const globalHooksFp = await fingerprintDir(globalHooksPath);
@@ -465,12 +457,12 @@ async function runSync() {
     console.log(`Synced ${target.label}: ${target.dir}`);
   }
 
-  if (!skipGlobalHooks) {
+  if (selectedTargetIds.includes("claude") && !skipGlobalHooks) {
     await copyCanonicalHooksToGlobal();
     console.log(`Synced Claude Code global hooks: ${globalMetaKimHooksDir()}`);
     await syncClaudeGlobalSettingsHooks();
   } else {
-    console.log("Skipped Claude Code global hooks (--skip-global-hooks).");
+    console.log("Skipped Claude Code global hooks.");
   }
 }
 
@@ -480,7 +472,7 @@ function printTargets() {
   console.log(`- OpenClaw: ${runtimeHomes.openclaw.dir} (${runtimeHomes.openclaw.source})`);
   console.log(`- Codex: ${runtimeHomes.codex.dir} (${runtimeHomes.codex.source})`);
   console.log("");
-  console.log("Resolved sync targets:");
+  console.log("Resolved active targets:");
   for (const target of activeTargets) {
     console.log(`- ${target.label}: ${target.dir}`);
   }

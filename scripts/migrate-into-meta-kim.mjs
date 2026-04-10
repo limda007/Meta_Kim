@@ -19,6 +19,8 @@ if (!sourceArg) {
 const SAFE_PATTERNS = [
   /^SOUL\.md$/i,
   /^AGENTS\.md$/i,
+  /^canonical\/agents\/.+\.md$/i,
+  /^canonical\/skills\/.+\/SKILL\.md$/i,
   /^\.claude\/agents\/.+\.md$/i,
   /^\.claude\/skills\/.+\/SKILL\.md$/i,
   /^contracts\/.+\.(json|ya?ml)$/i,

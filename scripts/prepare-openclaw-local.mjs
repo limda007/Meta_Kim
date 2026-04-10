@@ -2,11 +2,8 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
+import { canonicalAgentsDir } from "./meta-kim-sync-config.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..");
-const claudeAgentsDir = path.join(repoRoot, ".claude", "agents");
 const openclawAgentsRoot = path.join(os.homedir(), ".openclaw", "agents");
 const sourceAgentDir = path.join(openclawAgentsRoot, "main", "agent");
 const filesToMirror = ["auth.json", "auth-profiles.json", "models.json"];
@@ -21,7 +18,7 @@ async function ensureExists(filePath) {
 }
 
 async function loadAgentIds() {
-  const files = (await fs.readdir(claudeAgentsDir))
+  const files = (await fs.readdir(canonicalAgentsDir))
     .filter((file) => file.endsWith(".md"))
     .sort();
 

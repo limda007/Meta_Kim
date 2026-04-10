@@ -27,9 +27,9 @@ let scenarios;
 
 async function loadFixtures() {
   if (!skillContent) {
-    skillContent = await readFile(".claude/skills/meta-theory/SKILL.md");
+    skillContent = await readFile("canonical/skills/meta-theory/SKILL.md");
     const createAgent = await readFile(
-      ".claude/skills/meta-theory/references/create-agent.md"
+      "canonical/skills/meta-theory/references/create-agent.md"
     );
     pipelineCorpus = `${skillContent}\n${createAgent}`;
   }

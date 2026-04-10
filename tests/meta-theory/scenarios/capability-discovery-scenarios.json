@@ -5,7 +5,7 @@
     "input": "I need to find an agent that can review code quality",
     "capabilityTypes": ["AGENT", "SKILL"],
     "expectedDiscovery": {
-      "method": "MCP list_meta_agents + local .claude/agents/ scan",
+      "method": "MCP list_meta_agents + local canonical/agents/ scan",
       "scoring": "capability description matching (0-3), not name matching",
       "expectedAgents": ["meta-prism"],
       "expectedSkills": []
@@ -197,7 +197,7 @@
       "method": "recurring gap (>=3 occurrences) -> patternReuse writeback",
       "scoring": "Evolution triggers Type B for recurring gap",
       "expectedWriteback": {
-        "target": ".claude/agents/blockchain-developer.md",
+        "target": "canonical/agents/blockchain-developer.md",
         "reason": "recurring gap >= 3 times"
       }
     },

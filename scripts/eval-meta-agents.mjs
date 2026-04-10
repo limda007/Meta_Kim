@@ -6,6 +6,10 @@ import path from "node:path";
 import process from "node:process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import {
+  canonicalAgentsDir,
+  canonicalRuntimeAssetsDir,
+} from "./meta-kim-sync-config.mjs";
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,8 +29,11 @@ const selectedRuntimes = new Set(
         .filter(Boolean)
     : ["claude", "codex", "openclaw"]
 );
-const claudeAgentsDir = path.join(repoRoot, ".claude", "agents");
-const openclawLocalConfigPath = path.join(repoRoot, "openclaw", "openclaw.local.json");
+const openclawTemplateConfigPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "openclaw",
+  "openclaw.template.json"
+);
 const prepareOpenClawScriptPath = path.join(repoRoot, "scripts", "prepare-openclaw-local.mjs");
 const activeChildren = new Map();
 let cleanupInFlight = false;
@@ -375,8 +382,8 @@ const codexSmokeSchema = JSON.stringify({
   properties: {
     runtime: { type: "string" },
     entrypoint: { type: "string" },
-    project_skill_root: { type: "string" },
-    compat_skill_mirror: { type: "string" },
+    canonical_skill_root: { type: "string" },
+    runtime_profile: { type: "string" },
     has_meta_warden_agent: { type: "boolean" },
     mcp_supported: { type: "boolean" },
     sandbox_configurable: { type: "boolean" },
@@ -385,8 +392,8 @@ const codexSmokeSchema = JSON.stringify({
   required: [
     "runtime",
     "entrypoint",
-    "project_skill_root",
-    "compat_skill_mirror",
+    "canonical_skill_root",
+    "runtime_profile",
     "has_meta_warden_agent",
     "mcp_supported",
     "sandbox_configurable",
@@ -972,11 +979,37 @@ function scoreClaudeCase(caseConfig, payload) {
 }
 
 async function loadClaudeAgentIds() {
-  const files = (await fs.readdir(claudeAgentsDir))
+  const files = (await fs.readdir(canonicalAgentsDir))
     .filter((file) => file.endsWith(".md"))
     .sort();
 
   return files.map((file) => file.replace(/\.md$/, ""));
+}
+
+async function createOpenClawEvalConfig() {
+  const rawConfig = JSON.parse(await fs.readFile(openclawTemplateConfigPath, "utf8"));
+  const defaultModel = rawConfig?.agents?.defaults?.model;
+  const config = {
+    ...rawConfig,
+    agents: {
+      ...rawConfig.agents,
+      list: (rawConfig.agents?.list ?? []).map((agent) => ({
+        ...agent,
+        workspace: String(agent.workspace ?? "")
+          .replace("__REPO_ROOT__\\", `${repoRoot}\\`)
+          .replace("__REPO_ROOT__/", `${repoRoot}/`),
+        ...(typeof defaultModel === "string" && defaultModel.trim()
+          ? { model: defaultModel.trim() }
+          : {}),
+      })),
+    },
+  };
+
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "meta-kim-openclaw-"));
+  const configPath = path.join(tempDir, "openclaw.eval.json");
+  await fs.writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+
+  return { tempDir, configPath };
 }
 
 async function runClaudeDiscovery(agentIds) {
@@ -1137,8 +1170,8 @@ async function runCodexSmoke() {
     runtime: "codex",
     cli_version: versionStdout.trim(),
     entrypoint: "AGENTS.md",
-    project_skill_root: ".agents/skills/meta-theory",
-    compat_skill_mirror: ".codex/skills/meta-theory.md",
+    canonical_skill_root: "canonical/skills/meta-theory",
+    runtime_profile: "runtimes/codex.profile.json",
     custom_agents: codexAgentFiles.map((file) => file.replace(/\.toml$/, "")),
     mcp_supported: configExample.includes("[mcp_servers.meta_kim_runtime]"),
     sandbox_configurable: configExample.includes("sandbox_mode"),
@@ -1148,8 +1181,8 @@ async function runCodexSmoke() {
   const structuralOk =
     payload.runtime === "codex" &&
     payload.entrypoint === "AGENTS.md" &&
-    payload.project_skill_root === ".agents/skills/meta-theory" &&
-    payload.compat_skill_mirror === ".codex/skills/meta-theory.md" &&
+    payload.canonical_skill_root === "canonical/skills/meta-theory" &&
+    payload.runtime_profile === "runtimes/codex.profile.json" &&
     payload.custom_agents.includes("meta-warden") &&
     payload.mcp_supported === true &&
     payload.sandbox_configurable === true &&
@@ -1199,8 +1232,8 @@ async function runCodexLive() {
     runtime: "codex",
     cli_version: versionStdout.trim(),
     entrypoint: "AGENTS.md",
-    project_skill_root: ".agents/skills/meta-theory",
-    compat_skill_mirror: ".codex/skills/meta-theory.md",
+    canonical_skill_root: "canonical/skills/meta-theory",
+    runtime_profile: "runtimes/codex.profile.json",
     custom_agents: codexAgentFiles.map((file) => file.replace(/\.toml$/, "")),
     mcp_supported: configExample.includes("[mcp_servers.meta_kim_runtime]"),
     sandbox_configurable: configExample.includes("sandbox_mode"),
@@ -1210,8 +1243,8 @@ async function runCodexLive() {
   const structuralOk =
     payload.runtime === "codex" &&
     payload.entrypoint === "AGENTS.md" &&
-    payload.project_skill_root === ".agents/skills/meta-theory" &&
-    payload.compat_skill_mirror === ".codex/skills/meta-theory.md" &&
+    payload.canonical_skill_root === "canonical/skills/meta-theory" &&
+    payload.runtime_profile === "runtimes/codex.profile.json" &&
     payload.custom_agents.includes("meta-warden") &&
     payload.mcp_supported === true &&
     payload.sandbox_configurable === true &&
@@ -1226,8 +1259,8 @@ async function runCodexLive() {
     const prompt =
       "Read the current Meta_Kim repository and reply with JSON only. " +
       'runtime must be "codex". entrypoint must be "AGENTS.md". ' +
-      'project_skill_root must be ".agents/skills/meta-theory". ' +
-      'compat_skill_mirror must be ".codex/skills/meta-theory.md". ' +
+      'canonical_skill_root must be "canonical/skills/meta-theory". ' +
+      'runtime_profile must be "runtimes/codex.profile.json". ' +
       "has_meta_warden_agent must be true only if the repo exposes that custom agent. " +
       "mcp_supported, sandbox_configurable, and approvals_configurable must reflect the repository configuration. " +
       "Do not modify files.";
@@ -1281,8 +1314,8 @@ async function runCodexLive() {
     structuralOk &&
     runtimePayload?.runtime === "codex" &&
     runtimePayload?.entrypoint === "AGENTS.md" &&
-    runtimePayload?.project_skill_root === ".agents/skills/meta-theory" &&
-    runtimePayload?.compat_skill_mirror === ".codex/skills/meta-theory.md" &&
+    runtimePayload?.canonical_skill_root === "canonical/skills/meta-theory" &&
+    runtimePayload?.runtime_profile === "runtimes/codex.profile.json" &&
     runtimePayload?.has_meta_warden_agent === true &&
     runtimePayload?.mcp_supported === true &&
     runtimePayload?.sandbox_configurable === true &&
@@ -1311,10 +1344,11 @@ async function collectOpenClawBaseStatus() {
   );
 
   const command = await resolveOpenClawCommand();
+  const tempConfig = await createOpenClawEvalConfig();
   const env = {
     ...process.env,
     NO_COLOR: "1",
-    OPENCLAW_CONFIG_PATH: openclawLocalConfigPath,
+    OPENCLAW_CONFIG_PATH: tempConfig.configPath,
   };
 
   const validation = await runCommandWithIgnoredStdin(
@@ -1364,6 +1398,7 @@ async function collectOpenClawBaseStatus() {
   return {
     command,
     env,
+    tempConfig,
     validationOutput,
     hooksDiscovery,
   };
@@ -1371,129 +1406,136 @@ async function collectOpenClawBaseStatus() {
 
 async function runOpenClawSmoke() {
   const baseStatus = await collectOpenClawBaseStatus();
-  const ok =
-    baseStatus.validationOutput.toLowerCase().includes("config valid") &&
-    baseStatus.hooksDiscovery.ok;
+  try {
+    const ok =
+      baseStatus.validationOutput.toLowerCase().includes("config valid") &&
+      baseStatus.hooksDiscovery.ok;
 
-  return {
-    status: ok ? "passed" : "failed",
-    ok,
-    mode: "smoke",
-    configOk: baseStatus.validationOutput.toLowerCase().includes("config valid"),
-    hooksOk: baseStatus.hooksDiscovery.ok,
-    hooksDiscovery: baseStatus.hooksDiscovery.output,
-    validation: baseStatus.validationOutput,
-  };
+    return {
+      status: ok ? "passed" : "failed",
+      ok,
+      mode: "smoke",
+      configOk: baseStatus.validationOutput.toLowerCase().includes("config valid"),
+      hooksOk: baseStatus.hooksDiscovery.ok,
+      hooksDiscovery: baseStatus.hooksDiscovery.output,
+      validation: baseStatus.validationOutput,
+    };
+  } finally {
+    await fs.rm(baseStatus.tempConfig.tempDir, { recursive: true, force: true });
+  }
 }
 
 async function runOpenClawLive() {
   const baseStatus = await collectOpenClawBaseStatus();
+  try {
+    const smokeAgents = await loadClaudeAgentIds();
+    const agentResults = [];
 
-  const smokeAgents = await loadClaudeAgentIds();
-  const agentResults = [];
+    for (const agentId of smokeAgents) {
+      try {
+        logProgress(`OpenClaw live case ${agentResults.length + 1}/${smokeAgents.length}: ${agentId}`);
+        const caseConfig = claudeCases[agentId];
+        const prompt =
+          "你正在做 Meta_Kim 元 agent 角色边界自检。只输出一段 JSON，不要解释。" +
+          `agent 必须精确写 ${agentId}（不能翻译、不能改写、不能写角色名）。` +
+          "owns：字符串数组，恰好 3 条，每条是你明确负责的短句；" +
+          "refuses：字符串数组，恰好 2 条，每条是你明确不负责的短句；" +
+          "artifact：一个字符串，你最核心的产物；" +
+          "delegates_to：字符串数组，恰好 2 个 agent id，跨边界时最常委派给谁。";
+        const sessionId = `eval-${agentId}-${crypto.randomUUID()}`;
+        const { stdout, stderr } = await runCommandWithIgnoredStdin(
+          baseStatus.command.file,
+          baseStatus.command.toArgs([
+            "agent",
+            "--local",
+            "--agent",
+            agentId,
+            "--session-id",
+            sessionId,
+            "--message",
+            prompt,
+            "--json",
+            "--timeout",
+            "120",
+          ]),
+          {
+            cwd: repoRoot,
+            timeout: 180_000,
+            env: baseStatus.env,
+          }
+        );
 
-  for (const agentId of smokeAgents) {
-    try {
-      logProgress(`OpenClaw live case ${agentResults.length + 1}/${smokeAgents.length}: ${agentId}`);
-      const caseConfig = claudeCases[agentId];
-      const prompt =
-        "你正在做 Meta_Kim 元 agent 角色边界自检。只输出一段 JSON，不要解释。" +
-        `agent 必须精确写 ${agentId}（不能翻译、不能改写、不能写角色名）。` +
-        "owns：字符串数组，恰好 3 条，每条是你明确负责的短句；" +
-        "refuses：字符串数组，恰好 2 条，每条是你明确不负责的短句；" +
-        "artifact：一个字符串，你最核心的产物；" +
-        "delegates_to：字符串数组，恰好 2 个 agent id，跨边界时最常委派给谁。";
-      const sessionId = `eval-${agentId}-${crypto.randomUUID()}`;
-      const { stdout, stderr } = await runCommandWithIgnoredStdin(
-        baseStatus.command.file,
-        baseStatus.command.toArgs([
-          "agent",
-          "--local",
-          "--agent",
+        const payload = extractOpenClawReply(mergeCommandOutput(stdout, stderr));
+        const injectionOk =
+          payload.wrapper?.meta?.systemPromptReport?.injectedWorkspaceFiles?.every(
+            (item) => item.missing === false
+          ) ?? false;
+        const injectedWorkspaceFiles =
+          payload.wrapper?.meta?.systemPromptReport?.injectedWorkspaceFiles?.map((item) => ({
+            name: item.name,
+            missing: item.missing,
+            truncated: item.truncated,
+          })) ?? [];
+
+        const structuralOk = openClawStructuredPayloadLooksReal(agentId, payload);
+        const scored = caseConfig
+          ? scoreClaudeCase(caseConfig, payload)
+          : { score: 0, matchedGroups: [], missedGroups: ["missing-case-config"] };
+        const scoutDrift =
+          agentId === "meta-scout" && metaScoutOwnsDriftsArtisanOrConductor(payload);
+        const boundaryOk =
+          structuralOk &&
+          caseConfig != null &&
+          scored.score >= OPENCLAW_BOUNDARY_SCORE_MIN &&
+          !scoutDrift;
+
+        agentResults.push({
           agentId,
-          "--session-id",
-          sessionId,
-          "--message",
-          prompt,
-          "--json",
-          "--timeout",
-          "120",
-        ]),
-        {
-          cwd: repoRoot,
-          timeout: 180_000,
-          env: baseStatus.env,
-        }
-      );
-
-      const payload = extractOpenClawReply(mergeCommandOutput(stdout, stderr));
-      const injectionOk =
-        payload.wrapper?.meta?.systemPromptReport?.injectedWorkspaceFiles?.every(
-          (item) => item.missing === false
-        ) ?? false;
-      const injectedWorkspaceFiles =
-        payload.wrapper?.meta?.systemPromptReport?.injectedWorkspaceFiles?.map((item) => ({
-          name: item.name,
-          missing: item.missing,
-          truncated: item.truncated,
-        })) ?? [];
-
-      const structuralOk = openClawStructuredPayloadLooksReal(agentId, payload);
-      const scored = caseConfig
-        ? scoreClaudeCase(caseConfig, payload)
-        : { score: 0, matchedGroups: [], missedGroups: ["missing-case-config"] };
-      const scoutDrift =
-        agentId === "meta-scout" && metaScoutOwnsDriftsArtisanOrConductor(payload);
-      const boundaryOk =
-        structuralOk &&
-        caseConfig != null &&
-        scored.score >= OPENCLAW_BOUNDARY_SCORE_MIN &&
-        !scoutDrift;
-
-      agentResults.push({
-        agentId,
-        ok: boundaryOk && injectionOk,
-        injectionOk,
-        structuralOk,
-        boundaryScore: scored.score,
-        matchedGroups: scored.matchedGroups,
-        missedGroups: scored.missedGroups,
-        ...(scoutDrift ? { scoutArtisanConductorDrift: true } : {}),
-        sample: {
-          agent: payload.agent ?? null,
-          owns: payload.owns ?? null,
-          refuses: payload.refuses ?? null,
-          artifact: payload.artifact ?? null,
-          delegates_to: payload.delegates_to ?? null,
-          injectedWorkspaceFiles,
-        },
-      });
-    } catch (error) {
-      agentResults.push({
-        agentId,
-        ok: false,
-        error: error.message,
-      });
+          ok: boundaryOk && injectionOk,
+          injectionOk,
+          structuralOk,
+          boundaryScore: scored.score,
+          matchedGroups: scored.matchedGroups,
+          missedGroups: scored.missedGroups,
+          ...(scoutDrift ? { scoutArtisanConductorDrift: true } : {}),
+          sample: {
+            agent: payload.agent ?? null,
+            owns: payload.owns ?? null,
+            refuses: payload.refuses ?? null,
+            artifact: payload.artifact ?? null,
+            delegates_to: payload.delegates_to ?? null,
+            injectedWorkspaceFiles,
+          },
+        });
+      } catch (error) {
+        agentResults.push({
+          agentId,
+          ok: false,
+          error: error.message,
+        });
+      }
     }
-  }
 
-  return {
-    status:
-      baseStatus.validationOutput.toLowerCase().includes("config valid") &&
-      baseStatus.hooksDiscovery.ok &&
-      agentResults.every((result) => result.ok && result.injectionOk)
-        ? "passed"
-        : "failed",
-    ok:
-      baseStatus.validationOutput.toLowerCase().includes("config valid") &&
-      baseStatus.hooksDiscovery.ok &&
-      agentResults.every((result) => result.ok && result.injectionOk),
-    configOk: baseStatus.validationOutput.toLowerCase().includes("config valid"),
-    hooksOk: baseStatus.hooksDiscovery.ok,
-    hooksDiscovery: baseStatus.hooksDiscovery.output,
-    validation: baseStatus.validationOutput,
-    agentResults,
-  };
+    return {
+      status:
+        baseStatus.validationOutput.toLowerCase().includes("config valid") &&
+        baseStatus.hooksDiscovery.ok &&
+        agentResults.every((result) => result.ok && result.injectionOk)
+          ? "passed"
+          : "failed",
+      ok:
+        baseStatus.validationOutput.toLowerCase().includes("config valid") &&
+        baseStatus.hooksDiscovery.ok &&
+        agentResults.every((result) => result.ok && result.injectionOk),
+      configOk: baseStatus.validationOutput.toLowerCase().includes("config valid"),
+      hooksOk: baseStatus.hooksDiscovery.ok,
+      hooksDiscovery: baseStatus.hooksDiscovery.output,
+      validation: baseStatus.validationOutput,
+      agentResults,
+    };
+  } finally {
+    await fs.rm(baseStatus.tempConfig.tempDir, { recursive: true, force: true });
+  }
 }
 
 async function main() {

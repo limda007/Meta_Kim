@@ -94,7 +94,10 @@ async function tailTranscriptFallback(transcriptPath) {
     });
     rl.on("close", () => {
       for (const line of buf) {
-        if (line.includes('"role":"assistant"') || line.includes('"role": "assistant"')) {
+        if (
+          line.includes('"role":"assistant"') ||
+          line.includes('"role": "assistant"')
+        ) {
           parts.push(line);
         }
       }
@@ -111,7 +114,9 @@ async function main() {
     process.exit(0);
   }
 
-  const mode = (process.env.META_KIM_STOP_COMPLETION_GUARD || "").trim().toLowerCase();
+  const mode = (process.env.META_KIM_STOP_COMPLETION_GUARD || "")
+    .trim()
+    .toLowerCase();
   if (!mode || mode === "0" || mode === "off" || mode === "false") {
     process.exit(0);
   }
@@ -141,7 +146,7 @@ async function main() {
 
   const reason =
     "[Meta_Kim] You claimed completion but the last assistant text did not reference verification/summary/validate:run. " +
-    "If this was a governed complex run: produce or update the run artifact, close findings, and align summaryPacket with contracts/workflow-contract.json publicDisplay gates.";
+    "If this was a governed complex run: produce or update the run artifact, close findings, and align summaryPacket with config/contracts/workflow-contract.json publicDisplay gates.";
 
   if (mode === "block") {
     process.stdout.write(JSON.stringify({ decision: "block", reason }));

@@ -84,7 +84,7 @@
         "substeps": {
           "step10_integration": {
             "dispatchTo": "meta-warden",
-            "output": ".claude/agents/{name}.md with all station deliverables preserved"
+            "output": "canonical/agents/{name}.md with all station deliverables preserved"
           },
           "step11_verification": {
             "checks": ["Five Criteria 5/5 PASS", "No death patterns", "8 modules complete", "Skipped stations justified"]
@@ -171,7 +171,7 @@
       "phase5_integration": {
         "integration": {
           "dispatch": "Agent tool → meta-warden",
-          "output": "final .claude/agents/{name}.md",
+          "output": "final canonical/agents/{name}.md",
           "rule": "preserve station weapon packs in readable form"
         },
         "finalVerification": {

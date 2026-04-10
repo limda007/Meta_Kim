@@ -9,7 +9,7 @@ import {
 } from "./_helpers.mjs";
 
 describe("workflow-contract.json — schema compliance", async () => {
-  const contract = await readJson("contracts/workflow-contract.json");
+  const contract = await readJson("config/contracts/workflow-contract.json");
 
   test("schemaVersion exists", () => {
     assert.notEqual(contract.schemaVersion, undefined);
@@ -441,7 +441,7 @@ describe("workflow-contract.json — schema compliance", async () => {
 });
 
 describe("evolution-contract.json — schema compliance", async () => {
-  const evo = await readJson("contracts/evolution-contract.json");
+  const evo = await readJson("config/contracts/evolution-contract.json");
 
   test("schemaVersion exists", () => {
     assert.notEqual(evo.schemaVersion, undefined);
@@ -522,7 +522,7 @@ describe("evolution-contract.json — schema compliance", async () => {
 });
 
 describe("scar-protocol.md — schema compliance", async () => {
-  const content = await readFile("contracts/scar-protocol.md");
+  const content = await readFile("config/contracts/scar-protocol.md");
 
   test("all 4 scar types documented", () => {
     for (const scarType of SCAR_TYPES) {

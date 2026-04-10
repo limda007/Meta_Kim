@@ -1,38 +1,63 @@
 import { promises as fs } from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
+import {
+  canonicalAgentsDir,
+  canonicalRuntimeAssetsDir,
+  canonicalSkillPath,
+  canonicalSkillReferencesDir,
+  repoRoot,
+  resolveTargetContext,
+} from "./meta-kim-sync-config.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..");
-const claudeAgentsDir = path.join(repoRoot, ".claude", "agents");
-const claudeSkillPath = path.join(
+const claudeAgentsProjectionDir = path.join(repoRoot, ".claude", "agents");
+const claudeSkillProjectionRoot = path.join(
   repoRoot,
   ".claude",
   "skills",
   "meta-theory",
-  "SKILL.md"
 );
-const claudeSkillReferencesDir = path.join(
+const claudeHooksProjectionDir = path.join(repoRoot, ".claude", "hooks");
+const claudeSettingsProjectionPath = path.join(
   repoRoot,
   ".claude",
-  "skills",
-  "meta-theory",
-  "references"
+  "settings.json",
 );
+const claudeMcpProjectionPath = path.join(repoRoot, ".mcp.json");
 const codexLegacySkillsDir = path.join(repoRoot, ".codex", "skills");
 const codexAgentsDir = path.join(repoRoot, ".codex", "agents");
 const codexProjectSkillsDir = path.join(repoRoot, ".agents", "skills");
 const openclawDir = path.join(repoRoot, "openclaw");
 const openclawWorkspacesDir = path.join(openclawDir, "workspaces");
 const openclawSkillsDir = path.join(openclawDir, "skills");
-const sharedSkillsDir = path.join(repoRoot, "shared-skills");
 const templateConfigPath = path.join(openclawDir, "openclaw.template.json");
-const localConfigPath = path.join(openclawDir, "openclaw.local.json");
 const checkOnly = process.argv.includes("--check");
-const genericOpenClawModel =
-  process.env.META_KIM_TEMPLATE_OPENCLAW_MODEL || "claude-sonnet-4-5";
+const cliArgs = process.argv.slice(2);
+const canonicalClaudeHooksDir = path.join(
+  canonicalRuntimeAssetsDir,
+  "claude",
+  "hooks",
+);
+const canonicalClaudeSettingsPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "claude",
+  "settings.json",
+);
+const canonicalClaudeMcpPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "claude",
+  "mcp.json",
+);
+const canonicalCodexConfigExamplePath = path.join(
+  canonicalRuntimeAssetsDir,
+  "codex",
+  "config.toml.example",
+);
+const canonicalOpenClawTemplatePath = path.join(
+  canonicalRuntimeAssetsDir,
+  "openclaw",
+  "openclaw.template.json",
+);
 
 const preferredOrder = [
   "meta-warden",
@@ -111,7 +136,9 @@ function sortAgents(agents) {
 }
 
 function parseAgentPresentation(agent) {
-  const titleMatch = agent.title.match(/^(.*?)(?::\s*(.*?))?(?:\s+([^\s]+))?$/u);
+  const titleMatch = agent.title.match(
+    /^(.*?)(?::\s*(.*?))?(?:\s+([^\s]+))?$/u,
+  );
   const displayName = titleMatch?.[1]?.trim() || agent.id;
   const localizedRole = titleMatch?.[2]?.trim() || agent.description;
   const emoji = titleMatch?.[3]?.trim() || "🤖";
@@ -214,85 +241,21 @@ Store information that stays true across sessions.
 `;
 }
 
-async function readJsonIfExists(filePath) {
-  try {
-    return JSON.parse(await fs.readFile(filePath, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      return null;
-    }
-    throw error;
-  }
-}
-
-function pickPreferredModelFromProviders(providers) {
-  const candidates = [];
-
-  for (const [providerId, provider] of Object.entries(providers || {})) {
-    for (const model of provider.models || []) {
-      if (!Array.isArray(model.input) || !model.input.includes("text")) {
-        continue;
-      }
-
-      candidates.push({
-        qualifiedId: `${providerId}/${model.id}`,
-        reasoning: Boolean(model.reasoning),
-      });
-    }
-  }
-
-  if (candidates.length === 0) {
-    return null;
-  }
-
-  const preferredPatterns = [/M2\.7/i, /M2\.5/i, /sonnet/i, /opus/i, /gpt/i];
-  for (const pattern of preferredPatterns) {
-    const match = candidates.find((candidate) => pattern.test(candidate.qualifiedId));
-    if (match) {
-      return match.qualifiedId;
-    }
-  }
-
-  return (
-    candidates.find((candidate) => candidate.reasoning)?.qualifiedId ||
-    candidates[0].qualifiedId
-  );
-}
-
-async function detectLocalOpenClawModel() {
-  const explicit =
-    process.env.META_KIM_OPENCLAW_MODEL || process.env.OPENCLAW_DEFAULT_MODEL;
-  if (explicit) {
-    return explicit;
-  }
-
-  const globalConfig = await readJsonIfExists(
-    path.join(os.homedir(), ".openclaw", "openclaw.json")
-  );
-  const configuredPrimary = globalConfig?.agents?.defaults?.model?.primary;
-  if (typeof configuredPrimary === "string" && configuredPrimary.trim()) {
-    return configuredPrimary.trim();
-  }
-
-  const mainModels = await readJsonIfExists(
-    path.join(os.homedir(), ".openclaw", "agents", "main", "agent", "models.json")
-  );
-  return pickPreferredModelFromProviders(mainModels?.providers) || genericOpenClawModel;
-}
-
 async function loadAgents() {
-  const files = (await fs.readdir(claudeAgentsDir))
+  const files = (await fs.readdir(canonicalAgentsDir))
     .filter((file) => file.endsWith(".md"))
     .sort();
 
   const agents = [];
   for (const file of files) {
-    const filePath = path.join(claudeAgentsDir, file);
+    const filePath = path.join(canonicalAgentsDir, file);
     const raw = await fs.readFile(filePath, "utf8");
     const { data, body } = parseFrontmatter(raw, filePath);
 
     if (!data.name || !data.description) {
-      throw new Error(`${filePath} must define frontmatter name and description.`);
+      throw new Error(
+        `${filePath} must define frontmatter name and description.`,
+      );
     }
 
     agents.push({
@@ -302,6 +265,7 @@ async function loadAgents() {
       title: extractTitle(body, data.name),
       summary: extractSummary(body, data.description),
       role: roleFromTitle(extractTitle(body, data.name), data.description),
+      raw,
       body: body.trim(),
     });
   }
@@ -312,14 +276,13 @@ async function loadAgents() {
 function buildWorkspaceDirectory(agents) {
   const rows = agents
     .map(
-      (agent) =>
-        `| \`${agent.id}\` | ${agent.title} | ${agent.description} |`
+      (agent) => `| \`${agent.id}\` | ${agent.title} | ${agent.description} |`,
     )
     .join("\n");
 
   return `# AGENTS.md - Meta_Kim Team Directory
 
-This file is generated from \`.claude/agents/*.md\` by \`npm run sync:runtimes\`.
+This file is generated from \`canonical/agents/*.md\` by \`npm run sync:runtimes\`.
 
 Use the smallest agent whose boundary matches the task. Escalate to \`meta-warden\` when the task spans multiple agent boundaries.
 
@@ -334,7 +297,7 @@ ${rows}
 function buildSoul(agent) {
   return `# SOUL.md - ${agent.id}
 
-Generated from \`${agent.sourceFile}\`. Edit the Claude source file first, then run \`npm run sync:runtimes\`.
+Generated from \`${agent.sourceFile}\`. Edit the canonical source first, then run \`npm run sync:runtimes\`.
 
 ## Runtime Notes
 
@@ -389,80 +352,12 @@ ${teammates || "- None"}
 `;
 }
 
-function buildOpenClawHooks() {
-  return {
-    internal: {
-      enabled: true,
-      entries: {
-        "session-memory": {
-          enabled: true,
-        },
-        "command-logger": {
-          enabled: true,
-        },
-        "boot-md": {
-          enabled: true,
-        },
-      },
-    },
-  };
-}
-
-function buildOpenClawConfig(agents, workspaceRoot) {
-  return {
-    agents: {
-      defaults: {
-        model: genericOpenClawModel,
-      },
-      list: agents.map((agent, index) => ({
-        id: agent.id,
-        default: index === 0,
-        name: agent.title,
-        workspace: path.join(workspaceRoot, agent.id),
-      })),
-    },
-    bindings: [],
-    hooks: buildOpenClawHooks(),
-    tools: {
-      agentToAgent: {
-        enabled: true,
-        allow: agents.map((agent) => agent.id),
-      },
-    },
-  };
-}
-
-function buildLocalOpenClawConfig(agents, workspaceRoot, model) {
-  return {
-    agents: {
-      defaults: {
-        model,
-      },
-      list: agents.map((agent, index) => ({
-        id: agent.id,
-        default: index === 0,
-        name: agent.title,
-        workspace: path.join(workspaceRoot, agent.id),
-        model,
-      })),
-    },
-    bindings: [],
-    hooks: buildOpenClawHooks(),
-    tools: {
-      agentToAgent: {
-        enabled: true,
-        allow: agents.map((agent) => agent.id),
-      },
-    },
-  };
-}
-
 async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
 async function loadSkillReferences() {
-  const entries = await fs.readdir(claudeSkillReferencesDir, {
+  const entries = await fs.readdir(canonicalSkillReferencesDir, {
     withFileTypes: true,
   });
   const files = entries.filter((entry) => entry.isFile());
@@ -471,10 +366,10 @@ async function loadSkillReferences() {
     files.map(async (file) => ({
       name: file.name,
       content: await fs.readFile(
-        path.join(claudeSkillReferencesDir, file.name),
-        "utf8"
+        path.join(canonicalSkillReferencesDir, file.name),
+        "utf8",
       ),
-    }))
+    })),
   );
 }
 
@@ -495,7 +390,9 @@ function buildCodexAgentInstructions(agent) {
 }
 
 function buildCodexAgent(agent) {
-  const instructions = escapeTomlBasicMultiline(buildCodexAgentInstructions(agent));
+  const instructions = escapeTomlBasicMultiline(
+    buildCodexAgentInstructions(agent),
+  );
 
   return `name = "${agent.id}"
 description = "${agent.description.replace(/"/g, '\\"')}"
@@ -545,166 +442,275 @@ async function writeGeneratedJson(filePath, value) {
   return writeGeneratedFile(filePath, nextContent);
 }
 
+async function syncClaudeProjection(
+  agents,
+  portableSkill,
+  skillReferences,
+  changedFiles,
+) {
+  for (const agent of agents) {
+    if (
+      (
+        await writeGeneratedFile(
+          path.join(claudeAgentsProjectionDir, `${agent.id}.md`),
+          agent.raw,
+        )
+      ).changed
+    ) {
+      changedFiles.push(`.claude/agents/${agent.id}.md`);
+    }
+  }
+
+  if (
+    (
+      await writeGeneratedFile(
+        path.join(claudeSkillProjectionRoot, "SKILL.md"),
+        portableSkill,
+      )
+    ).changed
+  ) {
+    changedFiles.push(".claude/skills/meta-theory/SKILL.md");
+  }
+
+  for (const reference of skillReferences) {
+    if (
+      (
+        await writeGeneratedFile(
+          path.join(claudeSkillProjectionRoot, "references", reference.name),
+          reference.content,
+        )
+      ).changed
+    ) {
+      changedFiles.push(
+        `.claude/skills/meta-theory/references/${reference.name}`,
+      );
+    }
+  }
+
+  const hookEntries = (
+    await fs.readdir(canonicalClaudeHooksDir, { withFileTypes: true })
+  )
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".mjs"))
+    .sort((left, right) => left.name.localeCompare(right.name));
+
+  for (const hookEntry of hookEntries) {
+    const hookContent = await fs.readFile(
+      path.join(canonicalClaudeHooksDir, hookEntry.name),
+      "utf8",
+    );
+    if (
+      (
+        await writeGeneratedFile(
+          path.join(claudeHooksProjectionDir, hookEntry.name),
+          hookContent,
+        )
+      ).changed
+    ) {
+      changedFiles.push(`.claude/hooks/${hookEntry.name}`);
+    }
+  }
+
+  const [settingsContent, mcpContent] = await Promise.all([
+    fs.readFile(canonicalClaudeSettingsPath, "utf8"),
+    fs.readFile(canonicalClaudeMcpPath, "utf8"),
+  ]);
+
+  if (
+    (await writeGeneratedFile(claudeSettingsProjectionPath, settingsContent))
+      .changed
+  ) {
+    changedFiles.push(".claude/settings.json");
+  }
+  if ((await writeGeneratedFile(claudeMcpProjectionPath, mcpContent)).changed) {
+    changedFiles.push(".mcp.json");
+  }
+}
+
 async function main() {
+  const { cliTargets, supportedTargets } = await resolveTargetContext(cliArgs);
+  const selectedTargets = cliTargets.length > 0 ? cliTargets : supportedTargets;
   const agents = await loadAgents();
   const teamDirectory = buildWorkspaceDirectory(agents);
-  const portableSkill = await fs.readFile(claudeSkillPath, "utf8");
+  const portableSkill = await fs.readFile(canonicalSkillPath, "utf8");
   const skillReferences = await loadSkillReferences();
-  const localOpenClawModel = await detectLocalOpenClawModel();
   const changedFiles = [];
 
-  for (const agent of agents) {
-    const workspaceDir = path.join(openclawWorkspacesDir, agent.id);
-    const writes = await Promise.all([
-      writeGeneratedFile(path.join(workspaceDir, "BOOT.md"), buildBoot(agent)),
-      writeGeneratedFile(
-        path.join(workspaceDir, "BOOTSTRAP.md"),
-        buildBootstrap(agent)
-      ),
-      writeGeneratedFile(
-        path.join(workspaceDir, "IDENTITY.md"),
-        buildIdentity(agent)
-      ),
-      writeGeneratedFile(
-        path.join(workspaceDir, "MEMORY.md"),
-        buildMemory(agent)
-      ),
-      writeGeneratedFile(path.join(workspaceDir, "USER.md"), buildUser()),
-      writeGeneratedFile(path.join(workspaceDir, "SOUL.md"), buildSoul(agent)),
-      writeGeneratedFile(path.join(workspaceDir, "AGENTS.md"), teamDirectory),
-      writeGeneratedFile(
-        path.join(workspaceDir, "HEARTBEAT.md"),
-        buildHeartbeat(agent)
-      ),
-      writeGeneratedFile(
-        path.join(workspaceDir, "TOOLS.md"),
-        buildTools(agent, agents)
-      ),
-    ]);
+  if (selectedTargets.includes("claude")) {
+    await syncClaudeProjection(
+      agents,
+      portableSkill,
+      skillReferences,
+      changedFiles,
+    );
+  }
 
-    if (writes.some((result) => result.changed)) {
-      changedFiles.push(`openclaw/workspaces/${agent.id}`);
+  if (selectedTargets.includes("openclaw")) {
+    for (const agent of agents) {
+      const workspaceDir = path.join(openclawWorkspacesDir, agent.id);
+      const writes = await Promise.all([
+        writeGeneratedFile(
+          path.join(workspaceDir, "BOOT.md"),
+          buildBoot(agent),
+        ),
+        writeGeneratedFile(
+          path.join(workspaceDir, "BOOTSTRAP.md"),
+          buildBootstrap(agent),
+        ),
+        writeGeneratedFile(
+          path.join(workspaceDir, "IDENTITY.md"),
+          buildIdentity(agent),
+        ),
+        writeGeneratedFile(
+          path.join(workspaceDir, "MEMORY.md"),
+          buildMemory(agent),
+        ),
+        writeGeneratedFile(path.join(workspaceDir, "USER.md"), buildUser()),
+        writeGeneratedFile(
+          path.join(workspaceDir, "SOUL.md"),
+          buildSoul(agent),
+        ),
+        writeGeneratedFile(path.join(workspaceDir, "AGENTS.md"), teamDirectory),
+        writeGeneratedFile(
+          path.join(workspaceDir, "HEARTBEAT.md"),
+          buildHeartbeat(agent),
+        ),
+        writeGeneratedFile(
+          path.join(workspaceDir, "TOOLS.md"),
+          buildTools(agent, agents),
+        ),
+      ]);
+
+      if (writes.some((result) => result.changed)) {
+        changedFiles.push(`openclaw/workspaces/${agent.id}`);
+      }
     }
-  }
 
-  const templateConfig = buildOpenClawConfig(
-    agents,
-    "__REPO_ROOT__/openclaw/workspaces"
-  );
-  const localConfig = buildLocalOpenClawConfig(
-    agents,
-    path.join(repoRoot, "openclaw", "workspaces"),
-    localOpenClawModel
-  );
+    const templateConfig = JSON.parse(
+      await fs.readFile(canonicalOpenClawTemplatePath, "utf8"),
+    );
 
-  if ((await writeGeneratedJson(templateConfigPath, templateConfig)).changed) {
-    changedFiles.push("openclaw/openclaw.template.json");
-  }
-  if ((await writeGeneratedJson(localConfigPath, localConfig)).changed) {
-    changedFiles.push("openclaw/openclaw.local.json");
-  }
-  if (
-    (await writeGeneratedFile(
-      path.join(sharedSkillsDir, "meta-theory.md"),
-      portableSkill
-    )).changed
-  ) {
-    changedFiles.push("shared-skills/meta-theory.md");
-  }
-  for (const reference of skillReferences) {
+    if (
+      (await writeGeneratedJson(templateConfigPath, templateConfig)).changed
+    ) {
+      changedFiles.push("openclaw/openclaw.template.json");
+    }
     if (
       (
         await writeGeneratedFile(
-          path.join(sharedSkillsDir, "references", reference.name),
-          reference.content
+          path.join(openclawSkillsDir, "meta-theory.md"),
+          portableSkill,
         )
       ).changed
     ) {
-      changedFiles.push(`shared-skills/references/${reference.name}`);
+      changedFiles.push("openclaw/skills/meta-theory.md");
+    }
+    for (const reference of skillReferences) {
+      if (
+        (
+          await writeGeneratedFile(
+            path.join(openclawSkillsDir, "references", reference.name),
+            reference.content,
+          )
+        ).changed
+      ) {
+        changedFiles.push(`openclaw/skills/references/${reference.name}`);
+      }
     }
   }
-  if (
-    (await writeGeneratedFile(
-      path.join(openclawSkillsDir, "meta-theory.md"),
-      portableSkill
-    )).changed
-  ) {
-    changedFiles.push("openclaw/skills/meta-theory.md");
-  }
-  for (const reference of skillReferences) {
+
+  if (selectedTargets.includes("codex")) {
     if (
       (
         await writeGeneratedFile(
-          path.join(openclawSkillsDir, "references", reference.name),
-          reference.content
+          path.join(codexLegacySkillsDir, "meta-theory.md"),
+          portableSkill,
         )
       ).changed
     ) {
-      changedFiles.push(`openclaw/skills/references/${reference.name}`);
+      changedFiles.push(".codex/skills/meta-theory.md");
     }
-  }
-  if (
-    (await writeGeneratedFile(
-      path.join(codexLegacySkillsDir, "meta-theory.md"),
-      portableSkill
-    )).changed
-  ) {
-    changedFiles.push(".codex/skills/meta-theory.md");
-  }
-  for (const reference of skillReferences) {
+    for (const reference of skillReferences) {
+      if (
+        (
+          await writeGeneratedFile(
+            path.join(codexLegacySkillsDir, "references", reference.name),
+            reference.content,
+          )
+        ).changed
+      ) {
+        changedFiles.push(`.codex/skills/references/${reference.name}`);
+      }
+    }
     if (
       (
         await writeGeneratedFile(
-          path.join(codexLegacySkillsDir, "references", reference.name),
-          reference.content
+          path.join(codexProjectSkillsDir, "meta-theory", "SKILL.md"),
+          portableSkill,
         )
       ).changed
     ) {
-      changedFiles.push(`.codex/skills/references/${reference.name}`);
+      changedFiles.push(".agents/skills/meta-theory/SKILL.md");
     }
-  }
-  if (
-    (await writeGeneratedFile(
-      path.join(codexProjectSkillsDir, "meta-theory", "SKILL.md"),
-      portableSkill
-    )).changed
-  ) {
-    changedFiles.push(".agents/skills/meta-theory/SKILL.md");
-  }
-  for (const reference of skillReferences) {
     if (
       (
         await writeGeneratedFile(
           path.join(
             codexProjectSkillsDir,
             "meta-theory",
-            "references",
-            reference.name
+            "agents",
+            "openai.yaml",
           ),
-          reference.content
+          buildCodexSkillMetadata(),
         )
       ).changed
     ) {
-      changedFiles.push(`.agents/skills/meta-theory/references/${reference.name}`);
+      changedFiles.push(".agents/skills/meta-theory/agents/openai.yaml");
     }
-  }
-  if (
-    (await writeGeneratedFile(
-      path.join(codexProjectSkillsDir, "meta-theory", "agents", "openai.yaml"),
-      buildCodexSkillMetadata()
-    )).changed
-  ) {
-    changedFiles.push(".agents/skills/meta-theory/agents/openai.yaml");
-  }
-
-  for (const agent of agents) {
+    for (const reference of skillReferences) {
+      if (
+        (
+          await writeGeneratedFile(
+            path.join(
+              codexProjectSkillsDir,
+              "meta-theory",
+              "references",
+              reference.name,
+            ),
+            reference.content,
+          )
+        ).changed
+      ) {
+        changedFiles.push(
+          `.agents/skills/meta-theory/references/${reference.name}`,
+        );
+      }
+    }
+    const codexConfigExample = await fs.readFile(
+      canonicalCodexConfigExamplePath,
+      "utf8",
+    );
     if (
-      (await writeGeneratedFile(
-        path.join(codexAgentsDir, `${agent.id}.toml`),
-        buildCodexAgent(agent)
-      )).changed
+      (
+        await writeGeneratedFile(
+          path.join(repoRoot, "codex", "config.toml.example"),
+          codexConfigExample,
+        )
+      ).changed
     ) {
-      changedFiles.push(`.codex/agents/${agent.id}.toml`);
+      changedFiles.push("codex/config.toml.example");
+    }
+
+    for (const agent of agents) {
+      if (
+        (
+          await writeGeneratedFile(
+            path.join(codexAgentsDir, `${agent.id}.toml`),
+            buildCodexAgent(agent),
+          )
+        ).changed
+      ) {
+        changedFiles.push(`.codex/agents/${agent.id}.toml`);
+      }
     }
   }
 
@@ -723,34 +729,49 @@ async function main() {
   }
 
   const byLayer = {
-    "Claude Code/.claude/agents/": changedFiles.filter((f) => f.startsWith(".claude/agents/")).length,
-    "Claude Code/.claude/skills/": changedFiles.filter((f) => f.startsWith(".claude/skills/")).length,
-    "Codex/.codex/agents/": changedFiles.filter((f) => f.startsWith(".codex/agents/")).length,
-    "Codex/.codex/skills/": changedFiles.filter((f) => f.startsWith(".codex/skills/")).length,
-    "Codex/.agents/skills/": changedFiles.filter((f) => f.startsWith(".agents/skills/")).length,
-    "OpenClaw/openclaw/workspaces/": changedFiles.filter((f) => f.startsWith("openclaw/workspaces/")).length,
-    "OpenClaw/openclaw/skills/": changedFiles.filter((f) => f.startsWith("openclaw/skills/")).length,
-    "OpenClaw/shared-skills/": changedFiles.filter((f) => f.startsWith("shared-skills/")).length,
-    "OpenClaw/model:": 0,
+    "Claude Code/.claude/agents/": changedFiles.filter((f) =>
+      f.startsWith(".claude/agents/"),
+    ).length,
+    "Claude Code/.claude/skills/": changedFiles.filter((f) =>
+      f.startsWith(".claude/skills/"),
+    ).length,
+    "Codex/.codex/agents/": changedFiles.filter((f) =>
+      f.startsWith(".codex/agents/"),
+    ).length,
+    "Codex/.codex/skills/": changedFiles.filter((f) =>
+      f.startsWith(".codex/skills/"),
+    ).length,
+    "Codex/.agents/skills/": changedFiles.filter((f) =>
+      f.startsWith(".agents/skills/"),
+    ).length,
+    "OpenClaw/openclaw/workspaces/": changedFiles.filter((f) =>
+      f.startsWith("openclaw/workspaces/"),
+    ).length,
+    "OpenClaw/openclaw/skills/": changedFiles.filter((f) =>
+      f.startsWith("openclaw/skills/"),
+    ).length,
   };
 
   // Group by runtime
   const groups = {
-    "Claude Code": ["Claude Code/.claude/agents/", "Claude Code/.claude/skills/"],
-    "Codex": ["Codex/.codex/agents/", "Codex/.codex/skills/", "Codex/.agents/skills/"],
-    "OpenClaw": ["OpenClaw/openclaw/workspaces/", "OpenClaw/openclaw/skills/", "OpenClaw/shared-skills/", "OpenClaw/model:"],
+    "Claude Code": [
+      "Claude Code/.claude/agents/",
+      "Claude Code/.claude/skills/",
+    ],
+    Codex: [
+      "Codex/.codex/agents/",
+      "Codex/.codex/skills/",
+      "Codex/.agents/skills/",
+    ],
+    OpenClaw: ["OpenClaw/openclaw/workspaces/", "OpenClaw/openclaw/skills/"],
   };
 
   for (const [group, keys] of Object.entries(groups)) {
     console.log(`${group}:`);
     for (const key of keys) {
-      if (key === "OpenClaw/model:") {
-        console.log(`  model: ${localOpenClawModel}`);
-      } else {
-        const count = byLayer[key] ?? 0;
-        const relPath = key.split("/").slice(1).join("/");
-        console.log(`  ${relPath} ${count} files`);
-      }
+      const count = byLayer[key] ?? 0;
+      const relPath = key.split("/").slice(1).join("/");
+      console.log(`  ${relPath} ${count} files`);
     }
   }
 }

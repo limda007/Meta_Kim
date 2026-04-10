@@ -224,7 +224,7 @@
       { "step": 1, "agent": null, "description": "Evolution — run 5+1 evolution detection model" },
       { "step": 2, "agent": null, "description": "Write reusable patterns to memory/patterns/" },
       { "step": 3, "agent": null, "description": "Write scars to memory/scars/" },
-      { "step": 4, "agent": null, "description": "Update agent boundaries in .claude/agents/ if needed, then run npm run sync:runtimes" },
+      { "step": 4, "agent": null, "description": "Update agent boundaries in canonical/agents/ if needed, then run npm run sync:runtimes" },
       { "step": 5, "agent": null, "description": "Log capability gaps to memory/capability-gaps.md" }
     ],
     "forbiddenBehavior": "Evolution stage skipped entirely; structural lessons left floating in conversation context without writeback",

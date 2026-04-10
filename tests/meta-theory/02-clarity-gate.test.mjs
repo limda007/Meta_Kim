@@ -105,7 +105,7 @@ describe("Part B: SKILL.md Clarity Gate rule verification", async () => {
 
   test("follow-up probe strategy documented (Round 1: scope, Round 2: priorities)", async () => {
     const devGov = await readFile(
-      ".claude/skills/meta-theory/references/dev-governance.md"
+      "canonical/skills/meta-theory/references/dev-governance.md"
     );
     const combinedText = skillContent + "\n" + devGov;
     const hasRound1 = /Round\s*1.*scope/i.test(combinedText);
@@ -118,7 +118,7 @@ describe("Part B: SKILL.md Clarity Gate rule verification", async () => {
 
   test("max 2 rounds rule is documented", async () => {
     const devGov = await readFile(
-      ".claude/skills/meta-theory/references/dev-governance.md"
+      "canonical/skills/meta-theory/references/dev-governance.md"
     );
     const combinedText = skillContent + "\n" + devGov;
     const hasMaxRounds =
@@ -132,7 +132,7 @@ describe("Part B: SKILL.md Clarity Gate rule verification", async () => {
 
   test("early exit condition is documented", async () => {
     const devGov = await readFile(
-      ".claude/skills/meta-theory/references/dev-governance.md"
+      "canonical/skills/meta-theory/references/dev-governance.md"
     );
     const combinedText = skillContent + "\n" + devGov;
     const hasEarlyExit =
@@ -171,7 +171,7 @@ describe("Part B: SKILL.md Clarity Gate rule verification", async () => {
 
   test("Clarity Gate states (Confirmed / Probed / Assumed) exist in dev-governance.md", async () => {
     const devGov = await readFile(
-      ".claude/skills/meta-theory/references/dev-governance.md"
+      "canonical/skills/meta-theory/references/dev-governance.md"
     );
     const states = ["Confirmed", "Probed", "Assumed"];
     const missing = states.filter((s) => !devGov.includes(s));

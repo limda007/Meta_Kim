@@ -67,7 +67,7 @@ Before Stage 4 starts, Thinking must produce explicit protocol artifacts for the
 
 If these protocol artifacts do not exist, the run is not ready for Execution.
 
-For `governanceFlow` in `complex_dev` or `meta_analysis`, the machine-validated JSON artifact must also include **`intentPacket`** (`trueUserIntent`, `successCriteria`, `nonGoals`, `intentPacketVersion: v1`) and **`intentGatePacket`** (`ambiguitiesResolved`, `requiresUserChoice`, `defaultAssumptions`, `intentGatePacketVersion: v1`; if `requiresUserChoice` is true, include non-empty `pendingUserChoices[]`) before Execution — see `contracts/workflow-contract.json` (`protocols.intentPacket`, `protocols.intentGatePacket`, `runDiscipline.protocolFirst.intentPacketRequiredWhenGovernanceFlows` / `intentGatePacketRequiredWhenGovernanceFlows`).
+For `governanceFlow` in `complex_dev` or `meta_analysis`, the machine-validated JSON artifact must also include **`intentPacket`** (`trueUserIntent`, `successCriteria`, `nonGoals`, `intentPacketVersion: v1`) and **`intentGatePacket`** (`ambiguitiesResolved`, `requiresUserChoice`, `defaultAssumptions`, `intentGatePacketVersion: v1`; if `requiresUserChoice` is true, include non-empty `pendingUserChoices[]`) before Execution — see `config/contracts/workflow-contract.json` (`protocols.intentPacket`, `protocols.intentGatePacket`, `runDiscipline.protocolFirst.intentPacketRequiredWhenGovernanceFlows` / `intentGatePacketRequiredWhenGovernanceFlows`).
 
 ---
 
@@ -78,14 +78,14 @@ When work is not done after one pass (open review findings, `verificationPacket.
 1. **Execution / Revision** — address the highest-severity open findings; update code or docs as needed.
 2. **Review** — refresh `reviewPacket` and finding `closeState` transitions (`open` → `fixed_pending_verify` as appropriate).
 3. **Verification** — refresh `revisionResponses`, `verificationResults`, and `closeFindings` until every finding is `verified_closed` or `accepted_risk`.
-4. **Summary** — align `summaryPacket` with `contracts/workflow-contract.json` `runDiscipline.publicDisplayRequires` before setting `publicReady=true`.
+4. **Summary** — align `summaryPacket` with `config/contracts/workflow-contract.json` `runDiscipline.publicDisplayRequires` before setting `publicReady=true`.
 5. **Validate** — run `npm run validate:run -- <artifact.json>`; if it fails, run `npm run prompt:next-iteration -- <artifact.json>` and feed the printed checklist back into the orchestrator.
 
 Stop when `validate:run` passes **or** the user explicitly accepts risk with documented `accepted_risk` and honest `publicReady=false`.
 
 **Session recovery (API / compact / tool failure):** Check `.meta-kim/state/{profile}/run-index.sqlite` first for the latest validated governed run, then load the governed artifact as the source of truth. After an interrupted session, reload at minimum: `runHeader`, `taskClassification`, `intentPacket`, `intentGatePacket` (when required), `cardPlanPacket`, `dispatchEnvelopePacket`, `dispatchBoard`, `workerTaskPackets` / `workerResultPackets`, `reviewPacket`, `verificationPacket`, `summaryPacket`, `evolutionWritebackPacket`. If a local `compactionPacket` exists, use it only as continuity aid; it never replaces the governed artifact. Re-run `npm run validate:run -- <artifact.json>` before claiming closure. The same packet list is printed by `npm run prompt:next-iteration -- <artifact.json>` under **Minimal context reload**.
 
-Optional **soft todo gate** (off by default): set `META_KIM_SOFT_PUBLIC_READY_GATES=1` when running `validate:run`. If `summaryPacket.publicReady` is true, no `workerTaskPacket` may have `taskTodoState: "open"`. Omit `taskTodoState` if not tracking todos. See `contracts/workflow-contract.json` → `runDiscipline.runArtifactValidation.softPublicReadyTodoGate`.
+Optional **soft todo gate** (off by default): set `META_KIM_SOFT_PUBLIC_READY_GATES=1` when running `validate:run`. If `summaryPacket.publicReady` is true, no `workerTaskPacket` may have `taskTodoState: "open"`. Omit `taskTodoState` if not tracking todos. See `config/contracts/workflow-contract.json` → `runDiscipline.runArtifactValidation.softPublicReadyTodoGate`.
 
 Optional **soft comment-review gate**: set `META_KIM_SOFT_COMMENT_REVIEW=1` when running `validate:run`. If `summaryPacket.publicReady` is true, `summaryPacket.commentReviewAcknowledged` must be `true`. See `runDiscipline.runArtifactValidation.softCommentReviewGate`.
 
@@ -1060,7 +1060,7 @@ scar:
   "writebacks": [
     { "target": ".claude/agents/<agent>.md", "reason": "boundary drift" },
     { "target": ".claude/skills/<skill>/SKILL.md", "reason": "reusable execution pattern" },
-    { "target": "contracts/workflow-contract.json", "reason": "protocol or gate refinement" }
+    { "target": "config/contracts/workflow-contract.json", "reason": "protocol or gate refinement" }
   ],
   "scarIds": ["2026-04-02-overstep-example"],
   "syncRequired": true
@@ -1081,7 +1081,7 @@ Evolution outputs must be persisted to specific locations — not left floating 
 | **Scars** | `memory/scars/{scar-id}.yaml` | Permanent; prevention rules feed back into Critical stage checklists |
 | **New Skills** (extracted) | `.claude/skills/{skill-name}/SKILL.md` | Permanent; created via skill-creator, validated via Type D Review |
 | **Agent Boundary Adjustments** | `.claude/agents/{agent}.md` (direct edit) | Immediate; triggers `npm run sync:runtimes` |
-| **Rhythm Optimizations** | Recorded in `contracts/workflow-contract.json` or Conductor's card-deck defaults | Immediate; affects next run's dispatch board |
+| **Rhythm Optimizations** | Recorded in `config/contracts/workflow-contract.json` or Conductor's card-deck defaults | Immediate; affects next run's dispatch board |
 | **Capability Gap Records** | `memory/capability-gaps.md` | Until resolved; Scout monitors and closes when filled |
 
 **Storage Rule**: If an evolution artifact has no defined storage location, it does not count as "captured". The 5+1 model's amplification actions are only complete when the artifact is written to disk and indexed.
@@ -1102,7 +1102,7 @@ If any one of these is false, the run may produce internal notes, but it must no
 
 ## STAGE SPINE VS CONTROL CARDS
 
-**8-stage spine** (always the backbone): Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution. Business workflow **phase names** in `contracts/workflow-contract.json` (e.g. `direction`, `planning`, `execution`) are a separate vocabulary for department runs — do not relabel spine stages as “Guidance / Direction / Planning cards.”
+**8-stage spine** (always the backbone): Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution. Business workflow **phase names** in `config/contracts/workflow-contract.json` (e.g. `direction`, `planning`, `execution`) are a separate vocabulary for department runs — do not relabel spine stages as “Guidance / Direction / Planning cards.”
 
 **Control / overlay cards** (rhythm and safety — Conductor deals; not a second spine):
 

@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, "..", "..");
-export const SKILL_PATH = path.join(REPO_ROOT, ".claude", "skills", "meta-theory", "SKILL.md");
-export const REFERENCE_DIR = path.join(REPO_ROOT, ".claude", "skills", "meta-theory", "references");
-export const AGENTS_DIR = path.join(REPO_ROOT, ".claude", "agents");
+export const SKILL_PATH = path.join(REPO_ROOT, "canonical", "skills", "meta-theory", "SKILL.md");
+export const REFERENCE_DIR = path.join(REPO_ROOT, "canonical", "skills", "meta-theory", "references");
+export const AGENTS_DIR = path.join(REPO_ROOT, "canonical", "agents");
 export const CONTRACTS_DIR = path.join(REPO_ROOT, "contracts");
 
 export const ALL_TYPES = ["A", "B", "C", "D", "E"];
@@ -136,10 +136,10 @@ export async function readJson(relativePath) {
 
 /** Canonical skill + references — use for assertions whose content lives across files. */
 export async function loadMetaTheoryCorpus() {
-  const skill = await readFile(".claude/skills/meta-theory/SKILL.md");
-  const devGov = await readFile(".claude/skills/meta-theory/references/dev-governance.md");
-  const metaTheory = await readFile(".claude/skills/meta-theory/references/meta-theory.md");
-  const createAgent = await readFile(".claude/skills/meta-theory/references/create-agent.md");
+  const skill = await readFile("canonical/skills/meta-theory/SKILL.md");
+  const devGov = await readFile("canonical/skills/meta-theory/references/dev-governance.md");
+  const metaTheory = await readFile("canonical/skills/meta-theory/references/meta-theory.md");
+  const createAgent = await readFile("canonical/skills/meta-theory/references/create-agent.md");
   const combined = `${skill}\n${devGov}\n${metaTheory}\n${createAgent}`;
   return { skill, devGov, metaTheory, createAgent, combined };
 }

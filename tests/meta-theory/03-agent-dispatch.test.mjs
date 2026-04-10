@@ -36,7 +36,7 @@ let scenarios;
 
 async function ensureLoaded() {
   if (!skillContent) {
-    skillContent = await readFile(".claude/skills/meta-theory/SKILL.md");
+    skillContent = await readFile("canonical/skills/meta-theory/SKILL.md");
   }
   if (!scenarios) {
     const raw = await readJsonFile(SCENARIOS_PATH, "utf-8");
