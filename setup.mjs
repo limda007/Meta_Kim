@@ -260,8 +260,7 @@ const I18N = {
     pythonHint:
       "Install Python 3.10+ and run: pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
-    graphifyInstalling:
-      "Installing graphify (code knowledge graph, 71x token compression)...",
+    graphifyInstalling: "Installing graphify (code knowledge graph)...",
     graphifyInstalled: "graphify installed and Claude skill registered",
     graphifyInstallFailed: "graphify installation failed (non-blocking)",
     graphifyAlreadyInstalled: (v) => `graphify ${v} — already installed`,
@@ -279,8 +278,7 @@ const I18N = {
     updateSyncSkip: "Sync skipped or failed",
     updateReGlobal: "Re-select global skills directory?",
     askReselectRuntimes: "Re-select AI coding tools for this machine?",
-    askPythonToolsUpdate:
-      "Install Python graphify (code knowledge graph, 71x token compression)?",
+    askPythonToolsUpdate: "Install Python graphify (code knowledge graph)?",
     pythonToolsSkipped: "Python tools skipped",
     askGlobalSkillsUpdate: "Update global skills? (optional)",
     updateSkillsDone: "Global skills updated",
@@ -464,7 +462,7 @@ const I18N = {
     pythonHint:
       "安装 Python 3.10+ 后运行：pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
-    graphifyInstalling: "正在安装 graphify（代码知识图谱，71x token 压缩）...",
+    graphifyInstalling: "正在安装 graphify（代码知识图谱）...",
     graphifyInstalled: "graphify 已安装，Claude 技能已注册",
     graphifyInstallFailed: "graphify 安装失败（不影响其他功能）",
     graphifyAlreadyInstalled: (v) => `graphify ${v} — 已安装`,
@@ -481,8 +479,7 @@ const I18N = {
     updateSyncSkip: "未同步或同步失败",
     updateReGlobal: "是否重新选择全局技能目录？",
     askReselectRuntimes: "重新选择这台电脑的 AI 编程工具？",
-    askPythonToolsUpdate:
-      "安装 Python graphify（代码知识图谱，71x token 压缩）？",
+    askPythonToolsUpdate: "安装 Python graphify（代码知识图谱）？",
     pythonToolsSkipped: "Python 工具已跳过",
     askGlobalSkillsUpdate: "更新全局技能？（可选）",
     updateSkillsDone: "全局技能已更新",
@@ -675,8 +672,7 @@ const I18N = {
     pythonHint:
       "Python 3.10+ をインストール後：pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
-    graphifyInstalling:
-      "graphify をインストール中（コードナレッジグラフ、71x トークン圧縮）...",
+    graphifyInstalling: "graphify をインストール中（コードナレッジグラフ）...",
     graphifyInstalled: "graphify インストール完了、Claude スキル登録済み",
     graphifyInstallFailed: "graphify インストール失敗（非ブロッキング）",
     graphifyAlreadyInstalled: (v) => `graphify ${v} — インストール済み`,
@@ -697,7 +693,7 @@ const I18N = {
     askReselectRuntimes:
       "このパソコンで使うAIコーディングツールを再選択しますか？",
     askPythonToolsUpdate:
-      "Python graphify（コードナレッジグラフ、71x トークン圧縮）をインストールしますか？",
+      "Python graphify（コードナレッジグラフ）をインストールしますか？",
     pythonToolsSkipped: "Python ツールをスキップしました",
     askGlobalSkillsUpdate: "グローバルスキルを更新しますか？（オプション）",
     updateSkillsDone: "グローバルスキルが更新されました",
@@ -889,7 +885,7 @@ const I18N = {
     pythonHint:
       "Python 3.10+ 설치 후: pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
-    graphifyInstalling: "graphify 설치 중 (코드 지식 그래프, 71x 토큰 압축)...",
+    graphifyInstalling: "graphify 설치 중 (코드 지식 그래프)...",
     graphifyInstalled: "graphify 설치 완료, Claude 스킬 등록됨",
     graphifyInstallFailed: "graphify 설치 실패 (비차단)",
     graphifyAlreadyInstalled: (v) => `graphify ${v} — 이미 설치됨`,
@@ -906,8 +902,7 @@ const I18N = {
     updateSyncSkip: "동기화를 건너뛰었거나 실패했습니다",
     updateReGlobal: "전역 스킬 디렉토리를 다시 선택할까요?",
     askReselectRuntimes: "이 컴퓨터에서 사용할 AI 코딩 도구를 다시 선택할까요?",
-    askPythonToolsUpdate:
-      "Python graphify (코드 지식 그래프, 71x 토큰 압축)를 설치할까요?",
+    askPythonToolsUpdate: "Python graphify (코드 지식 그래프)를 설치할까요?",
     pythonToolsSkipped: "Python 도구 건너뜀",
     askGlobalSkillsUpdate: "전역 스킬을 업데이트할까요? (선택)",
     updateSkillsDone: "전역 스킬 업데이트 완료",
@@ -1010,7 +1005,7 @@ function info(msg) {
   log(`${C.dim}ℹ${C.reset}`, msg);
 }
 function heading(msg) {
-  console.log(`\n${C.bold}${C.section}  ▸ ${msg}${C.reset}\n`);
+  console.log(`\n${C.bold}${C.section}▸ ${msg}${C.reset}`);
 }
 
 function run(cmd, opts = {}) {
@@ -1031,7 +1026,7 @@ function run(cmd, opts = {}) {
 function detectCli(name) {
   for (const cmd of [name, `${name}.exe`]) {
     const ver = run(`${cmd} --version`);
-    if (ver) return ver;
+    if (ver) return ver.split(/\r?\n/)[0].trim();
   }
   const resolved = isWin
     ? run(`where ${name} 2>nul`)
@@ -1039,7 +1034,7 @@ function detectCli(name) {
   if (resolved) {
     const path = resolved.split(/\r?\n/)[0].trim();
     const ver = run(`"${path}" --version`);
-    if (ver) return ver;
+    if (ver) return ver.split(/\r?\n/)[0].trim();
   }
   return null;
 }
@@ -1417,6 +1412,7 @@ function checkSync(
 
   // --- Codex ---
   if (repoTargets.includes("codex")) {
+    console.log("");
     const codexAgentsDir = join(PROJECT_DIR, ".codex", "agents");
     if (existsSync(codexAgentsDir)) {
       const agents = readdirSync(codexAgentsDir).filter((f) =>
@@ -1448,6 +1444,7 @@ function checkSync(
 
   // --- OpenClaw ---
   if (repoTargets.includes("openclaw")) {
+    console.log("");
     const ocWorkspaces = join(PROJECT_DIR, "openclaw", "workspaces");
     if (existsSync(ocWorkspaces)) {
       const wsDirs = readdirSync(ocWorkspaces, { withFileTypes: true })
@@ -1490,6 +1487,7 @@ function checkSync(
 
   // --- Cursor ---
   if (repoTargets.includes("cursor")) {
+    console.log("");
     const cursorAgentsDir = join(PROJECT_DIR, ".cursor", "agents");
     if (existsSync(cursorAgentsDir)) {
       const agents = readdirSync(cursorAgentsDir).filter((f) =>
@@ -1897,23 +1895,22 @@ async function validate() {
 }
 
 function showNextSteps(runtimes) {
-  console.log("");
-  console.log(`${C.bold}${C.green}✓ ${t.setupComplete}${C.reset}`);
-  console.log("");
-  console.log(`${C.bold}  ${t.howToUse}${C.reset}
+  console.log(`${C.bold}${t.howToUse}${C.reset}
 `);
 
   if (runtimes.claude) {
-    console.log(`${C.dim}1.${C.reset} ${t.step1Open}
-     ${C.dim}cd "${PROJECT_DIR}" && claude${C.reset}
-
-  ${C.dim}2.${C.reset} ${t.step2Try}
-     ${C.dim}/meta-theory review my agent definitions${C.reset}
-
-  ${C.dim}3.${C.reset} ${t.step3Or}
-     ${C.dim}Build a user authentication system${C.reset}
-     ${C.dim}${t.step3Hint}${C.reset}
-`);
+    console.log(`${C.dim}1.${C.reset} ${t.step1Open}`);
+    console.log(`   ${C.dim}cd "${PROJECT_DIR}" && claude${C.reset}`);
+    console.log("");
+    console.log(`${C.dim}2.${C.reset} ${t.step2Try}`);
+    console.log(
+      `   ${C.dim}/meta-theory review my agent definitions${C.reset}`,
+    );
+    console.log("");
+    console.log(`${C.dim}3.${C.reset} ${t.step3Or}`);
+    console.log(`   ${C.dim}Build a user authentication system${C.reset}`);
+    console.log(`   ${C.dim}${t.step3Hint}${C.reset}`);
+    console.log("");
   }
 
   if (runtimes.codex)
@@ -1940,12 +1937,22 @@ function showNextSteps(runtimes) {
     );
   }
 
-  console.log(`${C.bold}  ${t.usefulCommands}${C.reset}
-    ${C.dim}node setup.mjs --update          # ${t.cmdUpdate}${C.reset}
-    ${C.dim}node setup.mjs --check           # ${t.cmdCheck}${C.reset}
-    ${C.dim}npm run doctor:governance         # ${t.cmdDoctor}${C.reset}
-    ${C.dim}npm run verify:all                # ${t.cmdVerify}${C.reset}
+  console.log("");
+  console.log(`${C.bold}${t.usefulCommands}${C.reset}
 `);
+  console.log(
+    `  ${C.dim}node setup.mjs --update          # ${t.cmdUpdate}${C.reset}`,
+  );
+  console.log(
+    `  ${C.dim}node setup.mjs --check           # ${t.cmdCheck}${C.reset}`,
+  );
+  console.log(
+    `  ${C.dim}npm run doctor:governance         # ${t.cmdDoctor}${C.reset}`,
+  );
+  console.log(
+    `  ${C.dim}npm run verify:all                # ${t.cmdVerify}${C.reset}`,
+  );
+  console.log("");
 }
 
 // ── Main ────────────────────────────────────────────────
@@ -2104,7 +2111,6 @@ function bannerLogo() {
   console.log(
     `${frame}  \u2503${C.dim}${center(tagline)}${C.reset}${frame}\u2503`,
   );
-  console.log(`${frame}  \u2503${blank}\u2503`);
   console.log(`${frame}  \u2503${C.dim}${center(sep)}${C.reset}${frame}\u2503`);
   console.log(`${frame}  \u2503${blank}\u2503`);
   contacts.forEach((c) => {
@@ -2143,7 +2149,7 @@ async function main() {
 
   // ── CLI shortcut modes (non-interactive) ──
   if (checkOnly) {
-    console.log(`\n  ${C.green}✓ ${t.envOk}${C.reset}\n`);
+    console.log(`\n${C.green}✓ ${t.envOk}${C.reset}\n`);
     const detectedRuntimes = await detectRuntimes();
     const targetContext = await resolveTargetContext(args);
     checkSync(detectedRuntimes, targetContext.supportedTargets);
@@ -2198,6 +2204,7 @@ async function main() {
 // ── Action runners ──────────────────────────────────────
 
 async function runInstall() {
+  const installStartTime = Date.now();
   const runtimes = await detectRuntimes();
   const activeTargets = await selectActiveTargets(runtimes);
 
@@ -2280,6 +2287,7 @@ async function runInstall() {
   }
 
   // [Optional] Python tools (graphify)
+  console.log("");
   stepNum++;
   const wantPython = await askYesNo(t.askPythonToolsUpdate, true);
   if (wantPython) {
@@ -2304,7 +2312,16 @@ async function runInstall() {
     await validate();
   });
 
-  console.log(`\n  ${C.bold}${C.green}✓ ${t.installComplete}${C.reset}\n`);
+  const totalMs = Date.now() - installStartTime;
+  const timeStr =
+    totalMs > 60000
+      ? `${(totalMs / 60000).toFixed(1)}min`
+      : totalMs > 1000
+        ? `${(totalMs / 1000).toFixed(1)}s`
+        : `${totalMs}ms`;
+  console.log(
+    `\n${C.bold}${C.green}✓ ${t.installComplete}（${timeStr}）${C.reset}\n`,
+  );
   showNextSteps(runtimes);
 }
 
@@ -2330,6 +2347,7 @@ async function runUpdate() {
   else warn(t.npmFailed);
 
   // ── 2. [Optional] Python tools (graphify) ─────────────────────────
+  console.log("");
   const wantPython = await askYesNo(t.askPythonToolsUpdate, true);
   if (wantPython) {
     await installPythonTools();
@@ -2351,6 +2369,7 @@ async function runUpdate() {
   }
 
   // ── 4. [Optional] Global skills update ─────────────────────────────
+  console.log("");
   const wantGlobalSkills = await askYesNo(t.askGlobalSkillsUpdate, true);
   if (wantGlobalSkills) {
     const updateInstallResult = runNodeScript(
@@ -2364,6 +2383,7 @@ async function runUpdate() {
   }
 
   // ── 5. [Optional] Global meta-theory sync ──────────────────────────
+  console.log("");
   const wantMetaTheory = await askYesNo(t.askMetaTheoryUpdate, true);
   if (wantMetaTheory) {
     const updateSyncResult = runNodeScript(
@@ -2379,11 +2399,11 @@ async function runUpdate() {
   // ── 6. checkSync (repo-local, project scope) ───────────────────────
   const { supportedTargets } = await resolveTargetContext(args);
   checkSync(runtimes, supportedTargets);
-  console.log(`\n  ${C.bold}${C.green}✓ ${t.updateComplete}${C.reset}\n`);
+  console.log(`\n${C.bold}${C.green}✓ ${t.updateComplete}${C.reset}\n`);
 }
 
 async function runCheck() {
-  console.log(`\n  ${C.green}✓ ${t.envOk}${C.reset}\n`);
+  console.log(`\n${C.green}✓ ${t.envOk}${C.reset}\n`);
   const runtimes = await detectRuntimes();
   const targetContext = await resolveTargetContext(args);
   checkSync(runtimes, targetContext.supportedTargets);

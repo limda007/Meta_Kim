@@ -41,3 +41,6 @@ docs/runtime-coverage-audit.md
 # Only ignore root-level images/, not docs/images/
 /images/
 
+# ========== Third-party Libraries (Downloaded at runtime) ==========
+docs/lib/
+

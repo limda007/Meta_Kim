@@ -61,8 +61,7 @@ const STRINGS = {
     pythonInstallHint:
       "Install Python 3.10+ and run: pip install graphifyy && python -m graphify claude install",
     skipGraphifyInstalled: (v) => `[SKIP] graphify already installed (${v})`,
-    installingGraphify:
-      "Installing graphify (code knowledge graph, 71x token compression)...",
+    installingGraphify: "Installing graphify (code knowledge graph)...",
     installingGraphifySkill: "Registering graphify Claude skill...",
     okGraphifyInstalled: "graphify installed and Claude skill registered",
     warnGraphifySkillFailed:
@@ -102,7 +101,7 @@ const STRINGS = {
     pythonInstallHint:
       "安装 Python 3.10+ 后运行：pip install graphifyy && python -m graphify claude install",
     skipGraphifyInstalled: (v) => `[SKIP] graphify 已安装 (${v})`,
-    installingGraphify: "正在安装 graphify（代码知识图谱，71x token 压缩）...",
+    installingGraphify: "正在安装 graphify（代码知识图谱）...",
     installingGraphifySkill: "正在注册 graphify Claude 技能...",
     okGraphifyInstalled: "graphify 已安装，Claude 技能已注册",
     warnGraphifySkillFailed: "graphify Claude 技能注册失败（不影响其他功能）",
@@ -141,8 +140,7 @@ const STRINGS = {
     pythonInstallHint:
       "Python 3.10+ インストール後：pip install graphifyy && python -m graphify claude install",
     skipGraphifyInstalled: (v) => `[SKIP] graphify インストール済み (${v})`,
-    installingGraphify:
-      "graphify をインストール中（コードナレッジグラフ、71x トークン圧縮）...",
+    installingGraphify: "graphify をインストール中（コードナレッジグラフ）...",
     installingGraphifySkill: "graphify Claude スキルを登録中...",
     okGraphifyInstalled: "graphify インストール完了、Claude スキル登録済み",
     warnGraphifySkillFailed: "graphify Claude スキル登録失敗（非ブロッキング）",
@@ -184,7 +182,7 @@ const STRINGS = {
     pythonInstallHint:
       "Python 3.10+ 설치 후: pip install graphifyy && python -m graphify claude install",
     skipGraphifyInstalled: (v) => `[SKIP] graphify 이미 설치됨 (${v})`,
-    installingGraphify: "graphify 설치 중 (코드 지식 그래프, 71x 토큰 압축)...",
+    installingGraphify: "graphify 설치 중 (코드 지식 그래프)...",
     installingGraphifySkill: "graphify Claude 스킬 등록 중...",
     okGraphifyInstalled: "graphify 설치 완료, Claude 스킬 등록됨",
     warnGraphifySkillFailed: "graphify Claude 스킬 등록 실패 (비차단)",
