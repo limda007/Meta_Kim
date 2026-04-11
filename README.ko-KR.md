@@ -145,7 +145,7 @@ flowchart LR
 
 </div>
 
-**같은 방법을 세 곳에 내려놓기** 요약(세부는 위 [그림: 정본·도구·런타임 미러](#meta-kim-visual-maps-ko)):
+**같은 방법을 네 곳에 내려놓기** 요약(세부는 위 [그림: 정본·도구·런타임 미러](#meta-kim-visual-maps-ko)):
 
 ```mermaid
 flowchart LR

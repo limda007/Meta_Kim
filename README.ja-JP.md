@@ -145,7 +145,7 @@ flowchart LR
 
 </div>
 
-**同一の方法を三か所に落とす**略図（詳細は上文 [図: 主源・ツール・ランタイム鏡像](#meta-kim-visual-maps-ja)）:
+**同一の方法を四か所に落とす**略図（詳細は上文 [図: 主源・ツール・ランタイム鏡像](#meta-kim-visual-maps-ja)）:
 
 ```mermaid
 flowchart LR

@@ -1260,7 +1260,7 @@ The system routes each request through the matching governance stage.
 | `npm run deps:install`                 | first Claude ecosystem setup                     | installs 9 global meta-skills                                         |
 | `npm run deps:update`                  | when skill dependencies need updating            | updates installed meta-skills                                         |
 | `npm run deps:install:all-runtimes`    | when local `activeTargets` need the same skill set | clones the same 9 skill repos into the selected runtime homes; runs `claude plugin install superpowers@claude-plugins-official` when Claude is active and `claude` is on PATH |
-| `npm run deps:update:all-runtimes`     | refresh all three skill trees                    | same as above with `--update`                                         |
+| `npm run deps:update:all-runtimes`     | refresh all four skill trees                    | same as above with `--update`                                         |
 | `npm run deps:install:claude-plugins`  | only official CC plugin bundles                | runs `claude plugin install …` only (no git clones)                  |
 | `npm run graphify:check`              | check graphify availability                     | verifies Python 3.10+ and graphify CLI                               |
 | `npm run graphify:install`            | install graphify                                | `pip install graphifyy` + register Claude skill                      |
