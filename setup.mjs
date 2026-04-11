@@ -461,7 +461,7 @@ const I18N = {
     stepPythonTools: "可选 Python 工具",
     pythonNotFound: "未检测到 Python 3.10+ — 跳过 graphify",
     pythonHint:
-      "安装 Python 3.10+ 后运行：pip install graphifyy && graphify claude install",
+      "安装 Python 3.10+ 后运行：pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "正在安装 graphify（代码知识图谱，71x token 压缩）...",
     graphifyInstalled: "graphify 已安装，Claude 技能已注册",
@@ -671,7 +671,7 @@ const I18N = {
     stepPythonTools: "オプション Python ツール",
     pythonNotFound: "Python 3.10+ が見つかりません — graphify をスキップ",
     pythonHint:
-      "Python 3.10+ をインストール後：pip install graphifyy && graphify claude install",
+      "Python 3.10+ をインストール後：pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling:
       "graphify をインストール中（コードナレッジグラフ、71x トークン圧縮）...",
@@ -885,7 +885,7 @@ const I18N = {
     stepPythonTools: "선택적 Python 도구",
     pythonNotFound: "Python 3.10+ 없음 — graphify 건너뜀",
     pythonHint:
-      "Python 3.10+ 설치 후: pip install graphifyy && graphify claude install",
+      "Python 3.10+ 설치 후: pip install graphifyy && python -m graphify claude install",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "graphify 설치 중 (코드 지식 그래프, 71x 토큰 압축)...",
     graphifyInstalled: "graphify 설치 완료, Claude 스킬 등록됨",

@@ -995,7 +995,7 @@ node setup.mjs
 npm run deps:install
 
 # Manual
-pip install graphifyy && graphify claude install
+pip install graphifyy && python -m graphify claude install
 
 # Check status
 npm run graphify:check

@@ -544,7 +544,7 @@ npm run migrate:meta-kim -- ../old-agent-repo --apply
 
 ```bash
 # 설치
-pip install graphifyy && graphify claude install
+pip install graphifyy && python -m graphify claude install
 
 # 상태 확인
 npm run graphify:check
