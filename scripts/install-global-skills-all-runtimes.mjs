@@ -14,8 +14,8 @@
  * CODEX_HOME, META_KIM_OPENCLAW_HOME, OPENCLAW_HOME
  */
 
-import { execFileSync, spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { execFileSync, execSync, spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -310,6 +310,42 @@ function installClaudePlugins() {
   console.log(
     `\n${C.bold}${AMBER}--- Claude Code plugins (user scope) ---${C.reset}`,
   );
+
+  // Pre-flight: verify @anthropic-ai/claude-code CLI is resolvable.
+  // On Windows, "npm config get prefix" may return "C:\home\kim\.npm-global"
+  // where the backslash after the drive letter makes Node treat it as a
+  // *relative* path — so existsSync(prefix) passes even when the dir is
+  // missing. Check for cli.js specifically to avoid false positives.
+  try {
+    const raw = execSync("npm config get prefix", { encoding: "utf8" })
+      .toString()
+      .trim();
+    if (raw && raw !== "") {
+      // Normalize to forward slashes so Node.js path handling is predictable
+      // (Windows npm returns backslashes; C:\ is relative on Windows, so
+      // existsSync("C:\home\...") wrongly returns true for non-existent dirs).
+      const prefix = raw.replace(/\\/g, "/");
+      // Build the path with forward slashes only — Node.js on Windows accepts
+      // both / and \ as separators, but mixing them causes confusion.
+      const cliPath = [
+        prefix,
+        "node_modules",
+        "@anthropic-ai",
+        "claude-code",
+        "cli.js",
+      ].join("/");
+      if (!existsSync(cliPath)) {
+        console.warn(`${C.yellow}⚠${C.reset} ${t.warnNpmPrefixBroken}`);
+        console.warn(
+          `${C.dim}  prefix="${raw}" -> "${prefix}" — cli.js not found${C.reset}`,
+        );
+        return;
+      }
+    }
+  } catch {
+    // npm unreadable — skip pre-flight, let plugin install attempt anyway
+  }
+
   const r = spawnSync("claude", ["--version"], { encoding: "utf8" });
   if (r.status !== 0) {
     console.warn(`${C.yellow}⚠${C.reset} ${t.warnClaNotFound}`);

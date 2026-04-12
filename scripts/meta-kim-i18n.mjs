@@ -51,10 +51,12 @@ const STRINGS = {
     pluginsHeader: "--- Claude Code plugins (user scope) ---",
     warnClaNotFound:
       "claude CLI not found on PATH — skip plugin install. Install Claude Code CLI, then re-run with --plugins-only.",
-    skipAlreadyInstalled: (name) => `[SKIP] ${name} — already installed`,
-    installingPlugin: (spec) => `Installing plugin: ${spec}`,
+    warnNpmPrefixBroken:
+      "npm global prefix is misconfigured. Fix ~/.npmrc: remove or correct the prefix= line, then re-run.",
     warnPluginFailed: (spec, code) =>
       `[WARN] plugin install failed: ${spec} (exit ${code})`,
+    skipAlreadyInstalled: (name) => `[SKIP] ${name} — already installed`,
+    installingPlugin: (spec) => `Installing plugin: ${spec}`,
     // Python/graphify
     pythonToolsHeader: "--- Python Tools (optional) ---",
     pythonNotFound: "Python 3.10+ not found. Skipping graphify.",
@@ -156,6 +158,8 @@ const STRINGS = {
     pluginsHeader: "--- Claude Code 插件（用户范围）---",
     warnClaNotFound:
       "未找到 claude CLI — 跳过插件安装。请先安装 Claude Code CLI，然后运行 --plugins-only。",
+    warnNpmPrefixBroken:
+      "npm 全局路径配置错误。修复 ~/.npmrc：删除或修正 prefix= 行，然后重新运行。",
     skipAlreadyInstalled: (name) => `[SKIP] ${name} — 已安装`,
     installingPlugin: (spec) => `正在安装插件：${spec}`,
     warnPluginFailed: (spec, code) =>
@@ -252,6 +256,8 @@ const STRINGS = {
     pluginsHeader: "--- Claude Code プラグイン（ユーザー範囲）---",
     warnClaNotFound:
       "claude CLI が見つかりません — プラグインインストールをスキップ。Claude Code CLI をインストール後、--plugins-only を再実行してください。",
+    warnNpmPrefixBroken:
+      "npm グローバルプレフィックスが誤っています。~/.npmrc を修正: prefix= の行を削除または修正してから再実行してください。",
     skipAlreadyInstalled: (name) => `[SKIP] ${name} — インストール済み`,
     installingPlugin: (spec) => `プラグインをインストール中：${spec}`,
     warnPluginFailed: (spec, code) =>
@@ -357,6 +363,8 @@ const STRINGS = {
     pluginsHeader: "--- Claude Code 플러그인 (사용자 범위) ---",
     warnClaNotFound:
       "claude CLI를 찾을 수 없음 — 플러그인 설치 건너뜀. Claude Code CLI를 설치한 후 --plugins-only를 다시 실행하세요.",
+    warnNpmPrefixBroken:
+      "npm 글로벌 접두사가 잘못되었습니다. ~/.npmrc을 수정: prefix= 줄을 삭제하거나 수정한 후 다시 실행하세요.",
     skipAlreadyInstalled: (name) => `[SKIP] ${name} — 이미 설치됨`,
     installingPlugin: (spec) => `플러그인 설치 중：${spec}`,
     warnPluginFailed: (spec, code) =>

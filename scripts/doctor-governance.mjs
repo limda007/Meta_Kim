@@ -50,6 +50,23 @@ const FIXTURE = path.join(
   "valid-run.json",
 );
 
+/**
+ * Normalize a hook command to its canonical hook name (e.g. "block-dangerous-bash").
+ * Handles both relative paths ("node .claude/hooks/block-dangerous-bash.mjs")
+ * and absolute Windows paths (node "C:\...\block-dangerous-bash.mjs").
+ */
+function normalizeHookName(command) {
+  const trimmed = command.trim();
+  // Strip the leading "node" and any quotes around the path
+  const withoutNode = trimmed
+    .replace(/^node\s+/, "")
+    .replace(/^["']|["']$/g, "");
+  // Strip leading dots and slashes, then extract the filename without .mjs
+  const normalized = path.normalize(withoutNode);
+  const basename = path.basename(normalized, ".mjs");
+  return basename;
+}
+
 function collectClaudeHookCommands(hooksRoot) {
   const commands = [];
   if (!hooksRoot || typeof hooksRoot !== "object") {
@@ -90,8 +107,11 @@ async function checkHooks() {
       ".claude/settings.json: missing PreToolUse or PostToolUse hooks",
     );
   }
-  const found = collectClaudeHookCommands(hooks).sort();
-  const expected = [...EXPECTED_CLAUDE_HOOK_COMMANDS].sort();
+  // Compare by hook name: normalize both relative paths and absolute paths
+  const found = collectClaudeHookCommands(hooks).map(normalizeHookName).sort();
+  const expected = [...EXPECTED_CLAUDE_HOOK_COMMANDS]
+    .map(normalizeHookName)
+    .sort();
   if (JSON.stringify(found) !== JSON.stringify(expected)) {
     throw new Error(
       `Hook command set mismatch.\n  expected (${expected.length}): ${expected.join(", ")}\n  found (${found.length}): ${found.join(", ")}`,
