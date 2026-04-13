@@ -55,36 +55,19 @@
 
 ## 联系方式与支持
 
-<div align="center">
-  <img src="docs/images/%E4%BA%8C%E7%BB%B4%E7%A0%81%E5%9F%BA%E7%A1%80%E6%AC%BE.png" alt="联系方式" width="560"/>
-  <p>
-    GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
-    𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> |
-    官网 <a href="https://www.aiking.dev/">aiking.dev</a> |
-    微信公众号：<strong>老金带你玩AI</strong>
-  </p>
-  <p>
-    飞书知识库：
-    <a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">长期更新入口</a>
-  </p>
-</div>
+![联系方式](docs/images/contact-qr.png)
 
-<div align="center">
-  <table align="center">
-    <tr>
-      <td align="center">
-        <img src="docs/images/%E5%BE%AE%E4%BF%A1.jpg" alt="微信收款码" width="220"/>
-        <br/>
-        <strong>微信支付</strong>
-      </td>
-      <td align="center">
-        <img src="docs/images/%E6%94%AF%E4%BB%98%E5%AE%9D.jpg" alt="支付宝收款码" width="220"/>
-        <br/>
-        <strong>支付宝</strong>
-      </td>
-    </tr>
-  </table>
-</div>
+GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
+𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> |
+官网 <a href="https://www.aiking.dev/">aiking.dev</a> |
+微信公众号：<strong>老金带你玩AI</strong>
+
+飞书知识库：
+<a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">长期更新入口</a>
+
+| 微信支付 | 支付宝 |
+| --- | --- |
+| ![微信收款码](docs/images/wechat-pay.jpg) | ![支付宝收款码](docs/images/alipay.jpg) |
 
 ### 方法依据与论文
 
