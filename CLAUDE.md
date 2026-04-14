@@ -241,14 +241,13 @@ Files that should usually remain derived or runtime-specific:
 - `.codex/agents/*.toml`
 - `.agents/skills/meta-theory/`
 - `.codex/skills/meta-theory.md` and `.codex/skills/references/*`
-- `shared-skills/meta-theory.md` and `shared-skills/references/*`
 - `openclaw/skills/meta-theory.md` and `openclaw/skills/references/*`
 - `openclaw/workspaces/*`
 - `.cursor/agents/*.md`
 - `.cursor/skills/meta-theory/`
 - `.cursor/mcp.json`
 
-`npm run sync:runtimes` writes the **same** portable `meta-theory` skill (main file + `references/`) into `.claude/`, `shared-skills/`, `openclaw/skills/`, `.codex/skills/`, and `.agents/skills/meta-theory/`. If those trees disagree, re-run sync from `canonical/skills/meta-theory/` — do not hand-edit projections as a second source of truth.
+`npm run sync:runtimes` writes the **same** portable `meta-theory` skill (main file + `references/`) into `.claude/`, `openclaw/skills/`, `.codex/skills/`, and `.agents/skills/meta-theory/`. If those trees disagree, re-run sync from `canonical/skills/meta-theory/` — do not hand-edit projections as a second source of truth.
 
 ### meta-theory reference language
 

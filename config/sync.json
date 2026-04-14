@@ -42,8 +42,7 @@
     "openclaw": [
       "openclaw/workspaces",
       "openclaw/skills",
-      "openclaw/openclaw.template.json",
-      "shared-skills"
+      "openclaw/openclaw.template.json"
     ],
     "cursor": [
       ".cursor/agents",

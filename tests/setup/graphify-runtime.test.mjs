@@ -6,28 +6,27 @@ import {
   extractPipShowVersion,
   formatPythonLauncher,
   runPythonModule,
+  meetsMinimumVersion,
+  checkNetworkx,
 } from "../../scripts/graphify-runtime.mjs";
 
 describe("detectPython310()", () => {
   test("detects python when version is printed to stderr", () => {
-    const python = detectPython310(
-      (command) => {
-        if (command === "python3") {
-          return {
-            status: 0,
-            stdout: "",
-            stderr: "Python 3.11.7",
-          };
-        }
+    const python = detectPython310((command) => {
+      if (command === "python3") {
         return {
-          status: 1,
+          status: 0,
           stdout: "",
-          stderr: "",
-          error: new Error("not found"),
+          stderr: "Python 3.11.7",
         };
-      },
-      "linux",
-    );
+      }
+      return {
+        status: 1,
+        stdout: "",
+        stderr: "",
+        error: new Error("not found"),
+      };
+    }, "linux");
 
     assert.equal(python.command, "python3");
     assert.equal(python.version.major, 3);
@@ -36,25 +35,22 @@ describe("detectPython310()", () => {
 
   test("prefers py -3 on Windows when available", () => {
     const calls = [];
-    const python = detectPython310(
-      (command, args) => {
-        calls.push([command, args]);
-        if (command === "py") {
-          return {
-            status: 0,
-            stdout: "Python 3.12.1",
-            stderr: "",
-          };
-        }
+    const python = detectPython310((command, args) => {
+      calls.push([command, args]);
+      if (command === "py") {
         return {
-          status: 1,
-          stdout: "",
+          status: 0,
+          stdout: "Python 3.12.1",
           stderr: "",
-          error: new Error("not found"),
         };
-      },
-      "win32",
-    );
+      }
+      return {
+        status: 1,
+        stdout: "",
+        stderr: "",
+        error: new Error("not found"),
+      };
+    }, "win32");
 
     assert.equal(python.command, "py");
     assert.deepEqual(python.args, ["-3"]);
@@ -94,6 +90,64 @@ describe("graphify helpers", () => {
   });
 
   test("formatPythonLauncher renders launcher arguments", () => {
-    assert.equal(formatPythonLauncher({ command: "py", args: ["-3"] }), "py -3");
+    assert.equal(
+      formatPythonLauncher({ command: "py", args: ["-3"] }),
+      "py -3",
+    );
+  });
+});
+
+describe("meetsMinimumVersion()", () => {
+  test("returns true when version meets minimum", () => {
+    assert.equal(meetsMinimumVersion("3.6.1", 3, 4), true);
+    assert.equal(meetsMinimumVersion("3.4.0", 3, 4), true);
+    assert.equal(meetsMinimumVersion("4.0.0", 3, 4), true);
+  });
+
+  test("returns false when version is below minimum", () => {
+    assert.equal(meetsMinimumVersion("3.1.0", 3, 4), false);
+    assert.equal(meetsMinimumVersion("3.3.9", 3, 4), false);
+    assert.equal(meetsMinimumVersion("2.9.1", 3, 4), false);
+  });
+
+  test("returns false for unparseable input", () => {
+    assert.equal(meetsMinimumVersion("unknown", 3, 4), false);
+    assert.equal(meetsMinimumVersion("", 3, 4), false);
+  });
+});
+
+describe("checkNetworkx()", () => {
+  const python = { command: "python", args: [] };
+
+  test("detects compatible networkx", () => {
+    const result = checkNetworkx(python, () => ({
+      status: 0,
+      stdout: "Name: networkx\nVersion: 3.6.1\nSummary: test",
+      stderr: "",
+    }));
+    assert.equal(result.installed, true);
+    assert.equal(result.version, "3.6.1");
+    assert.equal(result.meets, true);
+  });
+
+  test("detects incompatible networkx", () => {
+    const result = checkNetworkx(python, () => ({
+      status: 0,
+      stdout: "Name: networkx\nVersion: 3.1\nSummary: test",
+      stderr: "",
+    }));
+    assert.equal(result.installed, true);
+    assert.equal(result.version, "3.1");
+    assert.equal(result.meets, false);
+  });
+
+  test("handles missing networkx", () => {
+    const result = checkNetworkx(python, () => ({
+      status: 1,
+      stdout: "",
+      stderr: "WARNING: Package(s) not found: networkx",
+    }));
+    assert.equal(result.installed, false);
+    assert.equal(result.meets, false);
   });
 });

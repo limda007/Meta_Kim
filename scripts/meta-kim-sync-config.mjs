@@ -93,12 +93,11 @@ const runtimeProfileCatalog = {
     projection: {
       supportsRepoProjection: true,
       supportsLocalActivation: true,
-      assetTypes: ["workspaces", "skills", "config", "sharedSkills", "mcp"],
+      assetTypes: ["workspaces", "skills", "config", "mcp"],
       outputPaths: {
         workspacesDir: "openclaw/workspaces",
         skillsDir: "openclaw/skills",
         templateConfigFile: "openclaw/openclaw.template.json",
-        sharedSkillsDir: "shared-skills",
       },
     },
     activation: {
@@ -163,6 +162,44 @@ export function parseTargetsArg(argv = process.argv.slice(2)) {
   }
 
   return normalizeTargets(joinedValues.join(",").split(","));
+}
+
+/**
+ * Parse `--skills=id1,id2` / `--skills id1,id2` / `META_KIM_SKILL_IDS`.
+ * Returns null if unset (caller should treat as “all manifest skills”),
+ * or a list (possibly empty) when explicitly constrained.
+ */
+export function parseSkillsArg(argv = process.argv.slice(2)) {
+  const env = process.env.META_KIM_SKILL_IDS;
+  if (typeof env === "string" && env.trim()) {
+    return env
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  const joined = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const current = argv[index];
+    if (current === "--skills" && argv[index + 1] !== undefined) {
+      joined.push(argv[index + 1]);
+      index += 1;
+      continue;
+    }
+    if (current.startsWith("--skills=")) {
+      joined.push(current.slice("--skills=".length));
+    }
+  }
+
+  if (joined.length === 0) {
+    return null;
+  }
+
+  return joined
+    .join(",")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export function normalizeTargets(rawTargets) {
@@ -348,8 +385,6 @@ const runtimeProjectionLayouts = {
       legacySkillFile: ["openclaw", "skills", "meta-theory.md"],
       legacySkillReferencesDir: ["openclaw", "skills", "references"],
       templateConfigFile: ["openclaw", "openclaw.template.json"],
-      sharedSkillFile: ["shared-skills", "meta-theory.md"],
-      sharedSkillReferencesDir: ["shared-skills", "references"],
     },
     global: {
       workspacesRoot: [],

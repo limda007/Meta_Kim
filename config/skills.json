@@ -71,6 +71,7 @@
     {
       "id": "cli-anything",
       "repo": "HKUDS/CLI-Anything",
+      "defaultSelected": false,
       "targets": [
         "claude",
         "codex",

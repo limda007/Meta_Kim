@@ -53,6 +53,10 @@
             "type": "string",
             "description": "Claude Code marketplace plugin identifier if this skill is also an official plugin"
           },
+          "defaultSelected": {
+            "type": "boolean",
+            "description": "If false, setup does not pre-select this repo in the dependency multi-select (default: true)"
+          },
           "targets": {
             "type": "array",
             "description": "Which runtimes this skill applies to. If omitted, applies to all runtimes.",

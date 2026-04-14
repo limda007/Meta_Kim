@@ -142,7 +142,6 @@ function assert(condition, message) {
       .replace(/\.agents\/skills\//g, "Codex项目skill ")
       .replace(/openclaw\/workspaces\//g, "OpenClaw workspace ")
       .replace(/openclaw\/skills\//g, "OpenClaw skill ")
-      .replace(/shared-skills\//g, "shared-skill ")
       .replace(/\.md /g, ".md ")
       .replace(/\.toml /g, ".toml ");
     throw new Error(clean);
@@ -746,8 +745,10 @@ async function validateWorkflowContract() {
     "workflow-contract.json reviewPacket must require crossProjectContaminationCheck.",
   );
   assert(
-    JSON.stringify(contract.protocols?.reviewPacket?.crossProjectContaminationCheckEnum ?? []) ===
-      JSON.stringify(["pass", "fail"]),
+    JSON.stringify(
+      contract.protocols?.reviewPacket?.crossProjectContaminationCheckEnum ??
+        [],
+    ) === JSON.stringify(["pass", "fail"]),
     "workflow-contract.json reviewPacket crossProjectContaminationCheckEnum must be [pass, fail].",
   );
   for (const [protocolName, expectedFields] of [

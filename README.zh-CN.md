@@ -2,7 +2,6 @@
 
 <h1 style="font-size: 6em; font-weight: 900; margin-bottom: 0.2em; letter-spacing: 0.1em;">元</h1>
 <p style="font-size: 1.2em; color: #7c3aed; font-weight: 600; margin-top: 0;">META_KIM</p>
-<p style="color: #dc2626; font-weight: 700; margin-bottom: 0.5em;">⚠️ BETA VERSION — Work in Progress</p>
 
 <p>
   <a href="README.md">English</a> |
@@ -14,107 +13,34 @@
 <p>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw%20%7C%20Cursor-111827"/>
   <img alt="Stars" src="https://img.shields.io/github/stars/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Forks" src="https://img.shields.io/github/forks/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v2.0.0-7c3aed"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green"/>
 </p>
 
 </div>
 
-<!-- 维护者：GitHub 仓库 About 描述建议（勿写「运行时镜像系统」易误解为只做同步）。中文示例：AI 编码助手的治理层：统一元角色、工作流纪律与 meta-theory；主源在 .claude/，并生成 Codex / OpenClaw 的配套副本。 -->
-
 ## 简介
 
-**Meta_Kim** 是 AI 编码助手的治理层：一套统一的治理逻辑，同时在 Claude Code、Codex、OpenClaw、Cursor 四个运行时上工作，让复杂任务**做对了再做**。
+**Meta_Kim** 不是又一个 AI 编码工具。它是一套给 AI 编码助手装上"大脑"的治理系统。
 
-多数工具上来就写代码；Meta_Kim 在中间加了一步：先搞清楚你到底要什么，再计划谁干什么，最后才执行并审查。结果是跨文件改动少翻车，agent 职责更清晰，沉淀可复用模式而不是一次性 hack。
+打个比方：你现在用的 Claude Code、Codex、OpenClaw、Cursor，本质上都是"手"——能写代码、能改文件。但谁来决定先改哪个文件？改完谁来检查？检查出了问题谁来修？修完了怎么保证下次不会再犯同样的错？
 
-### 要点速览
+Meta_Kim 就是干这个的。它是**AI 之上的 AI**——一套统一的治理逻辑，让复杂任务不再是一锅乱炖。
 
-- 8 个专业元角色，统一走一个默认公开入口
-- **一套统一的治理逻辑**，投影到 Claude Code、Codex、OpenClaw、Cursor 四个运行时
-- 每个复杂任务走：追问澄清 → 搜索能力 → 执行 → 审查 → 沉淀进化
-- **四条铁律**：追问强于猜测、搜索强于假设、计划强于冲动、验证强于信任
-- 纪律：一个部门、一个主交付物、一条闭合交付链
-- 长期主源主要在 `canonical/` 和 `config/contracts/workflow-contract.json`
+### 一句话总结
 
+> **先搞清楚要干什么 → 再决定谁去干 → 干完审查 → 审完沉淀经验 → 经验反哺下一轮。**
 
-## 它适合谁
+这不是什么新概念，这就是任何成熟工程团队都在做的事情。只不过 Meta_Kim 把它变成了一套可运行的系统，而不是靠人的自觉。
 
-### 适合
+## 快速开始
 
-- 你要处理多文件、跨模块、跨运行时的复杂任务
-- 你在维护一套 agent / skill / hook / MCP 的工程资产
-- 你希望 AI 协作是可审查、可回滚、可持续维护的
-
-### 不适合
-
-- 你只想临时问几个简单问题
-- 你平时只改单个文件，不需要分工和治理
-- 你想把它当成一个即装即用的 SaaS 产品
-
-## 联系方式与支持
-
-![联系方式](docs/images/contact-qr.png)
-
-GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
-𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> |
-官网 <a href="https://www.aiking.dev/">aiking.dev</a> |
-微信公众号：<strong>老金带你玩AI</strong>
-
-飞书知识库：
-<a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">长期更新入口</a>
-
-| 微信支付 | 支付宝 |
-| --- | --- |
-| ![微信收款码](docs/images/wechat-pay.jpg) | ![支付宝收款码](docs/images/alipay.jpg) |
-
-### 方法依据与论文
-
-Meta_Kim 的方法依据来自“基于元的意图放大”评测与方法沉淀：
-
-- 论文页面：<https://zenodo.org/records/18957649>
-- DOI：`10.5281/zenodo.18957649`
-
-论文负责解释方法论基础。本仓库负责把这套方法落成可运行的工程资产。
-
-## 安装与初始化
-
-<a id="install-quick-zh"></a>
-
-**后半篇怎么读（任选）：** 只想装完能用 → 跟完下面「一键安装 / 手动安装」，再跳到 [使用指南](#使用指南)；要搞清四端、角色与命令表 → 从 [使用指南](#使用指南) 顺着读；要啃契约、八阶段与 run 产物 → 读 [原理与设计](#原理与设计)。在 Claude Code 里走治理方法论 → 输入 **`/meta-theory`**（见 [`meta-theory` 技能](#meta-theory-skill-zh)）。
-
-### 环境要求
-
-- **Node.js** v18+（用于 sync、validate、OpenClaw 脚本）
-- **Git**（用于克隆项目）
-- **Python** 3.10+（可选，用于 graphify 代码知识图谱）
-- **Claude Code CLI**（可选，仅在运行 `eval:agents` 时需要）
-- **Codex CLI**（可选，仅在运行 `eval:agents` 时需要）
-- **OpenClaw CLI**（可选，仅在运行 `npm run prepare:openclaw-local` 时需要）
-
-### 一键安装（推荐）
-
-**无需先 clone（`npx` 会临时拉取仓库并执行安装向导）：**
+如果你只想先装上试用，直接运行：
 
 ```bash
 npx --yes github:KimYx0207/Meta_Kim meta-kim
 ```
 
-**指定界面语言且只做环境检查（不写盘、不安装）：** `--lang` 与 `setup.mjs` 一致，取值为 `en`、`zh-CN`、`ja-JP`、`ko-KR`。
-
-<div align="center">
-
-| 界面语言 | 命令 |
-| --- | --- |
-| English | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang en --check` |
-| 简体中文 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang zh-CN --check` |
-| 日本語 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ja-JP --check` |
-| 한국어 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ko-KR --check` |
-
-</div>
-
-**经典方式（克隆后进目录）：**
+或者按传统方式：
 
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
@@ -122,1290 +48,731 @@ cd Meta_Kim
 node setup.mjs
 ```
 
-<div align="center">
-
-| 用法 | 说明 |
-| --- | --- |
-| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | 与 `node setup.mjs` 相同，省略手动 `git clone` / `cd` |
-| `node setup.mjs` | 交互式向导（选语言 → 安装 / 更新 / 检查，并选择本机 active runtimes） |
-| `node setup.mjs --targets claude,codex` | 非交互指定启用运行时 | 保存本机 `activeTargets`，只对这些 runtime 做本机同步/安装 |
-| `node setup.mjs --lang en` | 跳过语言选择，界面英语 |
-| `node setup.mjs --lang zh-CN` | 跳过语言选择，界面简体中文 |
-| `node setup.mjs --lang ja-JP` | 跳过语言选择，界面日本語 |
-| `node setup.mjs --lang ko-KR` | 跳过语言选择，界面 한국어 |
-| `node setup.mjs --update` | 更新所有技能和依赖（询问安装范围） |
-| `node setup.mjs --check` | 环境 + 依赖 + 跨运行时同步检查 |
-| `node setup.mjs --silent` | 非交互模式（CI / 脚本） |
-| `node setup.mjs --targets claude,codex,openclaw` | 非交互多运行时激活 |
-
-</div>
-
-向导流程与 `--check` 行为见上表；完整步骤见下文 [手动安装（逐步）](#manual-install-zh)。
-
-> **第三方元技能 findskill**：请**以本仓库为准**。`setup.mjs` 安装 **`KimYx0207/findskill`**（在公开生态能力上的维护与优化版）至 `~/.claude/skills/findskill/`。**本仓库内文档与 agent 统一使用名称 `findskill`**，勿与旧写法混用。勿在不同渠道重复安装同能力。
-
-> 纯 Node.js 脚本，Windows / macOS / Linux 通用，不依赖 bash。
-
----
-
-<a id="manual-install-zh"></a>
-
-### 手动安装（逐步）
-
-下面是更完整的维护者手动流程。它覆盖了 `node setup.mjs` 的核心安装动作，并额外补上 runtime 镜像同步、全局能力发现和全局 meta-theory 便携技能同步。
-
-#### 1. 克隆并安装依赖
-
-```bash
-git clone https://github.com/KimYx0207/Meta_Kim.git
-cd Meta_Kim
-npm install
-```
-
-#### 2. 同步四端镜像
+如果你准备维护仓库，优先改 `canonical/` 和 `config/contracts/workflow-contract.json`，然后执行：
 
 ```bash
 npm run sync:runtimes
-```
-
-作用：
-
-- 从 `.claude/` 主源重新生成 Codex / OpenClaw / shared-skills 镜像
-- 检查主源和派生产物是否一致
-
-如果你只是想确认有没有不同步，也可以用：
-
-```bash
-npm run check:runtimes
-```
-
-#### 3. 安装元技能依赖（可选，但推荐）
-
-```bash
-npm run deps:install
-```
-
-这一步会把 Meta_Kim 依赖的 9 个社区 skill 安装到 `~/.claude/skills/`。
-
-注意：
-
-- 这是 **Claude Code 生态** 的全局安装，不是安装到当前仓库里
-- 这个脚本通过 `bash install-deps.sh` 运行
-- **Windows 用户请确保机器上有 `bash`**，通常用 Git Bash 或 WSL 即可
-
-更新这些依赖时用：
-
-```bash
-npm run deps:update
-```
-
-#### 4. 扫描全局能力
-
-```bash
-npm run discover:global
-```
-
-这一步会扫描你电脑里的全局能力，并生成：
-
-```text
-.claude/capability-index/meta-kim-capabilities.json
-.claude/capability-index/global-capabilities.json   # 兼容镜像
-```
-
-扫描范围包括：
-
-- `~/.claude/`：agents、skills、hooks、plugins、commands
-- `~/.openclaw/`：agents、skills、hooks、commands
-- `~/.codex/`：agents、skills、commands
-
-如果你想先看 CLI 探测结果，可以先跑：
-
-```bash
-npm run probe:clis
-```
-
-#### 5. 可选：同步全局 meta-theory 便携技能
-
-```bash
-npm run show:global:meta-theory-targets
-npm run sync:global:meta-theory
-```
-
-这一步会把 canonical 的 `canonical/skills/meta-theory/` 同步到用户级 runtime home。默认按本机 `activeTargets` 执行，也可以用 `--targets claude,codex` 显式覆盖：
-
-- `~/.claude/skills/meta-theory`
-- `~/.openclaw/skills/meta-theory`
-- `~/.codex/skills/meta-theory`
-
-如果你只想检查有没有漂移，用：
-
-```bash
-npm run check:global:meta-theory
-```
-
-需要显式指定用户级 runtime home 时，可设置：
-
-- `META_KIM_CLAUDE_HOME` 或 `CLAUDE_HOME`
-- `META_KIM_OPENCLAW_HOME` 或 `OPENCLAW_HOME`
-- `META_KIM_CODEX_HOME` 或 `CODEX_HOME`
-
-#### 6. 做项目完整性校验
-
-```bash
 npm run validate
 ```
 
-这会检查：
+建议阅读顺序：
 
-- 必要文件是否存在
-- workflow contract 是否完整
-- 8 个 Claude agents 是否合规
-- OpenClaw workspaces 是否齐全
-- `SKILL.md` 多端镜像是否同步
-- Codex agents 是否有效
-- hooks / MCP / package scripts 是否配置正确
+1. 本文件 `README.zh-CN.md`
+2. `AGENTS.md`
+3. `docs/runtime-capability-matrix.md`
 
-#### 7. 跑一次 MCP 自测
+---
 
-```bash
-npm run test:mcp
-```
+## 联系方式
 
-这一步会自测 `meta-runtime-server`，也是 `node setup.mjs` 默认会执行的一项检查。
+![联系方式](docs/images/contact-qr.png)
 
-#### 8. 需要时再跑轻量运行时 smoke
+GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
+X <a href="https://x.com/KimYx0207">@KimYx0207</a> |
+官网 <a href="https://www.aiking.dev/">aiking.dev</a> |
+微信公众号：**老金带你玩AI**
 
-```bash
-npm run eval:agents
-```
+飞书知识库：
+<a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">长期更新入口</a>
 
-默认的 `eval:agents` 是轻量、无 LLM 的 runtime smoke：
+### 请我一杯咖啡
 
-- 可用且通过的运行时会显示 `passed`
-- 没装或当前不可用的可选运行时可能显示 `skipped`
-- 配置错误、注册表接线错误会显示 `failed`
-- 它**不会**主动打开 Claude / Codex / OpenClaw 的实时 prompt 会话
+如果 Meta_Kim 帮到了你，欢迎请我喝杯咖啡，算是对持续维护的支持。
 
-如果你明确要跑较慢的、带实时 prompt 的运行时验收：
-
-```bash
-npm run eval:agents:live
-```
-
-全部一起跑：
-
-```bash
-npm run verify:all
-```
-
-需要完整 live 验收时：
-
-```bash
-npm run verify:all:live
-```
-
-如果你手头有真实 run artifact，想核对整个 packet 链：
-
-```bash
-npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
-```
-
-#### 9. OpenClaw 本地运行前，额外准备一次
-
-```bash
-npm run prepare:openclaw-local
-```
-
-只有你准备在本机真正跑 OpenClaw 时才需要这一步。
-
-#### 10. 快速健康度检查
-
-```bash
-node scripts/agent-health-report.mjs
-```
-
-可以快速看 8 个 agent 的版本号、frontmatter 完整性、边界定义、workspace 文件和 skill 同步状态。
-
-#### 11. 开始使用（Claude Code）
-
-你可以直接说：
-
-```text
-认证系统要重构，散在 5 个文件里，没人知道 token 刷新到底是哪个文件在处理。
-```
-
-```text
-帮我设计一个 agent，处理这个项目的数据导出任务。
-```
-
-```text
-有问题，我的 agent 写的代码老是互相冲突。
-```
-
-系统会根据任务类型，把请求路由到匹配的治理阶段。
-
-## 使用指南
-
-### 四个运行时怎么承接
-
-最重要的一句：
-
-**Meta_Kim 只有一套方法，不是四个独立项目。**
-
-<div align="center">
-
-| 运行时 | 入口 | 仓库里的主要落点 | 角色 |
-| --- | --- | --- | --- |
-| Claude Code | [CLAUDE.md](CLAUDE.md) | `.claude/`、`.mcp.json` | 规范主源和默认编辑运行时 |
-| Codex | [AGENTS.md](AGENTS.md) | `.codex/`、`.agents/`、`codex/` | Codex 原生 custom agents / skills 映射 |
-| OpenClaw | `openclaw/workspaces/` | `openclaw/` | OpenClaw 本地 workspace 映射 |
-| Cursor | `.cursor/agents/` | `.cursor/` | Cursor agent 与 MCP 投影 |
-
-</div>
-
-<a id="runtime-sync-targets-zh"></a>
-
-#### 同步清单（`npm run sync:runtimes`）
-
-`sync-runtimes` 将规范主源同步到全部四个运行时树。修改 `canonical/` 或 `config/contracts/` 后执行此命令。
-
-<div align="center">
-
-| 运行时 | 同步目录 / 文件                     | 说明                                              |
-| --- | --- | --- |
-| Claude Code | `.claude/agents/`                     | 8 个 meta-agent .md 文件                             |
-|            | `.claude/skills/meta-theory/SKILL.md` | meta-theory 技能入口                               |
-|            | `.claude/skills/meta-theory/references/` | 6 个参考文档（dev-governance, rhythm 等）          |
-|            | `.claude/hooks/`                      | 8 个 hook 脚本                                     |
-|            | `.claude/settings.json`               | Claude 设置（项目级）                             |
-|            | `.mcp.json`                          | MCP 运行时服务器配置（根目录）                  |
-| Codex      | `.codex/agents/`                     | 8 个 meta-agent .toml 文件                       |
-|            | `.codex/skills/meta-theory.md`        | meta-theory 技能（扁平格式）                     |
-|            | `.codex/skills/references/`           | 参考文档                                         |
-|            | `.agents/skills/meta-theory/SKILL.md` | 项目级 meta-theory 技能                          |
-| OpenClaw   | `openclaw/workspaces/{agent}/`         | 8 个 workspace × 各 9 个 .md（BOOT, SOUL…）  |
-|            | `openclaw/openclaw.template.json`       | workspace 模板配置                               |
-|            | `openclaw/skills/meta-theory.md`       | 共享 meta-theory 技能                          |
-|            | `openclaw/skills/references/`          | 参考文档                                         |
-| Cursor     | `.cursor/agents/`                    | 8 个 meta-agent .md 文件（纯 Markdown，无 YAML）   |
-|            | `.cursor/skills/meta-theory/SKILL.md` | meta-theory 技能入口                           |
-|            | `.cursor/skills/meta-theory/references/` | 参考文档                                     |
-|            | `.cursor/mcp.json`                  | Cursor MCP 配置                               |
-| 共享       | `shared-skills/meta-theory.md`          | 跨运行时共享 meta-theory 技能                |
-|            | `shared-skills/references/`            | 参考文档                                         |
-
-</div>
-
-一图概括「**同一套方法，四处落地**」（细部与同步命令见 [原理与设计 · 元架构视角](#元架构视角) 主源图示）：
-
-```mermaid
-flowchart LR
-  SRC[主源 .claude 与 contracts] --> CC[Claude Code 编辑运行时]
-  SRC -->|镜像| CX[Codex]
-  SRC -->|workspace 映射| OW[OpenClaw]
-  SRC -->|agent 投影| CU[Cursor]
-```
-
-关键点：
-
-- **Claude Code 是 canonical（正典 / 主编辑源）编辑运行时。**
-- 长期主源主要在 `canonical/` 和 `config/contracts/workflow-contract.json`。
-- `.codex/`、`.agents/`、`openclaw/`、`.cursor/` 里大多数内容是同步产物或运行时适配层。
-- 改完主源以后，再用脚本把四端重新对齐。
-
-#### 各运行时怎么接
-
-##### 在 Claude Code 里
-
-Claude Code 自动读取 `CLAUDE.md`、`.claude/agents/`、`.claude/skills/`、`.mcp.json`。打开项目直接聊。
-
-<a id="meta-theory-skill-zh"></a>
-
-###### `meta-theory` 技能（治理方法论）
-
-**meta-theory** 是可随仓库同步的治理技能（主源 [`canonical/skills/meta-theory/SKILL.md`](canonical/skills/meta-theory/SKILL.md)）。在 Claude Code 中可**由用户主动唤起**：输入 **`/meta-theory`** 即可加载。它会区分 **元架构**（agent 边界、协作、治理）与 **项目技术架构**（栈、模块、代码组织），把请求归入 A–E 类流程，并沿八阶段脊柱推进（**Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution**）。它是**调度层**，不能代替具名 agent 的执行：**Gate 3 强制要求 meta-theory 在分派任何执行 agent 之前，必须将分派决策交给 `meta-warden` 验证通过** — `meta-warden` 既是默认公开前门，也是验证分派决策、强制调度纪律的角色。
-
-##### 在 Codex 里
-
-Codex 读取 `AGENTS.md`、`.codex/agents/`、`.agents/skills/`，MCP 接法见 `codex/config.toml.example`。注意：**Codex 是读取 / 执行运行时，不是主编辑运行时**。你应该先在 `.claude/` 改，再通过 `npm run sync:runtimes` 同步到 Codex。
-
-##### 在 OpenClaw 里
-
-```bash
-npm install
-npm run prepare:openclaw-local
-```
-
-然后可直接调用：
-
-```bash
-openclaw agent --local --agent meta-warden --message "帮我搞一个批量数据导出的系统，要带进度跟踪。" --json --timeout 120
-```
-
-##### 在 Cursor 里
-
-Cursor 读取 `.cursor/agents/` 目录下的 agent 定义和 `.cursor/mcp.json` 的 MCP 配置。这些都是从主源生成的投影：
-
-```bash
-npm run sync:runtimes -- --targets cursor
-```
-
-这会生成 `.cursor/agents/meta-warden.md`（以及其他 7 个 agent）、`.cursor/skills/meta-theory/` 和 `.cursor/mcp.json`。Cursor agent 使用纯 Markdown 格式（无 YAML frontmatter）。
-
-### 8 个元角色
-
-<div align="center">
-
-| Agent | 主要职责 | 你可以怎么理解 |
-| --- | --- | --- |
-| `meta-warden` | 默认入口、仲裁、最终汇总 | 项目经理 / 总协调 |
-| `meta-conductor` | 编排阶段、控制节奏 | 调度员 |
-| `meta-genesis` | 设计 `SOUL.md`、人格和认知结构 | 提示词 / 角色架构师 |
-| `meta-artisan` | skill、MCP、工具装配 | 工具与能力工程师 |
-| `meta-sentinel` | 安全、权限、hook、回滚 | 安全与守卫 |
-| `meta-librarian` | 记忆、上下文、连续性 | 知识管理员 |
-| `meta-prism` | 质量审查、漂移检测、反 AI 套话 | 质量法医 |
-| `meta-scout` | 外部能力发现与评估 | 侦察与选型 |
-
-</div>
-
-组织关系（**只记前门**即可，不必先背全表）：
-
-```mermaid
-flowchart LR
-  U[用户意图] --> W[meta-warden 默认前门]
-  W --> R[其余 7 元角色 后台专精]
-```
-
-如果你是普通使用者，只需要记住一件事：
-
-**默认公开前门是 `meta-warden`。**
-
-入口与 skill、八阶段开合关系的**略图**见 [原理与设计 · 元架构视角](#元架构视角)（默认路径与主源闭环图示）。
-
-### 系统怎么工作
-
-你不需要知道内部机制。但如果你好奇，下面是一张**外行可读的执行链**（与上文「略图」互补：这里偏「一次任务里发生什么」）：
-
-```mermaid
-flowchart TD
-    A[你说你要什么] --> B[系统澄清范围]
-    B --> C[搜索现有能力]
-    C --> D[分配给专家]
-    D --> E[agent 执行]
-    E --> F[审查产出]
-    F --> G[沉淀模式]
-```
-
-任务类型怎么分流、多路径怎么叠在一起，见 [项目里的流程关系总图](#项目里的流程关系总图)。
-
-每一条有效的业务 run，都必须保持一条唯一主线：
-
-- 一个部门
-- 一个主交付物
-- 一条闭合交付链
-
-如果同一轮里塞进多个互不相干的目标，`meta-conductor` 应该直接打回，`meta-warden` 也不应让它进入公开展示态。
-
-### 怎么用
-
-#### 自动模式（正常聊天就行）
-
-复杂任务直接描述你的需求。系统检测到跨文件或跨模块的工作时，治理流程自动激活。
-
-```text
-帮我搞一个通知系统，邮件、短信、站内信都要，带共享队列和重试逻辑。
-```
-
-```text
-支付流程在 3 个服务之间有竞态条件，修一下，再补上错误处理。
-```
-
-系统会：追问澄清（如果需要）→ 搜索现有 agent → 路由给对的人 → 执行 → 审查 → 沉淀模式。
-
-如果 Fetch 发现没有合适 owner，正常路径不是“直接硬做”，而是：
-
-- 先判断这是长期缺口还是一次性缺口
-- 长期缺口：先走 Type B 补 owner，再执行
-- 一次性低风险缺口：允许临时 `generalPurpose` owner 兜底，但必须在 Evolution 里复盘是否要升格
-
-如果你把真实治理 run 记录成 JSON，可以直接验：
-
-```bash
-npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
-```
-
-这个脚本不只是看字段齐不齐，还会检查 findingId 是否贯通、closeState 是否合法、delivery shell 是否可追溯，以及 `publicReady` 有没有被乱标。
-
-#### 手动模式（你知道你要什么的时候）
-
-如果你明确要设计、审查、审计 agent：
-
-```text
-帮我设计一个 agent，处理这个项目的数据导出任务。
-```
-
-```text
-审查一下我的 agent 定义，边界干不干净？
-```
-
-```text
-我的 agent 职责老是重叠，帮我修正组织结构。
-```
-
-### 项目结构
-
-（树状图在部分阅读器里会因**居中**与**中英混排**错位；下表与仓库布局一致，对齐稳定。）
-
-<div align="center">
-
-| 路径 | 说明 |
+| 微信支付 | 支付宝 |
 | --- | --- |
-| `.claude/` | 主源：agents、skills、hooks、settings |
-| `.codex/` | Codex custom agents 镜像 |
-| `.agents/` | Codex 项目级 skills 镜像 |
-| `codex/` | Codex 全局配置示例 |
-| `openclaw/` | OpenClaw workspaces、skills、配置模板 |
-| `.cursor/` | Cursor agent 与 MCP 投影（生成产物） |
-| `config/contracts/` | 运行时治理合约 |
-| `docs/` | 内部/私有说明文档，以及少量已纳入版本控制的 runtime 文档 |
-| `scripts/` | 同步、校验、探测、MCP、自检脚本 |
-| `shared-skills/` | 跨运行时共享 skill 镜像 |
-| `README.md` | 英文主文档（外链锚点常以本文为基准） |
-| `README.zh-CN.md` | 简体中文 |
-| `README.ja-JP.md` | 日本語 |
-| `README.ko-KR.md` | 한국어 |
-| `CLAUDE.md` | Claude Code 项目入口说明 |
-| `AGENTS.md` | Codex 项目入口说明 |
-| `CHANGELOG.md` | 变更记录 |
+| ![微信收款码](docs/images/wechat-pay.jpg) | ![支付宝收款码](docs/images/alipay.jpg) |
 
-</div>
+### 方法依据
 
-#### 你应该优先改哪里
+Meta_Kim 的方法论基础来自本项目维护者（KimYx0207）撰写的"基于元的意图放大"研究：
 
-长期维护时，优先编辑这些文件：
+- 论文：<https://zenodo.org/records/18957649>
+- DOI：`10.5281/zenodo.18957649`
 
-- `canonical/agents/*.md`
-- `canonical/skills/meta-theory/SKILL.md`
-- `canonical/skills/meta-theory/references/*.md`
-- `config/contracts/workflow-contract.json`
-- `README.md`
-- `README.zh-CN.md`
-- `README.ja-JP.md`
-- `README.ko-KR.md`
-- `CLAUDE.md`
-- `AGENTS.md`
+---
 
-#### 哪些文件通常不要手改
+## 架构：隐形骨架 + 动态发牌
 
-除非你很清楚自己在做什么，否则不要把这些当主源：
+这是 Meta_Kim 最核心的设计思想。整篇文档最重要的就是这一节。
 
-- `.codex/agents/*.toml`
-- `.agents/skills/meta-theory/`
-- `.codex/skills/meta-theory.md`
-- `shared-skills/meta-theory.md`
-- `openclaw/skills/meta-theory.md`
-- `openclaw/workspaces/*`
+### 先把核心词拆开，不然后面一定会混
 
-这些通常由脚本维护：
-
-- `npm run sync:runtimes`
-
-#### 为什么会有 `codex/`
-
-Codex 的配置分两层：
-
-- 仓库内资产：放在 `.codex/` 和 `.agents/`
-- 用户电脑里的全局配置：不能直接写进仓库根部
-
-所以：
-
-- `.codex/` 是 Codex 真正会直接读取的仓库内内容
-- `codex/` 只是一个配置示例目录，用来说明 `~/.codex/config.toml` 应该怎么接
-
-### Hooks（Claude Code）
-
-Meta_Kim 在 `.claude/settings.json` 中配置了 8 个 hook 脚本（`Stop` 事件上会顺序执行其中 2 个）：
-
-<div align="center">
-
-| Hook | 类型 | 用途 |
+| 概念 | 它是什么 | 它不是什么 |
 | --- | --- | --- |
-| `block-dangerous-bash.mjs` | PreToolUse/Bash | 阻止危险命令（rm -rf、DROP TABLE、force-push） |
-| `pre-git-push-confirm.mjs` | PreToolUse/Bash | `git push` 前提醒检查 |
-| `post-format.mjs` | PostToolUse/Edit,Write | 自动 prettier 格式化 JS/TS 文件 |
-| `post-typecheck.mjs` | PostToolUse/Edit,Write | 编辑 `.ts` / `.tsx` 后自动做类型检查 |
-| `post-console-log-warn.mjs` | PostToolUse/Edit,Write | 编辑后检测 `console.log` 并警告 |
-| `subagent-context.mjs` | SubagentStart | 给子 agent 注入项目上下文 |
-| `stop-console-log-audit.mjs` | Stop | 会话结束前审计改动文件里的 `console.log` |
-| `stop-completion-guard.mjs` | Stop | 可选弱哨兵：防未对齐治理流程就宣称「完成」（默认关闭，靠环境变量开启） |
+| **隐形骨架** | 表层流程下面必然存在的后台框架节点 | 一张先天写死的职责清单 |
+| **8 大流程** | 隐形骨架在执行层露出的人可读主链 | 全部治理逻辑本身 |
+| **10 大流程** | 复杂 run 被判断后叠加的更复杂递进方式 | 8 大流程的替代物 |
+| **发牌** | 围绕 8 大流程和 agent 单元做动态管控 | 简单派任务 |
+| **门** | 放行条件 | 阶段本身 |
+| **协议** | 节点必须交出的结构化东西 | 口号或抽象价值观 |
+| **agent 单元治理** | 让边界、能力、升级、回滚有抓手 | 角色菜单 |
+| **三层记忆体系** | memory / graphify / SQL 分工协作的长期记忆 | 一份大杂烩笔记 |
 
-</div>
+如果你只想记住一句话：
 
-Codex 和 OpenClaw 使用各自原生机制实现等效行为。
+> **8 大流程负责推进，门负责准入，协议负责交付，发牌负责动态介入。**
 
-### 代码知识图谱（graphify）（进阶）
+### 8 大流程 = 隐形骨架
 
-Meta_Kim 可以利用 [graphify](https://github.com/safishamsi/graphify)（`pip install graphifyy`）为**目标项目**生成压缩的代码知识图谱 — 不是 Meta_Kim 自身。通过子图提取代替全文件读取，最高实现 **71 倍 token 压缩**。
+Meta_Kim 有 8 个固定的执行阶段，我管它叫**隐形骨架**：
 
-#### 工作原理
+```mermaid
+flowchart LR
+    C[Critical<br/>澄清需求] --> F[Fetch<br/>搜索能力]
+    F --> T[Thinking<br/>规划方案]
+    T --> E[Execution<br/>分派执行]
+    E --> R[Review<br/>审查]
+    R --> MR[Meta-Review<br/>元审查]
+    MR --> V[Verification<br/>验证]
+    V --> EV[Evolution<br/>进化]
 
-1. **graphify** 在目标项目根目录生成 `graphify-out/graph.json`（NetworkX node-link JSON，含节点、边、置信度分数）
-2. Meta_Kim 的 Fetch 阶段自动检测图谱 — 无需手动干预
-3. 所有派发智能体通过 `subagent-context.mjs` hook 获得图谱上下文
-4. 复杂项目（图谱节点 >50）可自动通过 Type B 管线创建**项目级编排智能体**
-
-#### 自动触发条件
-
-当以下条件**全部满足**时自动使用图谱上下文：
-- 源文件数 > 20（排除 `node_modules/`、`.git/`、`dist/`）
-- 已安装 Python 3.10+
-- 已安装 graphify（`pip install graphifyy`）
-- 当前项目不是 Meta_Kim 自身
-
-#### 安装
-
-```bash
-# 通过 setup.mjs（交互式，自动检测 Python）
-node setup.mjs
-
-# 通过 install-deps.sh
-npm run deps:install
-
-# 手动安装
-pip install graphifyy && python -m graphify claude install
-
-# 检查状态
-npm run graphify:check
+    style C fill:#fbbf24,color:#000
+    style F fill:#34d399,color:#000
+    style T fill:#60a5fa,color:#000
+    style E fill:#f87171,color:#fff
+    style R fill:#a78bfa,color:#fff
+    style MR fill:#a78bfa,color:#fff
+    style V fill:#34d399,color:#000
+    style EV fill:#fbbf24,color:#000
 ```
 
-#### 质量门控
+**Critical — 先把真实问题钉住，不让后面全程建立在误解上**
 
-- AMBIGUOUS 节点占比 > 30% → 图谱标记为低质量，智能体以直接 `Read` 为主
-- 节点总数 < 10 → 图谱过于稀疏，回退到 `Glob`/`Grep`
-- God nodes（入度高的节点）→ 标记为串行瓶颈，由 `meta-conductor` 处理
+需求模糊时追问澄清，而不是猜。这一步产出 `intentPacket`（意图锁定），把真实用户意图、成功标准、排除范围全写死。如果需求已经清晰，系统显式记录跳过原因，不是偷偷跳过。
 
-### 这些命令什么时候要跑
+**Fetch — 先找已有能力，而不是上来就自己发明**
 
-<div align="center">
+搜索现有 agent、skill、工具、MCP 能不能覆盖这个需求。这一步的核心理念是**能力优先**——先定义需要什么能力，再搜索谁声明了这个能力，最后派给最匹配的 owner，而不是一开始就写死一个 agent 名字。
 
-| 命令 | 什么时候用 | 作用 |
-| --- | --- | --- |
-| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | **不想先 clone** | 与 `node setup.mjs` 相同（`npx` 会拉取本仓库） |
-| `node setup.mjs` | **首次拉仓库** | **交互式向导：语言 → 安装 / 更新 / 检查 + 选择本机 active runtimes** |
-| `node setup.mjs --update` | 依赖/技能需要更新时 | 更新所有技能（询问安装范围：project/global/both） |
-| `node setup.mjs --check` | 想先做环境体检时 | 环境 + 依赖 + 跨运行时同步验证 |
-| `npm install` | 手动安装时 | 安装 Node 依赖 |
-| `npm run sync:runtimes` | 改完主源后 | 重建四端镜像（默认：project 范围 → repo 本地目录） |
-| `npm run sync:runtimes -- --scope project` | 仅 repo 本地同步 | 写到 `.claude/`、`.codex/`、`openclaw/`、`shared-skills/` |
-| `npm run sync:runtimes -- --scope global` | 仅全局运行时目录 | 写到 `~/.claude/`、`~/.codex/`、`~/.openclaw/` |
-| `npm run sync:runtimes -- --scope both` | 同时同步两个范围 | 同时写到 repo 本地和全局目录 |
-| `npm run sync:runtimes -- --scope global --targets claude` | 全局 + 仅 Claude | 只写到 `~/.claude/` |
-| `npm run sync:runtimes -- --check` | 预览改动不写入 | 显示哪些文件会更新 |
-| `npm run check:runtimes` | 不想写文件时 | 只检查镜像是否最新 |
-| `npm run show:global:meta-theory-targets` | 想确认会写到哪些用户级目录 | 打印 Claude / OpenClaw / Codex 的全局 meta-theory 目标及 Claude hooks 路径 |
-| `npm run sync:global:meta-theory` | 改了 canonical `meta-theory` 或 `canonical/runtime-assets/claude/hooks` 后 | 默认按本机 `activeTargets` 同步用户级 `meta-theory`；若启用 Claude，还会把 hooks 复制到 `~/.claude/hooks/meta-kim/` 并合并到 `~/.claude/settings.json` |
-| `npm run sync:global:meta-theory -- --skip-global-hooks` | 不能动用户级 settings/hooks 时 | 同上但不写 Claude 全局 hooks |
-| `npm run check:global:meta-theory` | 不想改用户级文件时 | 检查全局 meta-theory 与 Claude `hooks/meta-kim` 是否与 canonical 一致 |
-| `npm run deps:install` | 第一次配置 Claude 生态 | 安装 9 个全局元技能 |
-| `npm run deps:update` | 依赖需要更新时 | 更新已安装的元技能 |
-| `npm run deps:install:all-runtimes` | 需要给本机 `activeTargets` 装同一套 skills | 把同一批 skill 仓库 clone 到已启用 runtime 的 home；若启用了 Claude 且 PATH 上有 `claude`，会执行 `claude plugin install superpowers@claude-plugins-official` |
-| `npm run deps:update:all-runtimes` | 四端 skills 都要更新 | 同上并带 `--update` |
-| `npm run deps:install:claude-plugins` | 只装 Claude Code 官方 plugin 包 | 只跑 `claude plugin install …`，不做 git clone |
-| `npm run graphify:check` | 检查 graphify 是否可用 | 验证 Python 3.10+ 和 graphify CLI |
-| `npm run graphify:install` | 安装 graphify | `pip install graphifyy` + 注册 Claude 技能 |
-| `npm run graphify:update` | 更新目标项目图谱 | 对目标项目执行增量 `graphify --update` |
-| `npm run discover:global` | 首次安装后、装了新全局能力后 | 生成 `.claude/capability-index/meta-kim-capabilities.json`（并同步兼容镜像 `global-capabilities.json`） |
-| `npm run index:runs -- <目录或文件>` | 录完 governed run 后 | 先做 contract 校验，再把合法 run 索引进 `.meta-kim/state/{profile}/run-index.sqlite` |
-| `npm run query:runs -- --owner meta-warden` | 想快速做 continuity / retrieval 时 | 按 flow、owner、publicReady、open findings 查询本地 run index |
-| `npm run rebuild:run-index -- <目录或文件>` | 想重建本地索引时 | 清空并重建 profile-local SQLite run index |
-| `npm run migrate:meta-kim -- <source-dir> --apply` | 从 prompt pack / 单 agent 仓库迁入时 | 只暂存 persona / skill / contract 相关资产，拒绝导入未验证 run state |
-| `npm run probe:clis` | 怀疑 CLI 没配好时 | 探测 Claude / Codex / OpenClaw CLI |
-| `npm run test:mcp` | 改了 MCP 相关逻辑时 | 自测 `meta-runtime-server` |
-| `npm run test:meta-theory` | 改了 `meta-theory` skill / contract / tests 时 | 跑 `tests/meta-theory/*.test.mjs` |
-| `npm run validate` | 每次准备提交前 | 做静态完整性校验 |
-| `npm run validate:run -- <run.json>` | 要校验真实 run 产物链时 | 检查 packet 对齐、finding closure、summary/public-ready 是否真实 |
-| `npm run doctor:governance` | 发布前或怀疑 hook/镜像漂移时 | 分层体检：canonical contract + mirror parity + runtime hooks + 本地 profile/run-index 健康 |
-| `npm run prompt:next-iteration -- <run.json>` | run 未过校验或 finding 未关时 | 从 artifact 打印下一轮闭环待办 |
-| `npm run check` | 想快速做一轮静态检查 | `check:runtimes + validate` |
-| `npm run eval:agents` | 要快速做一轮 runtime smoke 时 | 做 CLI / 配置 / hook / registry 级别的轻量检查，不跑 LLM prompt 验收 |
-| `npm run eval:agents:live` | 要做真实 live 运行时验收时 | 运行较慢的 Claude / Codex / OpenClaw prompt 验收 |
-| `npm run verify:all` | 发布前 / 大改后 | `check + check:global:meta-theory + 轻量 eval + tests` |
-| `npm run verify:all:live` | runtime 敏感发布前 | `check + check:global:meta-theory + live eval + tests` |
-| `node scripts/agent-health-report.mjs` | 想看总体健康度时 | 生成 8 个 agent 的健康报告 |
+**Thinking — 定义边界、owner、顺序、交付物、风险和停机条件**
 
-</div>
+把任务拆成子任务，给每个子任务指定 owner，明确依赖关系和并行分组。这一步产出 `dispatchBoard`（分派看板）——谁干什么、哪些可以并行跑、最终谁负责合并。同时要探索至少 2 条方案路径，不能只走一条路。
 
-**Windows / PATH：** 从图形界面或编辑器里启动任务时，Node 子进程继承到的 `PATH` 有时比你单独开的终端更短。遇到 `eval:agents` 找不到 CLI 时，优先检查 `%APPDATA%\\npm\\`、`where.exe` 结果，仍不行就设置绝对路径环境变量：
+**Execution — 真正产生产物，但此时仍然处于被治理状态**
 
-- `META_KIM_CLAUDE_BIN`
-- `META_KIM_CODEX_BIN`
-- `META_KIM_OPENCLAW_BIN`
+分派给专业 agent 执行。每个子任务打包成 `workerTaskPacket`，包含完整的文件上下文、约束条件、审查 owner 和验证 owner。独立子任务并行跑，不串行拖慢。**执行 ≠ 完成**——产出物后面还要过审查和验证。
 
-### 一个安全的维护流程
+**Review — 站在质量和边界角度检查当前执行是否靠谱**
 
-如果你要改 agent、skill、README 或运行时配置，推荐始终按这个顺序做：
+审查代码质量、安全性、架构合规、边界越界检测。产出 `reviewPacket`，里面是结构化的审查发现（findings）。每个发现都有严重等级，从 CRITICAL 到 LOW。这一步不是走过场——发现没关就不能往前推。
 
-1. 改 `.claude/` 主源或公共说明文件
-2. 如果改动涉及调度纪律、闸门或交付合约，同时更新 `config/contracts/workflow-contract.json`
-3. 跑 `npm run sync:runtimes`
-4. 如果改了 canonical `meta-theory`，并且你维护用户级 runtime home，再跑 `npm run sync:global:meta-theory`
-5. 跑 `npm run discover:global`
-6. 跑 `npm run validate`
-7. 如果改了 MCP runtime 相关逻辑，再跑 `npm run test:mcp`
-8. 需要 smoke 级运行时验收时，再跑 `npm run eval:agents`
-9. 只有明确需要 live prompt 验收时，再跑 `npm run eval:agents:live`
+**Meta-Review — 反过来审视 review 标准本身是不是偏了、漏了、松了**
 
-这样最不容易把四端镜像改乱。
+审查"审查"。如果 review 标准本身太松，等于没审；如果标准偏了，等于审错了方向。这一步保证审查系统的质量，而不是只保证被审代码的质量。
 
-### 新手最常见的 10 个问题
+**Verification — 确认真实世界里确实成立，而不是文本上看起来像成立**
 
-#### 1. 我必须同时安装 Claude Code、Codex、OpenClaw、Cursor 吗？
+验证修复是否真的把 review finding 关了。产出 `verificationResult` + `closeFindings`。如果修复没关上 finding，回修再验证，直到闭合。这步是最诚实的关卡——文本上看起来修了不等于真修了。
 
-不用。你可以只用其中一个运行时。Meta_Kim 设计成跨运行时兼容，但不是强制四端全装。
+**Evolution — 把本轮能力缺口、可复用模式、升级需求写回系统**
 
-#### 2. 我能不能只改 `.codex/` 或 `openclaw/`？
+把经验沉淀成结构性升级：可复用模式写入 memory，失败记录成伤疤，能力缺口标记给 Scout 追踪，agent 边界调整写回 canonical。每轮必须给出 `writebackDecision`——要么明确写回目标，要么说明为什么没有可落盘的内容。**不沉淀经验的 run 等于白干。**
 
-技术上可以，长期维护上不推荐。大多数情况下，你应该改 `.claude/` 主源，再同步。
+---
 
-#### 3. `discover:global` 生成的索引要提交吗？
+这 8 个阶段合在一起就是执行脊柱。
 
-通常不用。`meta-kim-capabilities.json` 以及兼容镜像 `global-capabilities.json` 都是本机能力索引，带本地路径，按机器重新生成。
+为什么是"相对"固定？因为有些阶段在简单场景下可以跳过——但系统会显式记录跳过的原因，不是偷偷跳过。
 
-#### 4. 旧 prompt pack / 单 agent 仓库怎么迁到 Meta_Kim？
+### 10 大流程 = 骨架之上的递进工作流
 
-先用本地迁移脚本做 staging：
+如果 8 大流程是骨架，那 10 大流程就是在这个骨架上长出来的**更复杂的递进方式**：
 
-```bash
-npm run migrate:meta-kim -- ../old-agent-repo --apply
+```
+direction → planning → execution → review → meta_review → revision → verify → summary → feedback → evolve
 ```
 
-它会把 persona / skill / contract 相关资产暂存到 `.meta-kim/state/{profile}/migrations/...`，并明确拒绝未验证 run state、SQLite 缓存、日志和 artifacts。先审 `manifest.json`，再决定哪些内容值得进入 `canonical/` 或 `config/contracts/`。
+它不是另起一套，而是从 8 大流程**派生**出来的。区别在于：
 
-#### 4. `eval:agents` 里看到 `skipped` 是不是就说明项目坏了？
-
-不一定。`skipped` 常见原因是对应 CLI 没装，或者对应 runtime 当前不可用。真正的硬失败会标成 `failed`。
-
-#### 5. `eval:agents` 和 `eval:agents:live` 有什么区别？
-
-`eval:agents` 是轻量 runtime smoke，只检查 CLI 可用性、配置接线、hook 和 runtime scaffolding，不主动打开 LLM prompt 会话。
-
-`eval:agents:live` 是更重的 live runtime 验收，会真实调用 Claude / Codex / OpenClaw，会慢很多。
-
-#### 6. 为什么默认入口不是 8 个 agent 直接给用户选？
-
-因为 Meta_Kim 的设计目标不是“给你一排角色菜单”，而是先用统一前门接住需求，再在后台做分工。
-
-#### 7. 什么情况下可以不走 agent？
-
-只有纯 `Q / Query`。也就是纯解释、纯问答、没有改代码、没有外部副作用、没有交付链要求。只要任务会执行、会产生产物、会进入审查或验证，就必须有 owner。
-
-#### 8. `.claude/skills/meta-theory/references/meta-theory.md` 是不是必读？
-
-不是。它更像从 canonical skill references 映射出来的方法长文。第一次上手先读本 README 即可。
-
-#### 9. 我只想看仓库地图，应该读什么？
-
-直接读本 README 里的仓库结构树即可。
-
-#### 10. 我想看四端能力差异，应该读什么？
-
-内部说明：运行时一致性参考在 `docs/` 下，不属于公开内容。
-
-### 最简单的开始方式
-
-上面的 [安装与初始化章节](#install-quick-zh) 已经包含了从克隆到跑起来的完整步骤。
-
-如果你是第一次接触这个项目，按下面顺序最省力：
-
-1. 先读本文件 `README.zh-CN.md`
-2. 再读 [CLAUDE.md](CLAUDE.md) 或 [AGENTS.md](AGENTS.md)
-3. 再看本 README 里的仓库结构树
-4. 需要方法细节时再读 `.claude/skills/meta-theory/references/meta-theory.md`
-
-## 原理与设计
-
-以下章节适合在**完成安装并开始使用**之后阅读。相对文首「简介」：那里是一句话定位与要点列表；**这里展开**失败模式、工程分层、八阶段脊柱（Critical / Fetch / Thinking …）、契约与状态骨架——**配图嵌在讲到该概念的各节里**，不单独堆一整块「流程图附录」。不重复抄简介，只补推理链。
-
-### 这是什么项目
-
-Meta_Kim 不是“让 AI 多写点代码”的项目，它解决的是另一类问题：
-
-- 需求是模糊的，AI 容易乱猜
-- 改动跨多个文件或模块，AI 容易串改
-- 同一套 agent / skill / 配置要同时跑在多个运行时里，容易越改越乱
-- 改完之后没人做统一审查、验证和经验沉淀
-
-Meta_Kim 的核心思路是：先做 **意图放大**，再做执行。
-
-这里的“意图放大”，用人话说就是：
-
-- 把一句模糊的话补成可执行任务
-- 把任务边界、约束、交付物和风险说清楚
-- 把工作分给合适的角色，而不是让一个大上下文硬扛到底
-
-工程上它同时组织这些层：
-
-- `agent`：职责边界和组织角色
-- `skill`：可复用能力块
-- `MCP`：外部能力接口
-- `hook`：运行时约束和自动化拦截
-- `memory`：长期上下文与连续性
-- `workspace`：运行时本地工作空间
-- `sync / validate / eval`：同步、校验、验收工具链
-
-一句话说：
-
-**Meta_Kim 关心的不是“单次答得像不像”，而是“复杂任务能不能被持续、稳定、可治理地完成”。**
-
-### 为什么它会越用越轻
-
-在弄清「解决什么问题」之后，再看**长期成本曲线**：Meta_Kim 很吸引人的一点，不是“第一次就最省 token”，而是：
-
-**它会把高成本的临时思考，逐步沉淀成可复用的长期能力资产。**
-
-这意味着：
-
-- **刚开始会更重**：因为你在补 agent、skill、hook、tool、contract、memory 和 review / verification 规则
-- **越往后越轻**：因为很多任务不需要再从零现找能力、现补边界、现踩同样的坑
-- **省下来的不是所有 token，而是重复性 token**：重复任务、同类任务、已知任务的平均成本会明显下降
-
-更准确地说：
-
-**Meta_Kim 的目标不是让每次任务都最便宜，而是把临时推理成本，慢慢转成一次建设、长期复用的能力成本。**
-
-### 元架构视角
-
-看这个仓库，最稳的方式不是把它理解成“一堆 prompt 加一些配置文件”，而是把它理解成一套分层治理系统：
-
-- **理论主源层**：`.claude/skills/meta-theory/` 及其 `references/` 定义方法本身
-- **组织主源层**：`canonical/agents/*.md` 定义 8 个元角色及其边界
-- **契约主源层**：`config/contracts/workflow-contract.json` 及相关 contract 定义 run 纪律、闸门和交付闭环
-- **运行时投影层**：`.codex/`、`.agents/`、`openclaw/`、`shared-skills/` 是同一套系统在不同运行时里的投影
-- **工具与验证层**：`scripts/`、`validate`、`eval:agents`、`tests/meta-theory/` 负责让这些投影持续和主源对齐
-
-所以，`Meta_Kim` 更准确的结构应该记成：
-
-**一套 meta-theory 主源系统 -> 一套可治理的元组织 -> 一套 workflow contract -> 多 runtime 投影 -> 一条同步与验证闭环**
-
-它的默认运行路径也不是偶然拼出来的，而是架构的一部分：
-
-`用户意图 -> meta-warden -> Critical -> Fetch -> Thinking -> 专业角色执行 -> Review -> Verification -> Evolution`
-
-对应的维护原则也很直接：
-
-**优先改 `canonical/` 和 `config/contracts/`，然后再同步并校验各 runtime 镜像。**
-
-<a id="meta-kim-visual-maps-zh"></a>
-
-#### 图示：主源、工具链与运行时镜像
-
-主源改在 `canonical/` 与 `config/contracts/`，经同步与校验落到四端镜像；与上表「分层」一一对应。英文版同构图示见 [README.md#meta-kim-visual-maps-en](README.md#meta-kim-visual-maps-en)。
+- **8 大流程**偏向执行逻辑——"按什么顺序干活"
+- **10 大流程**偏向业务治理——"每个阶段要交付什么、怎么算完成、交付物怎么流转"
 
 ```mermaid
 flowchart TB
-  subgraph Canon["主源层, 优先在这里改"]
-    MT["meta-theory skill + references"]
-    AG["agents 8 roles"]
-    WC["workflow-contract.json"]
-    HK["settings.json hooks"]
-  end
-  subgraph Tooling["工具链"]
-    SYNC["npm run sync:runtimes"]
-    VAL["npm run validate"]
-    DISC["npm run discover:global"]
-  end
-  subgraph Mirror["运行时镜像, 多为同步生成"]
-    CODEX[".codex + .agents"]
-    OW["openclaw workspaces skills"]
-    SK["shared-skills"]
-  end
-  MT --> SYNC
-  AG --> SYNC
-  WC --> SYNC
-  HK --> SYNC
-  SYNC --> CODEX
-  SYNC --> OW
-  SYNC --> SK
-  DISC --> VAL
-  HK --> VAL
-  SK --> VAL
+    subgraph spine["8 大流程（隐形骨架）"]
+        direction LR
+        C1[Critical] --> F1[Fetch] --> T1[Thinking] --> E1[Execution] --> R1[Review] --> MR1[Meta-Review] --> V1[Verification] --> EV1[Evolution]
+    end
+
+    subgraph workflow["10 大流程（递进工作流）"]
+        direction LR
+        D2[direction] --> P2[planning] --> EX2[execution] --> RE2[review] --> MET2[meta_review] --> REV2[revision] --> VER2[verify] --> SUM2[summary] --> FB2[feedback] --> EVO2[evolve]
+    end
+
+    C1 -.-> D2
+    F1 -.-> P2
+    T1 -.-> P2
+    E1 -.-> EX2
+    R1 -.-> RE2
+    MR1 -.-> MET2
+    V1 -.-> VER2
+    EV1 -.-> EVO2
+
+    style spine fill:#1e1b4b,stroke:#7c3aed,color:#e0e7ff
+    style workflow fill:#14532d,stroke:#22c55e,color:#dcfce7
 ```
 
-<a id="default-path-zh"></a>
+10 大流程额外多了 `revision`（修订）、`summary`（总结）、`feedback`（反馈）这些环节，让整个流程不仅仅是"做完"，还要"做好"和"做对"。
 
-#### 图示：默认路径（入口、meta-theory skill 与八阶段）
+### 协议 = 每个节点必须交出什么
 
-`meta-theory`（**skill**）是触发时加载的**方法说明书**；`meta-warden`（**agent**）是**默认公开入口角色**，负责闸门与综合收口。流程为：用户意图 → `meta-warden` 入口 → `meta-theory` 分类 + 制定分派计划 → **`meta-warden` 验证分派决策（Gate 3，不可跳过）** → agent 执行 → review → verify → evolve。下图是「意图进来之后先经过谁」的缩略关系（不是把八阶段展开，展开见 [复杂任务治理主轴](#complex-spine-zh)）。
+光有流程不够，还得规定每个环节**必须交出什么产物**。这就是协议。
 
-```mermaid
-flowchart LR
-  U["用户意图"] --> W["meta-warden 入口"]
-  W --> SK["meta-theory skill\n分类 + 分派计划"]
-  SK --> V["meta-warden 验证\n分派决策 (Gate 3)"]
-  V --> A["agent 执行"]
-  A --> OUT["review verify evolve"]
-```
+Meta_Kim 的协议不是口头约定，是**结构化的数据包（packet）**：
 
-### 元的理念
-
-在 Meta_Kim 里：
-
-**元 = 为了支持意图放大而存在的最小可治理单元。**
-
-它至少要满足五个条件：
-
-- 能独立理解
-- 足够小，便于控制
-- 边界清晰，知道自己不负责什么
-- 可替换，不会一换就让系统整体塌掉
-- 可复用，能被重复编排
-
-Meta_Kim 不把“元”当修辞，而是把它当架构粒度。
-
-#### 元和工程的关系
-
-一个更接近项目设计的说法是：
-
-**工程是元要治理的对象之一。元系统可以把工程任务纳入完整闭环，但元本身不等于一个全能工程师。**
-
-这句话拆开看：
-
-- **工程能做的事，元系统通常也能把它做成**，因为它可以通过 `Critical / Fetch / Thinking / Execution / Review / Meta-Review / Verification / Evolution` 这条链，把执行层 agent 编排起来。
-- **但元自己不是直接包办所有工程细节的执行者**。项目主源明确要求：元理论是 dispatcher，不是 executor；只要是可执行任务，就应该交给具名 owner。
-- **反过来，元能做的治理动作，普通工程流不一定天然会做**，比如 owner 解析、协议先行、review of review、验证闭环、Evolution 落盘。
-
-如果你只想记一句，可以记成：
-
-**工程是元的被治理域，不是元的下位替代品；元强在把工程做成闭环，而不是自己亲手做完一切工程。**
-
-### 方法主线
-
-Meta_Kim 的核心链路只有一条：
-
-```mermaid
-flowchart LR
-    A["元"] --> B["组织镜像"]
-    B --> C["节奏编排"]
-    C --> D["意图放大"]
-```
-
-- `元`：怎么拆
-- `组织镜像`：怎么组
-- `节奏编排`：怎么发
-- `意图放大`：怎么成
-
-缺任何一段，这套方法都不完整。
-
-**配图在哪里：** 主源与镜像、入口与 skill 的缩略关系见 [元架构视角](#元架构视角)；八阶段每一步的展开与铁律见 [复杂任务治理主轴](#complex-spine-zh)；「执行脊柱」与「部门业务合同」两套词汇的对照见 [八阶段脊柱和 business workflow 不是一回事](#meta-kim-diagram-two-layers-zh)；任务类型路网见 [项目里的流程关系总图](#task-routing-zh)。
-
-<a id="complex-spine-zh"></a>
-
-### 复杂任务治理主轴（核心必读）
-
-**复杂任务**（多文件 / 跨模块 / 需要多种能力协作）走八阶段脊柱。前半段对应四条铁律：**先追问再猜、先搜索再假设、先计划再冲动、先验证再信任**，中间由 **Thinking** 产出牌组与交付外壳计划。
-
-八阶段在纸面上很长，下图用**两行各四步**压缩高度；阶段全称与下表一致。（`flowchart TB` + 两个横向 `subgraph` 在 Mermaid 里常被排成左右并排，故拆成上下两个 `LR` 图，保证真·两排。）
-
-**上行 1–4（澄清 → 执行）**
-
-```mermaid
-flowchart LR
-  S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
-```
-
-**衔接：** `4 Execution` → `5 Review`
-
-**下行 5–8（审查 → 进化）**
-
-```mermaid
-flowchart LR
-  S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
-```
-
-阶段全称与职责：1 澄清范围（元架构 vs 技术架构）；2 搜索 agent / skill；3 `dispatchBoard` / `mergeOwner`；4 派给 owner；5 质量边界；6 审查标准；7 闸门闭环；8 模式与伤疤写回。
-
-与四条铁律的对齐（对应 1–3 阶段与审查）：
-
-```mermaid
-graph LR
-  I1[追问强于猜测] --> I2[搜索强于假设]
-  I2 --> I3[计划强于冲动]
-  I3 --> I4[验证强于信任]
-```
-
-<div align="center">
-
-| 阶段 | 作用 | 用人话解释 |
+| 协议产物 | 哪个阶段 | 作用 |
 | --- | --- | --- |
-| `Critical` | 澄清 | 先确认你到底要什么，不猜 |
-| `Fetch` | 检索 | 先找现成能力，不假设不存在 |
-| `Thinking` | 规划 | 设计拆分方式、交付物和顺序 |
-| `Execution` | 执行 | 把子任务派给合适的 agent |
-| `Review` | 审查 | 审代码、审边界、审质量 |
-| `Meta-Review（元审查）` | 审查审查本身 | 检查审查标准有没有偏 |
-| `Verification` | 验证闭环 | 确认修复真的生效 |
-| `Evolution` | 沉淀 | 把模式、伤疤、经验留下来 |
-
-</div>
-
-- `Critical > Guessing`
-- `Fetch > Assuming`
-- `Thinking > Rushing`
-- `Review > Trusting`
-
-各阶段说明：
-
-- **Stage 1 Critical**：明确范围，不猜
-- **Stage 2 Fetch**：搜索现有 agent / skill，不假设不存在
-- **Stage 3 Thinking**：规划子任务，设计牌组，准备交付外壳
-- **Stage 4 Execution**：通过分派机制把工作交给合适角色，而不是一股脑自己硬做
-- **Stage 5 Review**：对每个产出做质量审查
-- **Stage 6 Meta-Review（元审查）**：审查审查标准本身
-- **Stage 7 Verification**：验证修复已实际应用，关闭发现项
-- **Stage 8 Evolution**：捕获模式，更新伤疤记录，反哺系统
-
-这里还有 4 条容易被忽略、但现在已经写入主源规则的补充：
-
-- **只有纯 `Q / Query` 可以不走 agent**：也就是纯解释、纯问答、没有改文件、没有外部副作用、没有交付物交接
-- **任何可执行任务都必须有 owner**：能直接找到就用现成 owner；找不到就先补 owner，再执行
-- **Thinking 必须协议先行**：`runHeader`、`dispatchBoard`、`workerTaskPacket`、`reviewPacket`、`verificationPacket`、`evolutionWritebackPacket` 没定出来，Execution 不应开始
-- **能并行就并行**：独立子任务必须声明 `dependsOn`、`parallelGroup`、`mergeOwner`，不应该无故串行
-
-`meta-conductor` 维护 `stageState` / `controlState`（含跳过 / 中断 / 迭代）；`meta-warden` 与 `meta-prism` 负责闸门与验证闭环（`gateState` 等）。隐形骨架不是第二套用户界面。细则见 `.claude/skills/meta-theory/references/dev-governance.md`（元理论治理参考）。
-
-### 8 阶段脊柱和 business workflow 不是一回事
-
-这块很重要，因为它是 Meta_Kim 最容易被误读的地方。
-
-Meta_Kim 里同时存在两层流程语言：
-
-<div align="center">
-
-| 层级 | 定义位置 | 作用 |
-| --- | --- | --- |
-| **8 阶段脊柱** | `meta-theory` / `dev-governance.md` | 元理论定义的复杂开发任务标准执行链 |
-| **business workflow 10 phases** | `config/contracts/workflow-contract.json` | 部门 run 的合约语言、展示语言、交付纪律 |
-
-</div>
-
-<a id="meta-kim-diagram-two-layers-zh"></a>
-
-**对照图：** 上行是**执行骨架**（八阶段脊柱），下行是**部门 run 合约**（十阶段业务词汇）；两套词并行存在，业务阶段不会改名替换脊柱阶段。（`flowchart TB` 里两个横向 `subgraph` 常被并排，故拆成上下两个 `LR` 图。）
-
-**上行：八阶段脊柱（执行骨架）**
-
-```mermaid
-graph LR
-  A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
-  A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
-```
-
-**下行：十阶段业务合同（部门 run）**
-
-```mermaid
-graph LR
-  B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
-  B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
-  B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
-```
-
-文字版速记（与上图同一套顺序）——**8 阶段脊柱**：
-
-<div align="center">
-
-```text
-Critical -> Fetch -> Thinking -> Execution -> Review -> Meta-Review（元审查） -> Verification -> Evolution
-```
-
-</div>
-
-**business workflow** 的另一套「业务 run 词汇」：
-
-<div align="center">
-
-```text
-direction -> planning -> execution -> review -> meta_review -> revision -> verify -> summary -> feedback -> evolve
-```
-
-</div>
-
-重点不是背两套名词，而是理解关系：
-
-- **business workflow 不会替代 8 阶段脊柱**
-- 它更像“部门级 run contract 和交付包装层”
-- 真正的复杂开发治理，底层还是走 8 阶段
-- `summary / feedback / evolve` 这些更偏 run 管理和展示闭环，不等于把底层阶段改名
-
-如果你只记一句：
-
-**8 阶段是执行骨架，10 phases 是部门级运行合约。**
-
-### 项目里的流程关系总图
-
-<a id="task-routing-zh"></a>
-
-下面是一张**任务类型路网**（任务到达 → 是否纯 Query → 简单 / 复杂 Type C / 元分析 / Type D → 是否再叠加十步治理）。与 [使用指南 · 系统怎么工作](#系统怎么工作) 里的外行链、[元架构视角 · 默认路径](#default-path-zh) 互补：这里回答「需求进来之后走哪条分叉」。
+| `intentPacket` | Critical | 锁定真实意图，防止执行过程中跑偏 |
+| `dispatchBoard` | Thinking | 谁干什么，依赖关系，并行分组 |
+| `workerTaskPacket` | Execution | 每个子任务的完整上下文包 |
+| `reviewPacket` | Review | 审查发现的结构化记录 |
+| `revisionResponse` | Revision | 对每个审查发现的修复响应 |
+| `verificationResult` | Verification | 修复是否真的把问题关了 |
+| `summaryPacket` | Summary | 对外发布前的最终摘要 |
+| `evolutionWriteback` | Evolution | 经验回写目标 |
 
 ```mermaid
 flowchart LR
-  T[任务到达] --> Q{纯 Query?}
-  Q -->|是| D[直接作答]
-  Q -->|否| K{路由}
-  K -->|简单| P1[压缩脊柱尾段]
-  K -->|复杂 Type C| P2[八阶段全链]
-  K -->|元分析| P3[mw: analyze / propose / report]
-  K -->|审方案| P4[Type D]
-  P1 --> E[ERV → Evo]
-  P2 --> UP{再升高?}
-  UP -->|是| G["叠加十步治理"]
-  UP -->|否| E
-  P3 --> E
-  P4 --> E
+    subgraph packets["协议产物流转"]
+        direction LR
+        IP[intentPacket<br/>意图锁定] --> DP[dispatchBoard<br/>分派看板]
+        DP --> WTP[workerTaskPacket<br/>任务包]
+        WTP --> RP[reviewPacket<br/>审查发现]
+        RP --> RR[revisionResponse<br/>修复响应]
+        RR --> VR[verificationResult<br/>验证结果]
+        VR --> SP[summaryPacket<br/>最终摘要]
+        SP --> EW[evolutionWriteback<br/>经验回写]
+    end
+
+    IP ~~~ C2["Critical"]
+    DP ~~~ T2["Thinking"]
+    WTP ~~~ E2["Execution"]
+    RP ~~~ R2["Review"]
+    RR ~~~ REV2["Revision"]
+    VR ~~~ V2["Verification"]
+    SP ~~~ S2["Summary"]
+    EW ~~~ EV2["Evolution"]
+
+    style packets fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
-<div align="center">
+这些协议产物不是可有可无的文档——它们是系统运行的**事实来源**。没有协议，下一节点其实不是在"接力"，而是在"猜上一个节点到底想表达什么"。这就是很多 AI 协作一到复杂任务就开始失真的原因。
 
-| 分支 | 含义 |
+当前实现中的协议载体：执行前有 `taskClassification`，发牌前有 `cardPlanPacket`，分发前有 `dispatchEnvelopePacket`，review 之后有 `reviewPacket.findings`，revision 与 verify 之间有 `revisionResponses` + `verificationResults` + `closeFindings`，对外发布前有 `summaryPacket`，进入进化前有 `writebackDecision`。
+
+`npm run validate:run` 会校验这些产物链是否完整闭合。
+
+### 门 = 阶段到了不代表已经过门
+
+协议规定每个节点**必须交出什么**，门规定这些东西**够不够放行**。
+
+一句话说死：
+
+> **阶段说明你走到哪儿，门说明你配不配往前走。**
+
+```mermaid
+flowchart LR
+    A["到达某个阶段"] --> B{"门判断"}
+    B -->|通过| C["放行：进入下一步"]
+    B -->|不通过| D["回修：补证据/修产物"]
+    B -->|暂不放行| E["留白：等待条件成熟"]
+    B -->|升级| F["更高层介入"]
+
+    style A fill:#dbeafe,stroke:#2563eb,color:#000
+    style B fill:#7c3aed,stroke:#4c1d95,color:#fff
+    style C fill:#dcfce7,stroke:#16a34a,color:#000
+    style D fill:#fee2e2,stroke:#dc2626,color:#000
+    style E fill:#e0f2fe,stroke:#0284c7,color:#000
+    style F fill:#fef3c7,stroke:#f59e0b,color:#000
+```
+
+当前系统里的关键门：
+
+| 门 | 把什么关 | 放行条件 |
+| --- | --- | --- |
+| **planning gate** | 从规划进入执行前 | 边界、owner、交付物、风险都定了 |
+| **metaReview gate** | 元审查够不够格 | 审查标准本身没偏、没漏、没松 |
+| **verify gate** | 修复是不是真的关了 | finding → revision → verification 闭合 |
+| **summary gate** | 能不能对外发布 | 验证通过 + 摘要完成 |
+| **publicDisplay gate** | 能不能宣称"已完成" | verifyPassed + summaryClosed + singleDeliverableMaintained + deliverableChainClosed |
+
+最关键的是 **publicDisplay gate**——没有通过验证、摘要未闭合、交付链断裂，就不能假装"做完了"。
+
+门和协议的关系：
+
+- **协议**解决"节点必须交出什么"——偏交付契约
+- **门**解决"这些东西够不够放行"——偏准入判定
+- 没有协议，门没有判断依据；没有门，协议就是走过场
+
+### 动态发牌 = 补充隐形框架的灵活性
+
+8 大流程的骨架相对固定，但现实中的任务千变万化，不可能一套固定流程覆盖所有场景。所以 Meta_Kim 引入了**动态发牌机制**。
+
+发牌对应 8 大流程，但不是简单的 1:1 映射。10 张牌如下：
+
+| 牌 | 触发条件 | 注意力成本 |
+| --- | --- | --- |
+| **Clarify（澄清）** | 需求模糊 | 低 |
+| **Shrink scope（范围收缩）** | 仓库太大、文件太多 | 低 |
+| **Options（方案）** | 需求清晰但路径很多 | 中 |
+| **Execute（执行）** | 方案确定 | 高 |
+| **Verify（校验）** | 执行完成 | 中 |
+| **Fix（修复）** | 校验失败 | 中 |
+| **Rollback（回滚）** | 风险扩散 | 高 |
+| **Risk（风险）** | 涉及安全/全局/多方 | 高 |
+| **Nudge（建议）** | 用户卡住了，轻轻推一下 | 低 |
+| **Pause（留白）** | 连续 3 张高成本牌后强制休息 | 零 |
+
+关键在于：**部分牌是动态的**。它们能补充隐形框架相对较死的逻辑：
+
+- 当 3 张高注意力牌连续打出时，系统会**强制插入 Pause（留白）**——不是等用户提醒，是自己知道该停了
+- 当安全风险出现时，**Risk 牌会抢占**，打断当前流程
+- 当用户已经知道某些信息时，对应的牌会被**跳过**——不做无用功
+- 当任务迭代超过上限时，系统会**升级到 Warden 裁定**——不会无限循环
+
+发牌机制让固定骨架有了"呼吸感"——该严的地方严（8 大流程不变），该灵活的地方灵活（动态牌补充）。
+
+```mermaid
+flowchart TD
+    START[当前牌完成] --> SKIP{检查下一张牌<br/>skip_condition}
+    SKIP -->|满足,跳过| NEXT[继续下一张]
+    SKIP -->|不满足| INTR{检查中断队列}
+    INTR -->|安全风险抢占| RISK[Risk 风险牌<br/>最高优先级]
+    INTR -->|无抢占| PAUSE{连续 >=3 张<br/>高成本牌?}
+    PAUSE -->|是,强制休息| P[Pause 留白牌<br/>零注意力]
+    PAUSE -->|否| DEAL[按优先级发牌]
+    RISK --> DEAL
+    P --> DEAL
+    DEAL --> COUNT{迭代超过<br/>max_iterations?}
+    COUNT -->|是| WARDEN[升级到 Warden 裁定]
+    COUNT -->|否| START
+
+    style RISK fill:#dc2626,color:#fff
+    style P fill:#1e3a5f,color:#93c5fd
+    style WARDEN fill:#7c3aed,color:#fff
+    style DEAL fill:#16a34a,color:#fff
+```
+
+### 闭环 = 不断迭代 + 不断生成 + 不断提升
+
+有了骨架、递进流程、协议、动态发牌，就形成了一个**完美闭环**：
+
+```
+需求进来 → 骨架启动 → 发牌决策 → 分派执行 → 审查验证 → 经验沉淀 → agent 升级 → 下一轮更强
+```
+
+这个闭环不是一次性的。每一轮都会：
+
+1. **生成对应的 agent**——如果发现能力缺口，系统会通过 Type B 管线自动创建新 agent
+2. **提升 agent 的能力**——通过 Evolution 回写，agent 的 SOUL.md、技能负载、工具链都会持续优化
+3. **明确每个 agent 的边界**——每个 agent 只管一类事，越界会被 Sentinel 拦截
+
+```mermaid
+flowchart TD
+    INPUT[需求进来] --> SPINE[隐形骨架启动]
+    SPINE --> CARD[动态发牌决策]
+    CARD --> DISPATCH[分派给专业 Agent]
+    DISPATCH --> REVIEW[审查 + 验证]
+    REVIEW --> |通过| EVOLVE[经验沉淀]
+    REVIEW --> |不通过| FIX[修复 + 再审查]
+    FIX --> REVIEW
+    EVOLVE --> UPGRADE[Agent 能力升级]
+    UPGRADE --> |发现能力缺口| CREATE[Type B 管线<br/>自动创建新 Agent]
+    UPGRADE --> |边界需要调整| BOUNDARY[调整 Agent 边界]
+    CREATE --> INPUT2[下一轮更强]
+    BOUNDARY --> INPUT2
+
+    style INPUT fill:#fbbf24,color:#000
+    style EVOLVE fill:#34d399,color:#000
+    style CREATE fill:#f87171,color:#fff
+    style INPUT2 fill:#fbbf24,color:#000
+```
+
+### Agent 边界 + 技能集成
+
+8 个元角色各管一摊，边界清晰：
+
+| 角色 | 职责 | 不管什么 |
+| --- | --- | --- |
+| **meta-warden** | 协调、仲裁、最终综合 | 不直接写代码 |
+| **meta-conductor** | 工作流、节奏控制 | 不做安全检查 |
+| **meta-genesis** | Agent 设计、SOUL.md | 不管工具选型 |
+| **meta-artisan** | 技能、MCP、工具匹配 | 不管 agent 人设 |
+| **meta-sentinel** | 安全、权限、回滚 | 不管节奏编排 |
+| **meta-librarian** | 记忆、连续性 | 不管代码执行 |
+| **meta-prism** | 质量审查、反糊弄 | 不管能力搜索 |
+| **meta-scout** | 外部能力发现 | 不管内部协调 |
+
+每个 agent 可以集成各种强大的 **skill**（技能）和 **command**（命令），按需加载。Meta_Kim 预装了 9 个社区技能，也支持自定义扩展。
+
+```mermaid
+flowchart TD
+    WARDEN[meta-warden<br/>协调/仲裁/综合] --> CONDUCTOR[meta-conductor<br/>工作流/节奏]
+    WARDEN --> GENESIS[meta-genesis<br/>Agent 设计]
+    WARDEN --> ARTISAN[meta-artisan<br/>技能/工具匹配]
+    WARDEN --> SENTINEL[meta-sentinel<br/>安全/权限/回滚]
+    WARDEN --> LIBRARIAN[meta-librarian<br/>记忆/连续性]
+    WARDEN --> PRISM[meta-prism<br/>质量审查]
+    WARDEN --> SCOUT[meta-scout<br/>外部能力发现]
+
+    GENESIS -.-> |SOUL.md| ARTISAN
+    ARTISAN -.-> |技能负载| GENESIS
+    CONDUCTOR -.-> |任务看板| WARDEN
+    SENTINEL -.-> |安全拦截| WARDEN
+    PRISM -.-> |审查报告| WARDEN
+    SCOUT -.-> |能力候选| ARTISAN
+    LIBRARIAN -.-> |上下文记忆| WARDEN
+
+    SKILLS[9 个社区技能<br/>+ 自定义扩展] --> ARTISAN
+    HOOKS[Hook 自动化<br/>拦截/格式化/检查] --> SENTINEL
+
+    style WARDEN fill:#7c3aed,color:#fff
+    style CONDUCTOR fill:#60a5fa,color:#000
+    style GENESIS fill:#fbbf24,color:#000
+    style ARTISAN fill:#34d399,color:#000
+    style SENTINEL fill:#f87171,color:#fff
+    style LIBRARIAN fill:#a78bfa,color:#fff
+    style PRISM fill:#fb923c,color:#000
+    style SCOUT fill:#2dd4bf,color:#000
+```
+
+### Hook 自动化
+
+在 Claude Code 中，Meta_Kim 通过 **Hook** 实现自动化：
+
+- **危险命令拦截**：`rm -rf`、`DROP TABLE` 等操作会被自动阻断
+- **Git push 提醒**：推送前自动提醒你检查
+- **格式化**：编辑 JS/TS 文件后自动格式化
+- **类型检查**：编辑后自动跑 TypeScript 检查
+- **console.log 警告**：写了 console.log 会提醒你删掉
+- **会话结束审计**：会话结束前检查是否有遗留问题
+- **子 agent 上下文注入**：自动给子 agent 注入项目上下文
+
+这些 Hook 不是可选的锦上添花——它们是治理系统的执行层保障。
+
+### 跨平台映射
+
+**整个架构可以映射到任何支持 agent 且支持 agent-to-agent 通信的项目上。**
+
+Meta_Kim 当前已经映射了 4 个平台：
+
+| 平台 | 状态 | 映射方式 |
+| --- | --- | --- |
+| **Claude Code** | 完整支持 | `.claude/agents/*.md` + `SKILL.md` + hooks + MCP |
+| **Codex** | 完整支持 | `.codex/agents/*.toml` + skills + commands |
+| **OpenClaw** | 完整支持 | `openclaw/` 目录结构 + workspaces |
+| **Cursor** | 完整支持 | `.cursor/agents/*.md` + skills + MCP |
+
+核心逻辑是同一套（`canonical/` 目录），只是通过同步脚本（`npm run sync:runtimes`）投影到不同平台的文件结构。
+
+```mermaid
+flowchart TB
+    CANONICAL["canonical/<br/>（统一源码层）"]
+
+    CANONICAL --> |npm run sync:runtimes| CLAUDE[".claude/<br/>Claude Code<br/>agents + skills + hooks"]
+    CANONICAL --> |npm run sync:runtimes| CODEX[".codex/<br/>Codex<br/>agents.toml + skills"]
+    CANONICAL --> |npm run sync:runtimes| OPENCLAW["openclaw/<br/>OpenClaw<br/>workspaces + skills"]
+    CANONICAL --> |npm run sync:runtimes| CURSOR[".cursor/<br/>Cursor<br/>agents + skills + MCP"]
+
+    NEW[新平台...] -.-> |配置映射| CANONICAL
+
+    style CANONICAL fill:#7c3aed,color:#fff
+    style CLAUDE fill:#fbbf24,color:#000
+    style CODEX fill:#34d399,color:#000
+    style OPENCLAW fill:#60a5fa,color:#000
+    style CURSOR fill:#f87171,color:#fff
+    style NEW fill:#555,color:#aaa
+```
+
+你可以通过配置**不断补充新的平台映射**——只要那个平台支持 agent 和 agent 间通信。
+
+但要注意：四个运行时不是平权关系。当前 Claude Code 的承载面最完整，是主编辑运行时。
+
+| 能力面 | Claude Code | Codex | OpenClaw | Cursor |
+| --- | --- | --- | --- | --- |
+| **agent** | 原生 agents/subagents，项目级与用户级都成熟 | custom agents/subagents 很强 | workspace 型 agent，支持 agent-to-agent | agent 投影可用，较轻 |
+| **skill/references** | 原生 skill、references、全局技能生态完整 | `.agents/skills/` 兼容很好 | workspace skill + installable skill | skill/references 接入较轻 |
+| **hook/自动化** | 项目级 hooks + settings.json + 插件生态 | 没有仓库级原生 hook 文件面 | 有 workspace boot/hook 风格能力 | 原生治理 hook 最弱 |
+| **MCP/配置** | 原生 MCP 与配置面完整 | 可接 runtime adapter 与 MCP | workspace config 明确 | 可接 MCP，但整体较轻 |
+| **治理闭环承载力** | **最高** | 高，但低于 Claude Code | 高，但形态不同 | 最轻 |
+
+原因不是情怀——Claude Code 同时具备 agent、skill、references、hooks、settings、MCP、plugin、全局能力发现这些原生面，让"发牌 → 协议 → 过门 → 自动化守卫 → 写回"这一整套闭环更容易完整承载。
+
+### 仓库四层承载结构
+
+| 层 | 位置 | 作用 |
+| --- | --- | --- |
+| **canonical 主源** | `canonical/`、`config/contracts/workflow-contract.json` | 长期维护优先改这里 |
+| **运行时投影** | `.claude/`、`.codex/`、`.agents/skills/`、`openclaw/`、`.cursor/` | 同一能力投到不同运行时 |
+| **本地状态** | `.meta-kim/state/{profile}/`、`.meta-kim/local.overrides.json` | profile 级状态、run index、continuity |
+| **脚本与校验** | `scripts/`、`npm run *` | 同步、校验、发现、验收 |
+
+### 三层状态层（项目级 / 全局级 / 本地级）
+
+这三层最容易混，必须分开理解：
+
+| 层级 | 承载位置 | 决定什么 |
+| --- | --- | --- |
+| **项目级** | 当前仓库的 `canonical/`、contracts、runtime projections、文档、脚本 | 这个项目自己定义了什么 |
+| **全局级** | `~/.claude/`、`~/.codex/`、`~/.openclaw/`、`~/.cursor/`、`~/.meta-kim/global/` | 这台机器上还能发现什么 |
+| **本地级** | `.meta-kim/state/{profile}/run-index.sqlite`、`compaction/`、`profile.json` | 这次 run 在这个 profile 下留下了什么 |
+
+#### `.meta-kim/` 里面都有什么？
+
+`.meta-kim/` 就是 Meta_Kim 的本地存档目录。它干三件事：
+
+**1. 记住你的选择** — `local.overrides.json`
+
+你第一次跑 `node setup.mjs`，选了"我要用 Claude Code 和 Codex"，这个选择就存在这里。下次跑 setup 不用重新选。
+
+*例子：你电脑上装了 Claude Code、Codex、OpenClaw 三个，但你只想用前两个。这个配置就存在这里，所有脚本读这个文件来决定往哪装技能。*
+
+**2. 记录工作历史** — `state/{profile}/run-index.sqlite`
+
+假设你用 Meta_Kim 的治理流程做了一件事——比如"用 8-stage spine 审查了一段代码"。这个审查的结果记录（叫 run artifact）可以被索引进 SQLite 数据库，以后能查"上次审查了啥、谁审查的、结果怎样"。
+
+*例子：你上周让 meta-prism 审查了认证模块，这周又改了认证模块。系统查 `.meta-kim/state/` 就能知道"上次审查发现了 3 个问题，修复了 2 个，还剩 1 个没修"，不用你重复说。*
+
+**3. 跨会话恢复** — `state/{profile}/compaction/`
+
+你跟 Claude Code 聊到一半，token 用完了，会话断了。compaction 包把你当前做到哪一步、哪些待办没完成存下来，下次开新会话时能接着干。
+
+*例子：你让 Meta_Kim 做一个复杂的多文件重构，做到第 6 步断了。下次开新会话，系统从 compaction 包读到"做到第 6 步了，第 7 步还没开始"，直接从第 7 步继续，不用从头来。*
+
+**其他文件：** `doctor-cache/` 存 `npm run doctor:governance` 的缓存结果，`migrations/` 追踪版本间的数据结构升级，`profile.json` 存 profile 元信息。全部由脚本自动管理，你不需要手动编辑。
+
+**快速参考：**
+
+| 路径 | 作用 | 什么时候写入 |
+| --- | --- | --- |
+| `local.overrides.json` | 记住你选了哪些运行时 | 自动 — 首次运行 `setup.mjs` |
+| `state/{profile}/profile.json` | Profile 元信息（创建时间、名称） | 自动 — `setup.mjs` 创建 `default` profile |
+| `state/{profile}/run-index.sqlite` | 治理 run 的索引记录 — 谁跑了什么、发现了什么、还有什么没解决 | 按需 — `npm run index:runs -- <artifact>` |
+| `state/{profile}/compaction/` | 跨会话接力包：未完成的步骤、待处理的发现、未关闭的验证门 | 按需 — 治理 run 需要跨会话恢复时写入 |
+| `state/{profile}/doctor-cache/` | `npm run doctor:governance` 的缓存结果 | 按需 — `doctor:governance` 写入 |
+| `state/{profile}/migrations/` | 状态迁移追踪（Meta_Kim 版本间的 schema 升级） | 自动 — 状态 schema 在版本间变化时 |
+
+### 全局安装后哪些能力能用
+
+Meta_Kim 的门和协议有四层执行保障。全局安装（`node setup.mjs`）后，在任何项目中使用时：
+
+| 执行层 | 全局安装后能用 | 需要 Meta_Kim 仓库 |
+| --- | --- | --- |
+| **Prompt 层**（agents + skills 中定义的门和协议规则） | 能用 — 安装到 `~/.claude/skills/` 和 `~/.claude/agents/`，AI 读 prompt 就会遵守 | — |
+| **Hook 层**（会话结束时的门检查、危险命令拦截） | 能用 — 配置在 `.claude/settings.json` 中 | — |
+| **配置层**（workflow-contract.json 中的协议字段定义） | 能用 — 协议规则已嵌入 skill prompt，AI 知道每个 packet 必须有哪些字段 | — |
+| **代码校验**（`npm run validate:run` 硬校验 packet 链闭合） | — | 需要 — 脚本在 `scripts/validate-run-artifact.mjs` |
+
+前三层是主要防线，全局安装后在任何项目中都能工作。代码校验是最后一道兜底，需要回到 Meta_Kim 仓库目录运行（或将脚本路径指对）。
+
+---
+
+## 三层记忆体系
+
+Meta_Kim 的记忆不是单一的。它有三层，各有分工，共同保障 agent 持续进化且对项目越来越熟。
+
+**三层记忆在运行 `node setup.mjs` 后全部自动激活。** 无需手动配置——依赖自动安装、git hook 自动注册、数据生命周期由系统自动管理。
+
+### 第一层：Memory（Agent 升级记忆）
+
+- **负责什么**：Agent 的升级和持续学习
+- **存储位置**：`.claude/projects/*/memory/`
+- **工作机制**：每次运行结束前，系统会读取 memory 作为信息进行判断，决定 agent 是否需要升级、边界是否需要调整
+- **核心价值**：让 agent 越用越聪明，而不是每次都从零开始
+- **激活方式**：自动——AI 在每次会话中自动读写 memory
+- **查询方式**：直接问 AI——"之前关于这个项目我们学到了什么？"
+
+### 第二层：Graphify（项目级 LLM Wiki）
+
+- **负责什么**：项目级别的代码知识图谱
+- **存储位置**：`graphify-out/graph.json`（NetworkX 节点链接格式）
+- **工作机制**：`node setup.mjs` 自动安装 graphify、注册 git hook（commit/checkout 时自动重建）、生成初始图谱——全部自动
+- **核心价值**：
+  - 让记忆越来越熟悉项目——不是记住代码原文，而是理解代码的结构和关系
+  - **大幅降低幻觉**——agent 不再凭记忆瞎编，而是基于图谱事实回答
+  - **大幅减少 token 消耗**——通过子图提取代替原始文件读取，最高压缩 71 倍
+- **质量门槛**：
+  - 模糊节点 > 30% → 标记为低质量图谱，回退到直接文件读取
+  - 总节点 < 10 → 图谱太稀疏，回退到 Glob/Grep
+  - 存在"上帝节点"（入度过高）→ 标记为串行瓶颈
+- **激活方式**：`node setup.mjs` 一键搞定——安装、依赖检查（networkx >= 3.4）、git hook、初始图谱生成
+- **查询方式**：`python -m graphify query "你的问题"`——用自然语言查询代码图谱
+
+### 第三层：SQL（向量级会话检索）
+
+- **负责什么**：项目会话的向量级存储和检索
+- **存储方式**：SQLite + 向量扩展（sqlite-vec）
+- **工作机制**：把每次会话的关键信息存为向量，下次通过语义相似度检索
+- **核心价值**：
+  - 跨会话连续性——上次聊到哪了，这次能接上
+  - 向量级检索——不是关键词匹配，而是语义理解
+  - 精准召回——从历史会话中找到最相关的上下文
+- **激活方式**：自动——会话完成时自动索引；也可用 `npm run index:runs -- <artifact>` 手动索引已验证的 run 产物
+- **查询方式**：`npm run query:runs -- --owner <agent>`——按 agent 查找历史 run，或直接让 AI 回忆相关历史会话
+
+### 三层协同
+
+```mermaid
+flowchart TB
+    subgraph memory["第一层：Memory"]
+        M_IN[运行结束前<br/>读取 memory] --> M_JUDGE[判断 Agent<br/>是否需要升级]
+        M_JUDGE --> M_OUT[更新边界<br/>调整能力]
+    end
+
+    subgraph graphify["第二层：Graphify"]
+        G_IN[源文件 > 20 时<br/>自动生成图谱] --> G_COMPRESS[子图提取<br/>最高 71x 压缩]
+        G_COMPRESS --> G_QUERY[Agent 基于图谱<br/>事实回答]
+    end
+
+    subgraph sql["第三层：SQL"]
+        S_IN[会话关键信息<br/>存为向量] --> S_INDEX[SQLite + sqlite-vec<br/>向量索引]
+        S_INDEX --> S_RECALL[语义相似度<br/>精准召回]
+    end
+
+    memory <--> graphify
+    graphify <--> sql
+    sql <--> memory
+
+    GOAL1[降低幻觉<br/>基于事实而非编造]
+    GOAL2[减少 token<br/>压缩代替全文读取]
+
+    memory --> GOAL1
+    graphify --> GOAL1
+    graphify --> GOAL2
+    sql --> GOAL2
+
+    style memory fill:#fbbf24,color:#000
+    style graphify fill:#34d399,color:#000
+    style sql fill:#60a5fa,color:#000
+    style GOAL1 fill:#dc2626,color:#fff
+    style GOAL2 fill:#dc2626,color:#fff
+```
+
+三层记忆共同作用，实现两个核心目标：
+
+1. **大幅降低幻觉**——agent 不凭空编造，基于事实和上下文回答
+2. **大幅减少 token 消耗**——用图谱压缩代替全文读取，用向量检索代替暴力搜索
+
+---
+
+## 运维命令速查
+
+### 日常使用
+
+| 命令 | 作用 |
 | --- | --- |
-| 简单单 owner | 压缩脊柱片段，走 Exec → Review → Verify → Evolution |
-| 复杂多文件 | `Critical`…`Evolution` 全链；若复杂度继续升高再叠加十步治理 |
-| 元部门分析 | `metaWorkflow`：analyze → propose → report |
-| Type D | 读提案、清单、prism / scout / warden 审查报告 |
+| `node setup.mjs` | 交互式安装/更新/检查向导 |
+| `node setup.mjs --update` | 更新所有技能和依赖 |
+| `node setup.mjs --check` | 环境检查（不写盘） |
+| `node setup.mjs --lang zh-CN` | 指定中文界面 |
 
-</div>
+### 同步与校验
 
-**与上文一致：** 下面文字只收拢**同一路网下最容易误解的落地口径**（不再重复解释分叉本身）。
+| 命令 | 作用 |
+| --- | --- |
+| `npm run sync:runtimes` | 从 canonical 同步到四端 |
+| `npm run check:runtimes` | 检查四端是否同步 |
+| `npm run validate` | 项目完整性校验 |
+| `npm run verify:all` | 全量校验（含 runtime smoke） |
+| `npm run doctor:governance` | 治理健康体检 |
 
-如果按主项目真实设计来讲，Meta_Kim 不是“只有一条流程”，而是几条路径叠在一起（与上图同一张路网）。
+### 技能与依赖
 
-这里最容易误解的 4 件事：
+| 命令 | 作用 |
+| --- | --- |
+| `npm run deps:install` | 安装 9 个社区技能到全局 |
+| `npm run deps:install:all-runtimes` | 安装到所有 runtime |
+| `npm run discover:global` | 扫描全局能力 |
+| `npm run sync:global:meta-theory` | 同步 meta-theory 到用户级 |
 
-- **最简单路径不是“裸执行”**。只有纯 `Q / Query` 才能直答；只要任务会执行、会落盘、会交接，就仍然需要 owner。
-- **简单任务有压缩路径**，但它也不是跳过治理，而是走 `Execution → Review → Verification → Evolution` 这条 owner-driven shortcut。
-- **8 阶段才是复杂开发任务的正式主骨架**，10 步治理是它的升级层，不是替代品。
-- **3 phases 真正存在，但它指的是 `metaWorkflow = analyze → propose → report`**，不是“审查输出 → 验证修复 → evolution”这条你想象中的独立验证流。
+### 高级运维
 
-#### 那能不能“先手搓完，再交给后三段做验证”？
+| 命令 | 作用 |
+| --- | --- |
+| `npm run validate:run -- <file.json>` | 校验治理 run 产物 |
+| `npm run eval:agents` | 轻量 runtime smoke 测试 |
+| `npm run eval:agents:live` | 带实时 prompt 的验收 |
+| `npm run probe:clis` | 探测本机 CLI 工具 |
+| `npm run test:mcp` | MCP 自测 |
+| `npm run index:runs -- <dir>` | 索引已验证的 run 产物 |
+| `npm run query:runs -- --owner <agent>` | 查询 run 索引 |
+| `npm run migrate:meta-kim -- <dir> --apply` | 导入旧版提示包 |
 
-可以分两种情况看：
+---
 
-- **如果你手里的是一个现成方案 / 提案 / agent 定义文档**，那更接近 `Type D`，也就是“读提案 → checklist → 输出审查报告”。
-- **如果你手里的是已经写好的代码或可执行产物**，理论上可以把它当成“外部先做完的产物”接进后半段，但不能假装前面流程不存在。
+## FAQ
 
-项目主源的真实要求是：
+### Q：Meta_Kim 和普通的 AI 编码助手有什么区别？
 
-- `Review` 会先检查 owner coverage 和 protocol compliance
-- 没有 owner、没有 `dispatchBoard`、没有 `workerTaskPacket`、没有 `mergeOwner`，即使代码看起来能跑，也应该先记为协议不合规
-- 所以不能把“手搓完 → 只走一个想象中的 3 阶段验证流”当成项目里的正式默认路径
+普通 AI 编码助手是你问什么它就做什么，没有中间的治理环节。Meta_Kim 在"问"和"做"之间加了好几层：先确认你到底要什么，再规划谁来做，做完还要审查，审完还要验证，验证通过还要沉淀经验。**它不是另一个 AI，是给 AI 装了一套工程纪律。**
 
-更准确地说：
+### Q：我只有一个文件要改，需要用 Meta_Kim 吗？
 
-- **审文档 / 审方案** → 走 `Type D`
-- **补验已有代码产物** → 可以接入 Review 之后的尾链，但必须补齐 owner 和协议包
-- **真正按项目做复杂开发** → 仍然应从 `Critical / Fetch / Thinking` 开始
+**不需要。** Meta_Kim 解决的是跨文件、跨模块、需要多能力协作的复杂任务。如果你只是改一个文件里的一个函数，直接用 Claude Code 就够了。别用大炮打蚊子。
 
-### 它是不是仍然带着“链式法则”？
+### Q：8 大流程和 10 大流程是什么关系？
 
-是，**当前 Meta_Kim 仍然保留明显的链式脊柱**。
+8 大流程是**执行骨架**（Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution），相对固定。10 大流程是从骨架**派生出来的业务工作流**（direction → planning → execution → review → meta_review → revision → verify → summary → feedback → evolve），更注重交付物流转和闭环。10 大流程不是推翻 8 大流程，而是在它之上增加了递进治理的复杂度。
 
-如果只看表层，你看到的还是：
+### Q：动态发牌是什么意思？
 
-<div align="center">
+8 大流程是固定的，但现实中任务千变万化。发牌机制让系统在固定流程中有了灵活性——比如连续干了 3 件高强度的事，系统会自动暂停（Pause 牌）；发现安全问题，会立即打断当前流程（Risk 抢占牌）。**固定骨架保证了底线，动态发牌保证了适应性。**
 
-```text
-Critical -> Fetch -> Thinking -> Execution -> Review -> Meta-Review -> Verification -> Evolution
-```
+### Q：三层记忆会不会很重？
 
-</div>
+不会。三层各有分工：
+- Memory 很轻，就是几个 markdown 文件
+- Graphify 只在源文件 > 20 的项目才会启用，而且生成一次后可以复用
+- SQL 用的是本地 SQLite，不需要额外的数据库服务
 
-所以如果有人说“你这本质上还是一条增强版流水线”，这个判断不算错。
+三层加起来的资源消耗，远小于你每次从零开始让 AI 读整个项目的 token 消耗。
 
-但项目现在的真实状态不是“只有链”，而是：
+### Q：支持哪些平台？
 
-**以链为表，以状态、事件、owner 和协议为里。**
+目前完整支持 Claude Code、Codex、OpenClaw、Cursor 四个平台。核心逻辑在 `canonical/` 目录，通过同步脚本投影到各平台。只要一个平台支持 agent 和 agent 间通信，理论上就能映射上去。
 
-也就是说：
+### Q：安装复杂吗？
 
-- **链还在**：8 阶段仍然是人类最容易理解的标准执行骨架
-- **状态在兜底**：`stageState`、`controlState`、`gateState`、`surfaceState`、`capabilityState`、`agentInvocationState` 让系统不只是“往下走一步”
-- **事件在打断和改道**：skip、interrupt、intentional-silence、rollback、owner-resolution branch 都会改变运行路径
-- **并行在削弱单链**：独立任务要求声明 `parallelGroup` 和 `mergeOwner`，不再默认一律串行
-- **治理尾链在纠偏**：`Review / Meta-Review / Verification / Evolution` 不是装饰，而是用来判断、回修、闭环和写回
-
-所以更准确的表述不是“Meta_Kim 已经摆脱链式法则”，而是：
-
-**Meta_Kim 现在是“链式脊柱 + 状态骨架 + 事件控制 + owner 协议 + 并行编排”的混合系统。**
-
-如果你想再压缩成一句话，可以这样说：
-
-**它还不是纯状态机系统，但也不再是单纯的链式流程系统。链是可读骨架，不再是唯一的系统本体。**
-
-### 隐形状态骨架和公开展示闸门
-
-Meta_Kim 不只是“按顺序走完几个阶段”。
-
-在 8 阶段表层下面，还有一层隐形治理骨架，用来保证 run 没有假完成、假通过、假展示。
-
-常见状态层包括：
-
-<div align="center">
-
-| 状态层 | 典型值 | 主要责任方 | 作用 |
-| --- | --- | --- | --- |
-| `stageState` | `Critical -> ... -> Evolution` | Conductor | 当前处在哪个标准阶段 |
-| `controlState` | `normal / skip / interrupt / intentional-silence / iteration` | Conductor | 控制发牌节奏，而不是乱加伪阶段 |
-| `gateState` | `planning-open / verification-open / synthesis-ready` | Warden + Prism | 区分“阶段走完了”与“真的过闸了” |
-| `surfaceState` | `debug-surface / internal-ready / public-ready` | Warden | 决定这轮结果能不能被当成正式输出展示 |
-| `capabilityState` | `covered / partial / gap / escalated` | Scout + Artisan | 显式记录能力覆盖情况 |
-| `agentInvocationState` | `idle / discovered / matched / dispatched / returned / escalated` | `meta-theory`（元理论） | 约束系统先搜索再分派，不要偷懒自干 |
-
-</div>
-
-这层骨架是**隐形的**：
-
-- 它不是第二套 UI
-- 它不是给用户多看几层状态名
-- 它的作用是支撑 skip / interrupt / gate / verification / evolution 这些治理动作
-
-#### 什么叫“可以公开展示”
-
-项目设计里，run 要进入 public display，至少要同时满足这些条件：
-
-- `verifyPassed`
-- `summaryClosed`
-- `singleDeliverableMaintained`
-- `deliverableChainClosed`
-- `consolidatedDeliverablePresent`
-
-这意味着：
-
-- 不是“看起来做完了”就算完成
-- 不是“有内容可看了”就能展示
-- 只要交付链断了、验证没关、总结没闭环，就应该继续留在 debug / internal surface
-
-现在 canonical contract 还把它硬化成了真正发布门：
-
-- 没有 `verifyPassed`：不能出最终公开稿
-- 没有 `summaryClosed`：不能标记成外显结果
-- 交付链没闭合：不能标记完成
-
-### 回滚协议
-
-Verification 阶段不是只负责说“过 / 不过”，还负责判断要不要回滚。
-
-Meta_Kim 的设计里，回滚不是一刀切，而是分层处理：
-
-<div align="center">
-
-| 回滚级别 | 触发条件 | 动作 |
-| --- | --- | --- |
-| 文件级 | 单文件回归 | 回退这个文件到上一个已知正常状态 |
-| 子任务级 | 某个子任务改崩了相邻路径 | 只回滚该子任务相关文件集 |
-| 部分回滚 | 一部分子任务成功、一部分失败 | 保留成功部分，失败部分回滚后重新进入 Thinking |
-| 全量回滚 | 跨模块污染、原始假设失效 | 暂存未提交改动，回到 Stage 1 重新定义范围 |
-
-</div>
-
-简单理解：
-
-- 问题小，就小范围回滚
-- 问题跨模块，就不要硬顶着往前推
-- 一套没有回滚能力的治理系统，不算完整系统
-
-铁律是：
-
-**回滚不是失败，回滚是系统知道什么时候该停。**
-
-### Evolution 不只是“复盘一下”，而是要落盘
-
-Meta_Kim 的 `Evolution` 不是聊天式总结，而是明确要求把结构性学习写回磁盘。
-
-典型产出物和落点如下：
-
-<div align="center">
-
-| 产出物 | 存储位置 | 说明 |
-| --- | --- | --- |
-| 可复用模式 | `memory/patterns/{pattern-name}.md` | 给以后复用 |
-| 伤疤记录 | `memory/scars/{scar-id}.yaml` | 让失败变成下一轮的预防规则 |
-| 新技能 | `.claude/skills/{skill-name}/SKILL.md` | 沉淀成真正可调用能力 |
-| Agent 边界调整 | `.claude/agents/{agent}.md` | 改完后通常要跑 `npm run sync:runtimes` |
-| 节奏优化 | `config/contracts/workflow-contract.json` 或 Conductor 默认配置 | 让下一轮调度更稳 |
-| 能力缺口记录 | `memory/capability-gaps.md` | 给 Scout 持续追踪 |
-
-</div>
-
-如果一轮 Evolution 没有明确落盘位置，就不算真正“捕获了经验”。
-
-现在主源还额外要求问一句：
-
-- 这轮用的 owner 还够不够？
-- 是继续沿用、调整边界、还是应该新建 owner？
-- 如果这轮用了临时 `generalPurpose` owner，是否已经值得升级成正式能力？
-
-并且每轮都必须显式给出 `writebackDecision`：
-
-- `writeback`：列出具体写回目标
-- `none`：说明为什么这轮没有可落盘的结构性写回
-
-### 什么时候需要它
-
-<div align="center">
-
-| 你的场景 | 没有 Meta_Kim | 有 Meta_Kim |
-| --- | --- | --- |
-| “帮我把认证模块重构了，横跨 6 个文件” | AI 直接上手改，改着改着把别的模块搞崩了 | 先确认范围，分配给合适的 agent，审查跨模块影响 |
-| “帮我设计一个新 agent” | 拿到一个通用模板，跟你的业务对不上 | 系统先问你需求，检查现有 agent，必要时才创建 |
-| “我的 agent 老是互相打架” | 职责混乱，重复劳动，没人知道谁该干什么 | 清晰的职责边界，治理流程，质量关卡 |
-
-</div>
-
-**如果你每次只改一个文件，不需要它。** Meta_Kim 帮的是跨文件、跨模块、需要多种能力协作的复杂任务。
-
-### 它干了什么
-
-1. **先追问再执行**：需求模糊时追问澄清，而不是猜
-2. **先搜索再假设**：先检查现有 agent / skill 能不能干，不假设不存在就从头搞
-3. **先确定 owner 再执行**：除了纯问答，任何可执行任务都必须有明确 owner
-4. **先做任务判定再路由**：`taskClass + requestClass + governanceFlow + trigger/upgrade/bypass reasons` 先定下来
-5. **先决定发不发再干预**：`meta-conductor` 是主发牌员，`meta-warden` 是升级裁定方，`cardPlanPacket` 负责记录 deal / suppress / defer / skip / interrupt
-6. **核和壳分离**：同一意图核可以换不同 `deliveryShell` 外显，不把事实和交付壳绑死
-7. **先定协议再开工**：task classification、card plan、任务包、交付链、summary packet、审查包、验证包先说清楚，再分派
-8. **review finding 要真闭环**：review finding、revision response、verification result、`closeFindings` 必须对上
-9. **能并行就并行**：独立子任务不应该被无意义串行拖慢
-10. **每个产出都要审查**：代码质量、安全性、架构合规、协议合规、边界越界检测
-11. **真实 run 要能验真**：`validate:run` 会检查 packet 链、closeState 流转、publicReady 是否诚实
-12. **每次都沉淀经验**：捕获可复用模式，记录失败，并把经验回写到 agent / skill / contract
-
-> **读者提示**：以下面向**复杂任务**、JSON **run 产物**与契约字段校验；日常聊天式使用可跳过。
-
-### 治理 run 产物（复杂任务）
-
-当 `governanceFlow` 为 `complex_dev` 或 `meta_analysis` 时，除对话外应用 **一份 JSON run artifact** 作为事实源：
-
-1. Thinking 阶段写入 **`intentPacket`**（`trueUserIntent`、`successCriteria`、`nonGoals`、`intentPacketVersion: v1`）——重执行前的意图锁定（见 `protocols.intentPacket` 与 `intentPacketRequiredWhenGovernanceFlows`）。
-2. 写入 **`intentGatePacket`**（`ambiguitiesResolved`、`requiresUserChoice`、`defaultAssumptions`、`intentGatePacketVersion: v1`；若 `requiresUserChoice` 为 true 则填 `pendingUserChoices[]`）——结构化歧义/假设闸门（见 `protocols.intentGatePacket` 与 `intentGatePacketRequiredWhenGovernanceFlows`）。
-3. 按 `runDiscipline.protocolFirst.requiredPackets` 维护完整 packet 链（可每轮增量合并）。
-4. 在宣称 **对外可发** 或 **已完成** 之前执行：
+一行命令搞定：
 
 ```bash
-npm run validate:run -- path/to/your-run.json
+npx --yes github:KimYx0207/Meta_Kim meta-kim
 ```
 
-5. 若校验失败或 finding 仍开：生成下一轮待办清单：
+或者克隆后运行：
 
 ```bash
-npm run prompt:next-iteration -- path/to/your-run.json
+git clone https://github.com/KimYx0207/Meta_Kim.git
+cd Meta_Kim
+node setup.mjs
 ```
 
-可选 **Stop hook** 弱哨兵（默认关闭）：设置环境变量 `META_KIM_STOP_COMPLETION_GUARD=hint` 仅 stderr 提示，或 `=block` 在末条 assistant 声称完成却缺少治理关键词时强制再跑一轮。详见 `.claude/hooks/stop-completion-guard.mjs`。
+向导会引导你选择语言、平台和安装范围。
 
-**`npm run doctor:governance`**：窄域体检（契约可读、hook 命令集合、`check:runtimes`、样例 `validate:run`）。
+### Q：为什么叫"元"？
 
-可选 **软 todo 闸门**（跑 `validate:run` 时）：设置 `META_KIM_SOFT_PUBLIC_READY_GATES=1` 时，若 `summaryPacket.publicReady` 为 true，则任一 `workerTaskPacket` 不得为 `taskTodoState: "open"`；不跟踪 todo 时可省略 `taskTodoState`。见契约中 `runDiscipline.runArtifactValidation.softPublicReadyTodoGate`。
+在 Meta_Kim 里，**元 = 最小的可治理单元**。一个有效的元单元必须：
+- 拥有一个明确的责任类别
+- 定义它的拒绝边界
+- 可以被独立审查
+- 可以被替换
+- 可以被安全回滚
 
-可选 **软注释/文档审查闸门**：设置 `META_KIM_SOFT_COMMENT_REVIEW=1` 且 `summaryPacket.publicReady` 为 true 时，须 `summaryPacket.commentReviewAcknowledged === true`。见 `softCommentReviewGate`。
+不是什么都能叫"元"的。够得上这个标准，才算。
+
+### Q：这个项目和 MCP 有什么关系？
+
+Meta_Kim 使用 MCP（Model Context Protocol）来扩展 agent 的能力边界。通过 `.mcp.json` 配置文件，agent 可以调用外部工具和服务。但 Meta_Kim 本身不是一个 MCP 服务器——它是一套治理框架，MCP 只是它集成的工具之一。
+
+## 延伸阅读
+
+- [README.md](README.md)
+- [AGENTS.md](AGENTS.md)
+- [config/contracts/workflow-contract.json](config/contracts/workflow-contract.json)
+- [docs/runtime-capability-matrix.md](docs/runtime-capability-matrix.md)
+
+---
 
 ## License
 

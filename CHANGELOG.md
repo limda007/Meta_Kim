@@ -4,6 +4,18 @@ All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
+## [2.0.3] - 2026-04-14
+
+### Changed
+
+- **README overhaul**: Removed "BETA VERSION" banner, streamlined language, clarified Meta_Kim's governance mission
+- **Remove shared-skills/ projection layer**: Deprecated `shared-skills/` directory removed from `sync-runtimes.mjs`, `AGENTS.md`, `CLAUDE.md`, and `sync.json` — runtime projections now target only `.claude/`, `openclaw/skills/`, `.codex/skills/`, and `.agents/skills/meta-theory/`
+- **install-error-classifier**: Expanded TLS/SSL error patterns (`ssl_read`, `ssl_connect`, `ssl_error_syscall`, `openssl/ssl`) and added proxy network error detection for partial clone failures (`index-pack failed`, `file write error`, `pack-objects died`, `connection was reset`)
+- **graphify-runtime**: Added `checkNetworkx()` function enforcing `networkx >= 3.4` (required for `louvain_communities(max_level=...)`)
+- **skills-manifest schema**: Added `defaultSelected` boolean field to control which repos are pre-selected in dependency multi-select
+- **cli-anything skill**: Set `defaultSelected: false` — opt-in install only
+- **.gitignore**: Added `pnpm-lock.yaml` and `graphify-out/`
+
 ## [2.0.2] - 2026-04-14
 
 ### Fixed

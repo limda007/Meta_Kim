@@ -24,7 +24,6 @@
 | `node_modules/` | npm 依赖目录，自动生成，不手改 |
 | `openclaw/` | OpenClaw 运行时适配目录，包含 workspace、skill、配置模板 |
 | `scripts/` | 同步、校验、验收、MCP、本地 OpenClaw 准备脚本 |
-| `shared-skills/` | 给不同运行时复用的 skill 镜像目录 |
 
 ### 文件
 
@@ -169,13 +168,7 @@
 | `scripts/prepare-openclaw-local.mjs` | 把 `~/.openclaw/agents/main/agent/` 的授权状态同步到 8 个 meta agent |
 | `scripts/mcp/meta-runtime-server.mjs` | 本地 MCP 服务，给 Claude Code / Codex 等读取仓库运行时信息 |
 
-## 七、`shared-skills/`
-
-| 路径 | 作用 |
-| --- | --- |
-| `shared-skills/meta-theory.md` | 给多运行时共用的 `meta-theory` skill 镜像 |
-
-## 八、哪些文件应该优先改，哪些不要乱改
+## 七、哪些文件应该优先改，哪些不要乱改
 
 ### 优先改的主源
 
@@ -189,14 +182,13 @@
 - `.agents/skills/meta-theory/agents/openai.yaml`
 - `.codex/agents/*.toml`
 - `.codex/skills/meta-theory.md`
-- `shared-skills/meta-theory.md`
 - `openclaw/skills/meta-theory.md`
 - `openclaw/workspaces/*/*`
 - `openclaw/openclaw.local.json`
 
 这些通常由 `npm run sync:runtimes` 或 `npm run prepare:openclaw-local` 维护。
 
-## 九、推荐工作顺序
+## 八、推荐工作顺序
 
 1. 先改主源
 2. 运行 `npm run sync:runtimes`

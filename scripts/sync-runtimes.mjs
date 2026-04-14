@@ -63,9 +63,6 @@ function resolveProjectionDirs(scope) {
       : path.dirname(openclaw.legacySkillFile),
     openclawUsesDirectorySkill: globalScope,
     openclawTemplateConfigPath: openclaw.templateConfigFile,
-    sharedSkillsDir: globalScope
-      ? null
-      : path.dirname(openclaw.sharedSkillFile),
 
     // Cursor
     cursorAgentsDir: cursor.agentsDir,
@@ -85,10 +82,13 @@ function resolveProjectionDirs(scope) {
       codexSkills: globalScope ? codex.display.skillRoot : ".codex/skills",
       codexProjectSkills: globalScope ? null : ".agents/skills",
       codexConfig: codex.display.configExampleFile,
-      openclawWorkspaces: globalScope ? openclaw.baseDir : "openclaw/workspaces",
+      openclawWorkspaces: globalScope
+        ? openclaw.baseDir
+        : "openclaw/workspaces",
       openclawTemplate: openclaw.display.templateConfigFile,
-      openclawSkills: globalScope ? openclaw.display.skillRoot : "openclaw/skills",
-      sharedSkills: globalScope ? null : "shared-skills",
+      openclawSkills: globalScope
+        ? openclaw.display.skillRoot
+        : "openclaw/skills",
       cursorAgents: cursor.display.agentsDir,
       cursorSkill: cursor.display.skillRoot,
       cursorMcp: cursor.display.mcpFile,
@@ -801,32 +801,6 @@ Examples:
         changedFiles.push(`${dp.openclawSkills}/references/${reference.name}`);
       }
     }
-
-    // ── shared-skills/ (mirrored skill layer) ───────────────────
-    if (dirs.sharedSkillsDir && dp.sharedSkills) {
-      if (
-        (
-          await writeGeneratedFile(
-            path.join(dirs.sharedSkillsDir, "meta-theory.md"),
-            portableSkill,
-          )
-        ).changed
-      ) {
-        changedFiles.push(`${dp.sharedSkills}/meta-theory.md`);
-      }
-      for (const reference of skillReferences) {
-        if (
-          (
-            await writeGeneratedFile(
-              path.join(dirs.sharedSkillsDir, "references", reference.name),
-              reference.content,
-            )
-          ).changed
-        ) {
-          changedFiles.push(`${dp.sharedSkills}/references/${reference.name}`);
-        }
-      }
-    }
   }
 
   if (selectedTargets.includes("codex")) {
@@ -996,7 +970,8 @@ Examples:
     return;
   }
 
-  const normalizeDisplayPath = (value) => String(value ?? "").replace(/\\/g, "/");
+  const normalizeDisplayPath = (value) =>
+    String(value ?? "").replace(/\\/g, "/");
   const hasDisplayPrefix = (targetPath, prefix) => {
     if (!prefix) {
       return false;
@@ -1025,12 +1000,15 @@ Examples:
       hasDisplayPrefix(f, dirs.displayPaths.claudeHooks),
     ).length,
     claudeSettings: changedFiles.filter(
-      (f) => normalizeDisplayPath(f) === normalizeDisplayPath(dirs.displayPaths.claudeSettings),
+      (f) =>
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.claudeSettings),
     ).length,
     claudeMcp: changedFiles.filter(
       (f) =>
         dirs.displayPaths.claudeMcp &&
-        normalizeDisplayPath(f) === normalizeDisplayPath(dirs.displayPaths.claudeMcp),
+        normalizeDisplayPath(f) ===
+          normalizeDisplayPath(dirs.displayPaths.claudeMcp),
     ).length,
     codexAgents: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.codexAgents),
@@ -1042,7 +1020,9 @@ Examples:
       hasDisplayPrefix(f, dirs.displayPaths.codexProjectSkills),
     ).length,
     codexConfig: changedFiles.filter(
-      (f) => normalizeDisplayPath(f) === normalizeDisplayPath(dirs.displayPaths.codexConfig),
+      (f) =>
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.codexConfig),
     ).length,
     openclawWorkspace: changedFiles.filter((f) =>
       normalizeDisplayPath(f).startsWith(openclawWorkspacePrefix),
@@ -1052,10 +1032,8 @@ Examples:
     ).length,
     openclawTemplate: changedFiles.filter(
       (f) =>
-        normalizeDisplayPath(f) === normalizeDisplayPath(dirs.displayPaths.openclawTemplate),
-    ).length,
-    sharedSkill: changedFiles.filter((f) =>
-      hasDisplayPrefix(f, dirs.displayPaths.sharedSkills),
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.openclawTemplate),
     ).length,
     cursorAgents: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.cursorAgents),
@@ -1064,7 +1042,9 @@ Examples:
       hasDisplayPrefix(f, dirs.displayPaths.cursorSkill),
     ).length,
     cursorMcp: changedFiles.filter(
-      (f) => normalizeDisplayPath(f) === normalizeDisplayPath(dirs.displayPaths.cursorMcp),
+      (f) =>
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.cursorMcp),
     ).length,
   };
 
@@ -1072,39 +1052,71 @@ Examples:
     {
       name: "Claude Code",
       entries: [
-        { label: dirs.displayPaths.claudeAgents, count: layerCounts.claudeAgents },
-        { label: dirs.displayPaths.claudeSkill, count: layerCounts.claudeSkill },
-        { label: dirs.displayPaths.claudeHooks, count: layerCounts.claudeHooks },
-        { label: dirs.displayPaths.claudeSettings, count: layerCounts.claudeSettings },
+        {
+          label: dirs.displayPaths.claudeAgents,
+          count: layerCounts.claudeAgents,
+        },
+        {
+          label: dirs.displayPaths.claudeSkill,
+          count: layerCounts.claudeSkill,
+        },
+        {
+          label: dirs.displayPaths.claudeHooks,
+          count: layerCounts.claudeHooks,
+        },
+        {
+          label: dirs.displayPaths.claudeSettings,
+          count: layerCounts.claudeSettings,
+        },
         { label: dirs.displayPaths.claudeMcp, count: layerCounts.claudeMcp },
       ],
     },
     {
       name: "Codex",
       entries: [
-        { label: dirs.displayPaths.codexAgents, count: layerCounts.codexAgents },
+        {
+          label: dirs.displayPaths.codexAgents,
+          count: layerCounts.codexAgents,
+        },
         { label: dirs.displayPaths.codexSkills, count: layerCounts.codexSkill },
         {
           label: dirs.displayPaths.codexProjectSkills,
           count: layerCounts.codexProjectSkill,
         },
-        { label: dirs.displayPaths.codexConfig, count: layerCounts.codexConfig },
+        {
+          label: dirs.displayPaths.codexConfig,
+          count: layerCounts.codexConfig,
+        },
       ],
     },
     {
       name: "OpenClaw",
       entries: [
-        { label: dirs.displayPaths.openclawWorkspaces, count: layerCounts.openclawWorkspace },
-        { label: dirs.displayPaths.openclawSkills, count: layerCounts.openclawSkill },
-        { label: dirs.displayPaths.openclawTemplate, count: layerCounts.openclawTemplate },
-        { label: dirs.displayPaths.sharedSkills, count: layerCounts.sharedSkill },
+        {
+          label: dirs.displayPaths.openclawWorkspaces,
+          count: layerCounts.openclawWorkspace,
+        },
+        {
+          label: dirs.displayPaths.openclawSkills,
+          count: layerCounts.openclawSkill,
+        },
+        {
+          label: dirs.displayPaths.openclawTemplate,
+          count: layerCounts.openclawTemplate,
+        },
       ],
     },
     {
       name: "Cursor",
       entries: [
-        { label: dirs.displayPaths.cursorAgents, count: layerCounts.cursorAgents },
-        { label: dirs.displayPaths.cursorSkill, count: layerCounts.cursorSkill },
+        {
+          label: dirs.displayPaths.cursorAgents,
+          count: layerCounts.cursorAgents,
+        },
+        {
+          label: dirs.displayPaths.cursorSkill,
+          count: layerCounts.cursorSkill,
+        },
         { label: dirs.displayPaths.cursorMcp, count: layerCounts.cursorMcp },
       ],
     },

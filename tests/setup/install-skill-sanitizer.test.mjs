@@ -7,6 +7,7 @@ import { promises as fs } from "node:fs";
 import {
   detectLegacySubdirInstall,
   sanitizeInstalledSkillTree,
+  shouldSkipBundledRuntimePath,
   validateSkillFrontmatter,
 } from "../../scripts/install-skill-sanitizer.mjs";
 
@@ -112,7 +113,46 @@ describe("legacy subdir detection", () => {
   });
 });
 
+describe("bundled runtime path skip", () => {
+  test("skips OpenClaw/Codex/Cursor subtrees case-insensitively", () => {
+    assert.equal(shouldSkipBundledRuntimePath("openclaw"), true);
+    assert.equal(shouldSkipBundledRuntimePath("OpenClaw/skills/foo"), true);
+    assert.equal(shouldSkipBundledRuntimePath("gstack/openclaw/skills/x"), true);
+    assert.equal(shouldSkipBundledRuntimePath("pkg/Cursor/extra"), true);
+    assert.equal(shouldSkipBundledRuntimePath("legit-skill"), false);
+    assert.equal(shouldSkipBundledRuntimePath("openclawish"), false);
+  });
+});
+
 describe("skill tree sanitization", () => {
+  test("does not quarantine SKILL.md under bundled openclaw/ trees (e.g. gstack)", async () => {
+    const root = await makeTempDir();
+    const nested = path.join(
+      root,
+      "gstack",
+      "openclaw",
+      "skills",
+      "gstack-openclaw-ceo-review",
+    );
+    await fs.mkdir(nested, { recursive: true });
+    await fs.writeFile(
+      path.join(nested, "SKILL.md"),
+      "# no yaml frontmatter — would be invalid at repo root\n",
+      "utf8",
+    );
+
+    const result = await sanitizeInstalledSkillTree(path.join(root, "gstack"));
+    assert.equal(result.scanned, 0);
+    assert.equal(result.quarantined, 0);
+    assert.equal(
+      await fs
+        .access(path.join(nested, "SKILL.md"))
+        .then(() => true)
+        .catch(() => false),
+      true,
+    );
+  });
+
   test("quarantines only invalid SKILL.md files and preserves sibling content", async () => {
     const root = await makeTempDir();
     const invalidSkillDir = path.join(root, "exa", "skills");

@@ -234,7 +234,6 @@ Files that should usually be treated as mirrors or adapters:
 - `.claude/capability-index/meta-kim-capabilities.json`
 - `.claude/capability-index/global-capabilities.json`
 - `.codex/skills/meta-theory.md`
-- `shared-skills/meta-theory.md`
 - `openclaw/workspaces/*`
 
 ## Recommended Maintenance Loop

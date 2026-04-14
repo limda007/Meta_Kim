@@ -2,7 +2,6 @@
 
 <h1 style="font-size: 6em; font-weight: 900; margin-bottom: 0.2em; letter-spacing: 0.1em;">元</h1>
 <p style="font-size: 1.2em; color: #7c3aed; font-weight: 600; margin-top: 0;">META_KIM</p>
-<p style="color: #dc2626; font-weight: 700; margin-bottom: 0.5em;">⚠️ BETA VERSION — Work in Progress</p>
 
 <p>
   <a href="README.md">English</a> |
@@ -14,1017 +13,34 @@
 <p>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw%20%7C%20Cursor-111827"/>
   <img alt="Stars" src="https://img.shields.io/github/stars/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Forks" src="https://img.shields.io/github/forks/KimYx0207/Meta_Kim?style=flat&logo=github"/>
-  <img alt="Skill" src="https://img.shields.io/badge/skill-meta--theory%20v2.0.0-7c3aed"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green"/>
 </p>
 
 </div>
 
-<!-- Maintainer: suggested GitHub About (avoid implying “only a mirror stack”). Example: Governance layer for AI coding: meta agents, workflow contract, meta-theory; canonical in canonical/, with generated runtime projections for Claude, Codex, OpenClaw, and Cursor. -->
+## Overview
 
-## At a Glance
+**Meta_Kim** is not another AI coding tool. It is a governance system that gives AI coding assistants a brain.
 
-Meta_Kim is a **governance layer for AI coding assistants**: one unified discipline on Claude Code, Codex, OpenClaw, and Cursor so complex work is **done right before it is done fast**. Most tools jump straight to code; Meta_Kim inserts clarify → search capabilities → plan → execute → review → evolve.
+Claude Code, Codex, OpenClaw, and Cursor are all hands: they can write code and change files. But who decides which file to change first? Who reviews the result? Who fixes the problems that show up? And how do we make sure the same mistake does not repeat next time?
 
-- 8 specialized meta agents behind one public entry point
-- **One unified governance discipline** projected across Claude Code, Codex, OpenClaw, and Cursor
-- Every complex task goes through: clarify -> search -> execute -> review -> evolve
-- **Four iron rules**: Critical > Guessing, Fetch > Assuming, Thinking > Rushing, Review > Trusting
-- Discipline: one department, one primary deliverable, one closed handoff chain
-- The long-term source of truth mostly lives in `canonical/` and `config/contracts/workflow-contract.json`
+Meta_Kim is built for that. It is **AI above AI**: a unified governance layer that keeps complex work from turning into a mess.
 
-## What This Project Is
+### One-line summary
 
-Meta_Kim is not mainly about making AI write more code. It is about reducing the failure modes that show up when AI touches complex work:
+> **First clarify what needs to happen -> then decide who should do it -> review after execution -> preserve what was learned -> feed that back into the next run.**
 
-- vague requests turn into guessing
-- multi-file changes spill across boundaries
-- the same agent / skill / config stack has to stay aligned across multiple runtimes
-- nobody reviews, verifies, or captures what was learned
+This is not a new concept. Mature engineering teams already do this. Meta_Kim turns it into a runnable system instead of relying on human discipline alone.
 
-Meta_Kim solves that by doing **intent amplification before execution**.
+## Quick Start
 
-In plain language, that means:
-
-- turn a vague request into an executable task
-- make scope, constraints, deliverables, and risks explicit
-- route work to the right role instead of asking one giant context to brute-force everything
-
-At the engineering level, it organizes:
-
-- `agents`: responsibility boundaries and organizational roles
-- `skills`: reusable capability blocks
-- `MCP`: external capability interfaces
-- `hooks`: runtime rules and automation interception
-- `memory`: long-term continuity and context policy
-- `workspaces`: local runtime operating spaces
-- `sync / validate / eval`: synchronization, validation, and acceptance tooling
-
-In one line:
-
-**Meta_Kim cares less about whether a single answer looks right, and more about whether complex work can be sustained, stable, and governable.**
-
-## Why It Gets Lighter Over Time
-
-With that **problem framing** in mind, one of the most interesting things about Meta_Kim is not that it is cheapest on day one, but that:
-
-**it gradually turns expensive temporary reasoning into reusable long-term capability assets.**
-
-In practice that means:
-
-- **the early phase is heavier**: you are still building agents, skills, hooks, tools, contracts, memory, and review / verification discipline
-- **later runs get lighter**: repeated work no longer has to rediscover capabilities, redraw boundaries, or relearn the same lesson from scratch
-- **what shrinks is not all token usage, but repeated token usage**: recurring or familiar task families become much cheaper on average
-
-The more precise statement is:
-
-**Meta_Kim is not trying to make every single run as cheap as possible. It is trying to convert temporary reasoning cost into one-time capability-building cost that can be reused later.**
-
-## Meta Architecture View
-
-The safest way to read this repository is not as “some prompts plus config files”, but as one governed system with layered responsibilities:
-
-- **theory sources**: `canonical/skills/meta-theory/` and its `references/` define the method itself
-- **organization sources**: `canonical/agents/*.md` define the 8 meta roles and their boundaries
-- **contract sources**: `config/contracts/workflow-contract.json` and related contracts define run discipline, gates, and deliverable closure
-- **runtime projections**: `.codex/`, `.agents/`, `openclaw/`, and `shared-skills/` are projections of the same system into different runtimes
-- **tooling and verification**: `scripts/`, `validate`, `eval:agents`, and `tests/meta-theory/` keep those projections aligned with the sources
-
-That means Meta_Kim is best understood as:
-
-**one meta-theory source system -> one governed meta organization -> one workflow contract -> multiple runtime projections -> one synchronization and verification loop**
-
-The default runtime path is also architectural, not accidental:
-
-`user intent -> meta-warden -> Critical -> Fetch -> Thinking -> specialist execution -> Review -> Verification -> Evolution`
-
-The maintenance rule follows directly from that design:
-
-**edit `canonical/` and `config/contracts/` first, then sync and validate the runtime mirrors.**
-
-Figures below sit **next to the concepts above**: sources, mirrors, and the default entry path. Per-stage detail, two-layer vocabulary, and task routing are under [Development Governance Spine](#complex-spine-en), [The 8-Stage Spine And The Business Workflow](#meta-kim-diagram-two-layers-en), and [Workflow Relation Map](#task-routing-en). [README.zh-CN.md](README.zh-CN.md) uses the same structure (Chinese node labels where applicable).
-
-<a id="meta-kim-visual-maps-en"></a>
-
-#### Diagram: Canonical sources, tooling, and runtime mirrors
-
-```mermaid
-flowchart TB
-  subgraph Canon["Canonical sources, edit first"]
-    MT["meta-theory skill + references"]
-    AG["agents 8 roles"]
-    WC["workflow-contract.json"]
-    HK["settings.json hooks"]
-  end
-  subgraph Tooling["Tooling"]
-    SYNC["npm run sync:runtimes"]
-    VAL["npm run validate"]
-    DISC["npm run discover:global"]
-  end
-  subgraph Mirror["Runtime mirrors, mostly generated"]
-    CODEX[".codex + .agents"]
-    OW["openclaw workspaces skills"]
-    SK["shared-skills"]
-  end
-  MT --> SYNC
-  AG --> SYNC
-  WC --> SYNC
-  HK --> SYNC
-  SYNC --> CODEX
-  SYNC --> OW
-  SYNC --> SK
-  DISC --> VAL
-  HK --> VAL
-  SK --> VAL
-```
-
-<a id="default-path-en"></a>
-
-#### Diagram: Default path (entry, meta-theory skill, eight-stage spine overview)
-
-`meta-theory` (skill) is the **method playbook** loaded on triggers; `meta-warden` (agent) is the **default public entry role** that validates dispatch decisions and coordinates gates and synthesis. The flow is: user intent → `meta-warden` entry → `meta-theory` classifies + plans dispatch → **`meta-warden` validates the dispatch plan (Gate 3, non-skippable)** → agent execution → review → verify → evolve. This is **not** the full per-stage chart — that is in [Development Governance Spine](#complex-spine-en).
-
-```mermaid
-flowchart LR
-  U["User intent"] --> W["meta-warden entry"]
-  W --> SK["meta-theory skill\nclassify + dispatch plan"]
-  SK --> V["meta-warden validates\ndispatch decision (Gate 3)"]
-  V --> A["agent execution"]
-  A --> OUT["review verify evolve"]
-```
-
-## Contact and support
-
-![Contact QR](docs/images/contact-qr.png)
-
-GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
-𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> |
-Website <a href="https://www.aiking.dev/">aiking.dev</a> |
-WeChat Official Account: <strong>老金带你玩AI</strong>
-
-Feishu knowledge base:
-<a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">ongoing updates</a>
-
-| WeChat Pay | Alipay |
-| --- | --- |
-| ![WeChat Pay QR](docs/images/wechat-pay.jpg) | ![Alipay QR](docs/images/alipay.jpg) |
-
-### Paper and method basis
-
-The methodological foundation comes from evaluation work on meta-based intent amplification:
-
-- Paper: [https://zenodo.org/records/18957649](https://zenodo.org/records/18957649)
-- DOI: `10.5281/zenodo.18957649`
-
-The paper explains the method. This repository turns that method into runtime-ready engineering assets.
-
-## Who This Is For
-
-### Good Fit
-
-- You work on multi-file, cross-module, or cross-runtime tasks
-- You maintain agents, skills, hooks, MCP integrations, or other AI engineering assets
-- You want AI collaboration that is reviewable, rollback-friendly, and maintainable over time
-
-### Not A Good Fit
-
-- You only want a lightweight one-off assistant
-- You mostly edit a single file at a time
-- You want a plug-and-play SaaS product
-
-## Runtime Entry Points
-
-The most important sentence in this repository is:
-
-**Meta_Kim is one method projected into four runtimes, not four separate projects.**
-
-<div align="center">
-
-| Runtime     | Entry point              | Main locations in this repo           | Role                                                  |
-| ----------- | ------------------------ | ------------------------------------- | ----------------------------------------------------- |
-| Claude Code | [CLAUDE.md](CLAUDE.md)      | `.claude/`, `.mcp.json`           | Canonical (primary editing / source-of-truth) runtime |
-| Codex       | [AGENTS.md](AGENTS.md)      | `.codex/`, `.agents/`, `codex/` | Codex-native custom agent and skill projection        |
-| OpenClaw    | `openclaw/workspaces/` | `openclaw/`                         | OpenClaw local workspace projection                   |
-| Cursor      | `.cursor/agents/`      | `.cursor/`                          | Cursor agent and MCP projection                       |
-
-</div>
-
-<a id="runtime-sync-targets-en"></a>
-
-#### What Gets Synced (`npm run sync:runtimes`)
-
-`sync-runtimes` projects canonical sources into all four runtime trees simultaneously. Run `npm run sync:runtimes` after editing `canonical/` or `config/contracts/`.
-
-<div align="center">
-
-| Runtime     | Synced directory / files                   | Description                                               |
-| ---------- | ---------------------------------------- | --------------------------------------------------------- |
-| Claude Code | `.claude/agents/`                       | 8 meta-agent .md files                                    |
-|            | `.claude/skills/meta-theory/SKILL.md`   | meta-theory skill entry                                    |
-|            | `.claude/skills/meta-theory/references/` | 6 reference docs (dev-governance, rhythm, etc.)           |
-|            | `.claude/hooks/`                        | 8 hook scripts                                           |
-|            | `.claude/settings.json`                  | Claude settings (project-level)                            |
-|            | `.mcp.json`                             | MCP runtime server config (root)                          |
-| Codex      | `.codex/agents/`                        | 8 meta-agent .toml files                                 |
-|            | `.codex/skills/meta-theory.md`           | meta-theory skill (flat format)                          |
-|            | `.codex/skills/references/`              | reference docs                                           |
-|            | `.agents/skills/meta-theory/SKILL.md`    | project-level meta-theory skill                          |
-| OpenClaw   | `openclaw/workspaces/{agent}/`           | 8 workspaces × 9 .md files each (BOOT, SOUL, TOOLS…)  |
-|            | `openclaw/openclaw.template.json`         | workspace template config                                 |
-|            | `openclaw/skills/meta-theory.md`         | shared meta-theory skill                                 |
-|            | `openclaw/skills/references/`            | reference docs                                           |
-| Cursor     | `.cursor/agents/`                       | 8 meta-agent .md files (plain Markdown, no YAML frontmatter) |
-|            | `.cursor/skills/meta-theory/SKILL.md`   | meta-theory skill entry                                  |
-|            | `.cursor/skills/meta-theory/references/` | reference docs                                           |
-|            | `.cursor/mcp.json`                      | Cursor MCP config                                        |
-| Shared     | `shared-skills/meta-theory.md`            | cross-runtime shared meta-theory skill                   |
-|            | `shared-skills/references/`              | reference docs                                           |
-
-</div>
-
-One figure for **one method, four landing points** (details: [Meta Architecture View](#meta-kim-visual-maps-en)):
-
-```mermaid
-flowchart LR
-  SRC[Sources .claude + contracts] --> CC[Claude Code]
-  SRC -->|mirror| CX[Codex]
-  SRC -->|workspace map| OW[OpenClaw]
-  SRC -->|agent projection| CU[Cursor]
-```
-
-The practical takeaway is simple:
-
-- **If you are maintaining the project, start from `canonical/` and `config/contracts/workflow-contract.json`.**
-- Most content under `.codex/`, `.agents/`, and `openclaw/` is generated or runtime-specific.
-- After editing canonical files, resync the runtime mirrors with the provided scripts.
-
-### Per-Runtime Setup
-
-#### In Claude Code
-
-Claude Code automatically reads `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, and `.mcp.json`. Just open the project and talk.
-
-<a id="meta-theory-skill-en"></a>
-
-##### meta-theory skill
-
-The **meta-theory** skill is the portable governance playbook ([`canonical/skills/meta-theory/SKILL.md`](canonical/skills/meta-theory/SKILL.md)). It is **user-invocable**: in Claude Code, type **`/meta-theory`** to load it. The skill separates **meta architecture** (agent boundaries, collaboration, governance) from **project technical architecture** (stack, modules, code layout), classifies the request into flows A–E, and routes work along the eight-stage spine (**Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution**). It is a **dispatcher**, not a substitute for execution agents: substantive work goes to named agents, and **Gate 3 mandates that meta-theory must validate its dispatch decision with `meta-warden` before spawning any execution agents** — `meta-warden` is both the default public entry and the validator that enforces the dispatcher discipline.
-
-#### In Codex
-
-Codex reads `AGENTS.md`, `.codex/agents/`, `.agents/skills/`, and uses `codex/config.toml.example` as the MCP wiring example. Important: **Codex is a read / execute runtime, not the canonical editing runtime**. Edit `canonical/` first, then sync to Codex with `npm run sync:runtimes`.
-
-#### In OpenClaw
-
-```bash
-npm install
-npm run prepare:openclaw-local
-```
-
-Then you can call:
-
-```bash
-openclaw agent --local --agent meta-warden --message "I need a system to handle batch data exports with progress tracking." --json --timeout 120
-```
-
-#### In Cursor
-
-Cursor reads `.cursor/agents/` for agent definitions and `.cursor/mcp.json` for MCP server configuration. These are generated projections from canonical sources:
-
-```bash
-npm run sync:runtimes -- --targets cursor
-```
-
-This creates `.cursor/agents/meta-warden.md` (and the other 7 agents), `.cursor/skills/meta-theory/`, and `.cursor/mcp.json`. Cursor agents use plain Markdown without YAML frontmatter for compatibility.
-
-## Meta_Kim(元)
-
-In Meta_Kim:
-
-**Meta (`元`) = the smallest governable unit that exists to support intent amplification**
-
-A valid meta unit must be:
-
-- independently understandable
-- small enough to stay controllable
-- explicit about what it owns and refuses
-- replaceable without collapsing the whole system
-- reusable across workflows
-
-Meta is an architectural unit here, not decoration.
-
-### Meta and engineering
-
-A version that fits the actual project design more closely is:
-
-**Engineering is one of the domains meta governs. The meta system can bring engineering work into a full closed loop, but meta itself is not the same thing as an all-powerful engineer.**
-
-Broken down:
-
-- **What engineering can do, the meta system can usually still get done**, because it can orchestrate execution-layer agents through `Critical / Fetch / Thinking / Execution / Review / Meta-Review / Verification / Evolution`.
-- **But meta itself is not supposed to personally execute every engineering detail**. The canonical rules are explicit: meta-theory is the dispatcher, not the executor; executable work should belong to a named owner.
-- **In the other direction, the governance actions meta performs are not things ordinary engineering flow naturally covers**, such as owner resolution, protocol-first dispatch, review-of-review, verification closure, and Evolution writeback.
-
-If you want the shortest version, use this:
-
-**Engineering is a governed domain of meta, not a lower substitute for it; meta is strongest at closing the loop around engineering, not at personally doing every part of engineering.**
-
-## Core Method
-
-Meta_Kim follows one chain:
-
-```mermaid
-flowchart LR
-    A["Meta (元)"] --> B["Organizational Mirroring"]
-    B --> C["Rhythm Orchestration"]
-    C --> D["Intent Amplification"]
-```
-
-- `Meta (元)`: how to split
-- `Organizational Mirroring`: how to structure
-- `Rhythm Orchestration`: how to dispatch
-- `Intent Amplification`: how to complete
-
-Remove any one of these and the method is incomplete.
-
-**Where the figures are:** sources and entry path — [Meta Architecture View](#meta-kim-visual-maps-en); per-stage spine and iron rules — this section; spine vs 10-phase contract — [The 8-Stage Spine And The Business Workflow](#meta-kim-diagram-two-layers-en); task routing map — [Workflow Relation Map](#task-routing-en).
-
-<a id="complex-spine-en"></a>
-
-## Development Governance Spine (The Core - Read This First)
-
-For **complex work** (multi-file, cross-module, or requiring multiple capabilities), Meta_Kim follows an eight-stage spine. The early chain lines up with the **four iron rules**: clarify before guessing, search before assuming, plan before rushing, verify before trusting, with **Thinking** in the middle to shape the deck and delivery shell.
-
-The eight stages read compactly as **two rows of four** (same order as the table below). (A single `flowchart TB` with two horizontal `subgraph` blocks is often laid out **side by side** by Mermaid; two stacked `LR` diagrams below guarantee a true top/bottom pair.)
-
-**Row 1 — stages 1–4 (clarify → execute)**
-
-```mermaid
-flowchart LR
-  S1["1 Critical"] --> S2["2 Fetch"] --> S3["3 Thinking"] --> S4["4 Execution"]
-```
-
-**Between rows:** stage 4 `Execution` → stage 5 `Review`
-
-**Row 2 — stages 5–8 (review → evolve)**
-
-```mermaid
-flowchart LR
-  S5["5 Review"] --> S6["6 Meta-Review"] --> S7["7 Verification"] --> S8["8 Evolution"]
-```
-
-Full names: 1 scope (meta vs tech); 2 search agents/skills; 3 `dispatchBoard` / `mergeOwner`; 4 assign owners; 5 quality boundaries; 6 review standard; 7 verification gates; 8 patterns and writeback.
-
-Iron rules alignment (stages 1–3 and review):
-
-```mermaid
-flowchart LR
-  I1["Critical beats Guessing"] --> I2["Fetch beats Assuming"]
-  I2 --> I3["Thinking beats Rushing"]
-  I3 --> I4["Review beats Trusting"]
-```
-
-<div align="center">
-
-| Stage            | Purpose           | Plain-English meaning                                            |
-| ---------------- | ----------------- | ---------------------------------------------------------------- |
-| `Critical`     | Clarify           | confirm what the user actually wants before guessing             |
-| `Fetch`        | Search            | look for existing capabilities before assuming they do not exist |
-| `Thinking`     | Plan              | shape sub-tasks, ownership, deliverables, and sequencing         |
-| `Execution`    | Execute           | hand sub-tasks to the right agents                               |
-| `Review`       | Review            | check code, boundaries, and quality                              |
-| `Meta-Review`  | Review the review | make sure the review standard itself is sound                    |
-| `Verification` | Close the loop    | confirm the fix really landed                                    |
-| `Evolution`    | Learn             | keep patterns, scars, and reusable knowledge                     |
-
-</div>
-
-- `Critical > Guessing`
-- `Fetch > Assuming`
-- `Thinking > Rushing`
-- `Review > Trusting`
-
-Stage notes:
-
-- **Stage 1 Critical**: clarify scope before guessing
-- **Stage 2 Fetch**: search existing agents / skills before assuming they do not exist
-- **Stage 3 Thinking**: plan sub-tasks, shape the deck, prepare the delivery shell
-- **Stage 4 Execution**: route the work to the right roles instead of brute-forcing everything in one context
-- **Stage 5 Review**: review every output against quality standards
-- **Stage 6 Meta-Review**: review the review standard itself
-- **Stage 7 Verification**: verify that fixes actually landed and close findings
-- **Stage 8 Evolution**: capture patterns, scars, and reusable knowledge
-
-There are 4 additional rules now enforced in the canonical sources:
-
-- **Only pure `Q / Query` may bypass agents**: pure explanation / Q&A with no file change, no external side effect, and no handoff artifact
-- **Every executable task needs an owner**: use an existing owner if one exists; otherwise resolve the owner first, then execute
-- **Thinking is protocol-first**: `runHeader`, `dispatchBoard`, `workerTaskPacket`, `reviewPacket`, `verificationPacket`, and `evolutionWritebackPacket` must be defined before Execution starts
-- **Parallelize when independence exists**: independent sub-tasks should declare `dependsOn`, `parallelGroup`, and `mergeOwner` rather than drifting into unnecessary serial execution
-
-`meta-conductor` tracks `stageState` / `controlState` (including skip / interrupt / iteration). `meta-warden` and `meta-prism` own gates (`gateState`, verification closure). That hidden skeleton is not a second product UI; it keeps dealing rhythm and public-display discipline consistent.
-
-## The 8-Stage Spine And The Business Workflow Are Not The Same Thing
-
-This distinction matters because it is one of the easiest ways to misunderstand Meta_Kim.
-
-There are two layers of workflow language in the project:
-
-<div align="center">
-
-| Layer                                | Defined in                              | Purpose                                                                                 |
-| ------------------------------------ | --------------------------------------- | --------------------------------------------------------------------------------------- |
-| **8-stage spine**              | `meta-theory` / `dev-governance.md` | canonical execution chain for complex development work                                  |
-| **10-phase business workflow** | `config/contracts/workflow-contract.json`    | run-contract language, display language, and deliverable discipline for department runs |
-
-</div>
-
-<a id="meta-kim-diagram-two-layers-en"></a>
-
-**Diagram:** top row is the **execution spine** (8-stage), bottom row is the **department run contract** (10 business phases). They are parallel vocabularies; business phases do not rename spine stages. (Same Mermaid caveat as elsewhere: `TB` + two horizontal `subgraph` blocks often render **side by side**; two stacked `LR` diagrams below fix that.)
-
-**Row 1 — 8-stage spine (execution backbone)**
-
-```mermaid
-graph LR
-  A1[critical] --> A2[fetch] --> A3[thinking] --> A4[execution]
-  A4 --> A5[review] --> A6[meta_review] --> A7[verification] --> A8[evolution]
-```
-
-**Row 2 — 10-phase business contract (department run)**
-
-```mermaid
-graph LR
-  B1[direction] --> B2[planning] --> B3[execution] --> B4[review]
-  B4 --> B5[meta_review] --> B6[revision] --> B7[verify]
-  B7 --> B8[summary] --> B9[feedback] --> B10[evolve]
-```
-
-The 8-stage spine remains the underlying execution backbone (text shorthand):
-
-<div align="center">
-
-```text
-Critical -> Fetch -> Thinking -> Execution -> Review -> Meta-Review -> Verification -> Evolution
-```
-
-</div>
-
-The business workflow is a separate department-run vocabulary:
-
-<div align="center">
-
-```text
-direction -> planning -> execution -> review -> meta_review -> revision -> verify -> summary -> feedback -> evolve
-```
-
-</div>
-
-The key relationship is:
-
-- **the business workflow does not replace the 8-stage spine**
-- it is better understood as a run-contract and delivery-packaging layer
-- real complex development governance still runs on the 8-stage backbone
-- phases such as `summary / feedback / evolve` are about run management and closure, not about renaming the underlying execution stages
-
-If you remember one sentence, make it this:
-
-**the 8-stage spine is the execution backbone; the 10 phases are the department-level run contract.**
-
-## Workflow Relation Map
-
-<a id="task-routing-en"></a>
-
-**Task routing (same graph as the prose below):** horizontal layout to save vertical space; see the table for branch meanings.
-
-```mermaid
-flowchart LR
-  T[Task arrives] --> Q{Pure Query?}
-  Q -->|Yes| D[Answer directly]
-  Q -->|No| K{Route}
-  K -->|Simple| P1[Shortcut spine tail]
-  K -->|Complex Type C| P2[Full 8-stage chain]
-  K -->|Meta analysis| P3[mw: analyze / propose / report]
-  K -->|Proposal| P4[Type D]
-  P1 --> E[ERV → Evo]
-  P2 --> UP{Rising?}
-  UP -->|Yes| G["+ 10-step governance"]
-  UP -->|No| E
-  P3 --> E
-  P4 --> E
-```
-
-<div align="center">
-
-| Branch | Meaning |
-| --- | --- |
-| Simple single-owner | Shortcut spine segment: Exec → Review → Verify → Evolution |
-| Complex multi-file | Full `Critical`…`Evolution`; may add 10-step governance if complexity keeps rising |
-| Meta department analysis | `metaWorkflow`: analyze → propose → report |
-| Type D | Proposal, checklist, prism / scout / warden review report |
-
-</div>
-
-**Relationship to the diagram above:** this section collects **easy-to-misread implications** on that same graph; it does not re-explain every fork.
-
-According to the actual project design, Meta_Kim does not have just one workflow. It has several paths layered together (same routing map as above).
-
-The 4 easiest misunderstandings here are:
-
-- **the simplest path is not naked direct execution**. Only pure `Q / Query` may answer directly. The moment work executes, writes, hands off, or produces durable artifacts, it needs an owner.
-- **simple tasks still have a compressed governed path**. That shortcut is `Execution → Review → Verification → Evolution`, not “just do it and trust it”.
-- **the 8-stage spine is the formal backbone for complex development work**, while the 10-step governance is an upgrade layer, not a replacement.
-- **the real 3-phase flow does exist, but it means `metaWorkflow = analyze → propose → report`**, not a standalone “review output → verify fixes → evolution” pipeline.
-
-### Can you handcraft something first and then only send it through the last few stages?
-
-There are two different cases:
-
-- **If what you already have is a proposal / design / agent definition document**, that is closer to `Type D`: read proposal → checklist → output review report.
-- **If what you already have is written code or another executable artifact**, you can theoretically treat it as a pre-existing artifact and attach it to the later chain, but you cannot pretend the earlier governance never existed.
-
-The canonical project rules are explicit:
-
-- `Review` first checks owner coverage and protocol compliance
-- if there is no owner, no `dispatchBoard`, no `workerTaskPacket`, and no `mergeOwner`, the run should be marked protocol-non-compliant even if the code looks workable
-- so “handcraft it first, then only run an imagined 3-stage validation flow” is **not** a canonical default path in this project
-
-The more accurate mapping is:
-
-- **reviewing a document / proposal** → use `Type D`
-- **retrospectively validating an existing code artifact** → you may attach it to the review-side tail chain, but only after backfilling owner + protocol packets
-- **doing complex development the Meta_Kim way** → still starts from `Critical / Fetch / Thinking`
-
-## Does It Still Carry A Chain-Law Bias?
-
-Yes. **The current Meta_Kim still keeps an explicit chain-like spine.**
-
-If you only look at the visible surface, you still see:
-
-```text
-Critical -> Fetch -> Thinking -> Execution -> Review -> Meta-Review -> Verification -> Evolution
-```
-
-So if someone says “this is still basically an upgraded pipeline”, that is not an unreasonable reading.
-
-But the real project state is no longer “just a chain”. It is:
-
-**chain on the surface, state/event/owner/protocol control underneath.**
-
-More concretely:
-
-- **the chain is still there**: the 8-stage spine remains the most readable execution backbone
-- **state is now doing real control work**: `stageState`, `controlState`, `gateState`, `surfaceState`, `capabilityState`, and `agentInvocationState` keep the system from being just “step 1 then step 2 then step 3”
-- **events can interrupt and reroute**: skip, interrupt, intentional silence, rollback, and owner-resolution branches actively change the path
-- **parallelism weakens the single linear path**: independent work must declare `parallelGroup` and `mergeOwner` instead of defaulting to serial execution
-- **the governance tail chain corrects the run**: `Review / Meta-Review / Verification / Evolution` are not decorative stages; they judge, repair, close, and write back
-
-So the more accurate statement is not “Meta_Kim has escaped chain-law entirely”, but:
-
-**Meta_Kim is currently a hybrid of chain spine + state skeleton + event control + owner protocol + parallel orchestration.**
-
-If you want the shortest version:
-
-**it is not yet a pure state-machine system, but it is no longer a pure chain-flow system either. The chain is the readable backbone, not the whole ontology of the system.**
-
-## The Hidden State Skeleton And Public Display Gates
-
-Meta_Kim is not only “a sequence of stages”.
-
-Under the readable 8-stage flow, the project design also uses a hidden governance skeleton so a run cannot be treated as complete just because it looks complete.
-
-Common state layers include:
-
-<div align="center">
-
-| State layer              | Typical values                                                      | Primary owner   | Why it exists                                                  |
-| ------------------------ | ------------------------------------------------------------------- | --------------- | -------------------------------------------------------------- |
-| `stageState`           | `Critical -> ... -> Evolution`                                    | Conductor       | track canonical stage progression                              |
-| `controlState`         | `normal / skip / interrupt / intentional-silence / iteration`     | Conductor       | change dealing rhythm without inventing fake stages            |
-| `gateState`            | `planning-open / verification-open / synthesis-ready`             | Warden + Prism  | separate stage completion from actual gate clearance           |
-| `surfaceState`         | `debug-surface / internal-ready / public-ready`                   | Warden          | decide whether a run is displayable                            |
-| `capabilityState`      | `covered / partial / gap / escalated`                             | Scout + Artisan | make capability coverage explicit                              |
-| `agentInvocationState` | `idle / discovered / matched / dispatched / returned / escalated` | meta-theory     | enforce search-first delegation instead of lazy self-execution |
-
-</div>
-
-This skeleton is intentionally **hidden**:
-
-- it is not a second UI
-- it is not there to expose more labels to the user
-- it exists to support gates, skips, interrupts, verification, and evolution logging
-
-### What Counts As Publicly Displayable
-
-In the project design, a run must satisfy all of these before entering public display:
-
-- `verifyPassed`
-- `summaryClosed`
-- `singleDeliverableMaintained`
-- `deliverableChainClosed`
-- `consolidatedDeliverablePresent`
-
-In practical terms:
-
-- “it looks done” is not enough
-- “there is something to show” is not enough
-- if verification is still open, the deliverable chain is broken, or synthesis is not closed, the run should remain on the debug or internal surface
-
-This is now treated as a hard release gate in the canonical contract:
-
-- no `verifyPassed` -> no final public draft
-- no `summaryClosed` -> no external-ready result
-- no closed deliverable chain -> no completed status
-
-## Rollback Protocol
-
-The Verification stage does not only decide pass or fail. It also decides whether a rollback is necessary.
-
-Meta_Kim treats rollback as a layered response:
-
-<div align="center">
-
-| Rollback level   | Trigger                                               | Action                                                                        |
-| ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
-| File-level       | a regression is isolated to one file                  | restore that file to the last known good state                                |
-| Sub-task level   | one sub-task broke adjacent paths                     | rollback only that sub-task’s file set                                       |
-| Partial rollback | some sub-tasks succeeded and some failed              | keep the successful work, rollback the failed portion, then re-enter Thinking |
-| Full rollback    | cross-module contamination or invalidated assumptions | stash uncommitted changes and return to Stage 1 with a revised scope          |
-
-</div>
-
-The simple mental model is:
-
-- small problem, small rollback
-- cross-module damage, do not keep pushing forward blindly
-- a governance system without rollback is not a complete governance system
-
-The iron rule is:
-
-**rollback is not failure; rollback is the system knowing when to stop making things worse.**
-
-## Evolution Is Not “A Nice Retrospective” - It Must Be Persisted
-
-In Meta_Kim, `Evolution` is not just a conversational summary. Structural learning is expected to be written back to disk.
-
-Typical outputs and storage locations are:
-
-<div align="center">
-
-| Output                     | Storage location                                           | Meaning                                       |
-| -------------------------- | ---------------------------------------------------------- | --------------------------------------------- |
-| Reusable patterns          | `memory/patterns/{pattern-name}.md`                      | preserve repeatable solutions                 |
-| Scars                      | `memory/scars/{scar-id}.yaml`                            | turn failures into future prevention rules    |
-| New skills                 | `canonical/skills/{skill-name}/SKILL.md`                 | convert learning into callable capability     |
-| Agent boundary adjustments | `canonical/agents/{agent}.md`                            | usually followed by `npm run sync:runtimes` |
-| Rhythm optimizations       | `config/contracts/workflow-contract.json` or Conductor defaults | improve the next dispatch cycle               |
-| Capability gap records     | `memory/capability-gaps.md`                              | keep unresolved gaps visible to Scout         |
-
-</div>
-
-If an Evolution artifact has no explicit storage location, it does not count as captured learning.
-
-The canonical rules now also require one extra owner question after each run:
-
-- does the current owner still fit?
-- should the owner boundary be adjusted?
-- if a temporary `generalPurpose` owner was used, should it now become a real maintained capability?
-
-Each run must now also emit an explicit `writebackDecision`:
-
-- `writeback` -> list the concrete targets
-- `none` -> explain why no durable writeback is justified for this run
-
-## When You Need This
-
-<div align="center">
-
-| Your situation                                    | Without Meta_Kim                                           | With Meta_Kim                                                                                    |
-| ------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| “Refactor the auth module across 6 files”       | AI jumps in, changes files, breaks things in other modules | clarifies scope first, assigns the right roles, reviews cross-module impact                      |
-| “Design a new agent for my project”             | you get a generic template that does not fit your domain   | the system asks what you need, checks existing agents first, and only creates one when necessary |
-| “My agents keep stepping on each other’s toes” | confusion, duplicated work, nobody knows who owns what     | clear ownership boundaries, governance flow, quality gates                                       |
-
-</div>
-
-**If you mostly edit one file at a time, you probably do not need this.** Meta_Kim helps when work spans files, modules, or capability boundaries.
-
-## What It Does
-
-1. **Clarifies before executing**: asks follow-up questions when the request is vague instead of guessing
-2. **Searches before assuming**: checks whether an existing agent / skill already covers the job
-3. **Establishes an owner before execution**: except for pure queries, every executable task needs an explicit owner
-4. **Classifies before it routes**: `taskClass + requestClass + governanceFlow + trigger/upgrade/bypass reasons` are expected before execution starts
-5. **Deals cards instead of only routing**: `meta-conductor` is the primary dealer, `meta-warden` is the escalation owner, and `cardPlanPacket` records what to deal, suppress, defer, skip, or interrupt
-6. **Separates intent core from delivery shell**: the same intent can surface through different `deliveryShell` objects without changing the underlying fact or action
-7. **Defines the protocol before work starts**: task classification, card plan, task packets, summary packet, handoff chain, review packet, and verification packet come first
-8. **Closes review findings explicitly**: review findings, revision responses, verification results, and `closeFindings` must line up
-9. **Parallelizes when safe**: independent tasks should not be serialized by default
-10. **Reviews every output**: code quality, safety, architecture compliance, protocol compliance, and boundary violations
-11. **Validates real runs, not just the contract**: `validate:run` checks whether a recorded run artifact actually satisfies the full packet chain
-12. **Writes learning back into the system**: reusable patterns, scars, and owner / skill / contract adjustments are persisted
-
-> **Reader note:** the following is for **complex tasks**, JSON **run artifacts**, and contract-field validation. Skip if you only use chat-style workflows.
-
-## Governed run artifacts (complex work)
-
-For runs where `governanceFlow` is `complex_dev` or `meta_analysis`, treat a **single JSON run artifact** as the source of truth alongside chat:
-
-1. During Thinking, capture **`intentPacket`** (`trueUserIntent`, `successCriteria`, `nonGoals`, `intentPacketVersion: v1`) — intent lock-in before heavy execution (see `protocols.intentPacket` and `intentPacketRequiredWhenGovernanceFlows`).
-2. Capture **`intentGatePacket`** (`ambiguitiesResolved`, `requiresUserChoice`, `defaultAssumptions`, `intentGatePacketVersion: v1`; if `requiresUserChoice` is true, add `pendingUserChoices[]`) — structured ambiguity gate (see `protocols.intentGatePacket` and `intentGatePacketRequiredWhenGovernanceFlows`).
-3. Keep the full packet chain required by `runDiscipline.protocolFirst.requiredPackets` in that file (or merge incrementally each round).
-4. Before claiming **public-ready** or **done**, run:
-
-```bash
-npm run validate:run -- path/to/your-run.json
-```
-
-5. If validation fails or findings are still open, get a concrete next-iteration checklist:
-
-```bash
-npm run prompt:next-iteration -- path/to/your-run.json
-```
-
-Optional **Stop hook** guard (off by default): set `META_KIM_STOP_COMPLETION_GUARD=hint` for stderr-only reminders, or `=block` to force another turn when the last assistant text claims completion without governance cues. See `.claude/hooks/stop-completion-guard.mjs`.
-
-**`npm run doctor:governance`** runs a narrow health check: contract readable, Claude hook command set matches expectations, `npm run check:runtimes`, and `validate:run` on the sample fixture.
-
-Optional **soft todo gate** during `validate:run`: set `META_KIM_SOFT_PUBLIC_READY_GATES=1`. When `summaryPacket.publicReady` is true, no `workerTaskPacket` may have `taskTodoState: "open"`. Omit `taskTodoState` if you are not tracking todos. See `runDiscipline.runArtifactValidation.softPublicReadyTodoGate` in the contract.
-
-Optional **soft comment-review gate**: set `META_KIM_SOFT_COMMENT_REVIEW=1`. When `summaryPacket.publicReady` is true, `summaryPacket.commentReviewAcknowledged` must be `true`. See `softCommentReviewGate` in the contract.
-
-## The eight meta agents
-
-<div align="center">
-
-| Agent              | Main job                                          | Human shorthand               |
-| ------------------ | ------------------------------------------------- | ----------------------------- |
-| `meta-warden`    | default entry, arbitration, final synthesis       | project manager / coordinator |
-| `meta-conductor` | sequencing and rhythm control                     | dispatcher                    |
-| `meta-genesis`   | `SOUL.md`, persona, cognitive structure         | prompt and role architect     |
-| `meta-artisan`   | skills, MCP, tool fit                             | capability engineer           |
-| `meta-sentinel`  | safety, permissions, hooks, rollback              | security guardrail            |
-| `meta-librarian` | memory and continuity                             | knowledge keeper              |
-| `meta-prism`     | quality review, drift detection, anti-slop checks | quality forensic reviewer     |
-| `meta-scout`     | external capability discovery and evaluation      | scout and evaluator           |
-
-</div>
-
-If you are a normal user, remember just one thing:
-
-**the public front door is `meta-warden`.**
-
-Organization (remember the **front door** first; you do not need the full table on day one):
-
-```mermaid
-flowchart LR
-  U[User intent] --> W[meta-warden default entry]
-  W --> R[Seven other meta roles — backstage specialists]
-```
-
-Entry vs skill vs spine overview: [Meta Architecture View → Default path](#default-path-en).
-
-## How the System Works
-
-You do not need to know the internals. But if you are curious:
-
-```mermaid
-flowchart TD
-    A[You describe what you need] --> B[System clarifies scope]
-    B --> C[Search existing capabilities]
-    C --> D[Route to specialists]
-    D --> E[Agents execute]
-    E --> F[Review output]
-    F --> G[Capture patterns]
-```
-
-For routing and stacked paths, see [Workflow Relation Map](#task-routing-en).
-
-Every valid business run must keep a single organizing thread:
-
-- one department
-- one primary deliverable
-- one closed handoff chain
-
-If a run bundles unrelated goals into the same thread, `meta-conductor` should reject it and `meta-warden` should keep it out of public display.
-
-## How To Use It
-
-### Auto Mode (just talk normally)
-
-For complex work, just describe what you need. The governance flow activates automatically when the system detects multi-file or cross-module work.
-
-```text
-Build a notification system - email, SMS, and in-app - with a shared queue and retry logic.
-```
-
-```text
-The checkout flow is broken across 3 services. Fix the race condition and add proper error handling.
-```
-
-The system will: ask clarifying questions if needed -> search existing agents -> route to the right specialist -> execute -> review -> capture patterns.
-
-If Fetch discovers that no clean owner exists, the normal path is not “just do it directly.” The project now distinguishes:
-
-- durable / recurring gap -> create or compose the owner first (Type B), then execute
-- one-off low-risk gap -> allow a temporary `generalPurpose` owner, then review that choice during Evolution
-
-When you record a real governed run as JSON, validate it directly:
-
-```bash
-npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
-```
-
-That validator checks more than field presence. It verifies finding lineage, close-state flow, delivery-shell references, deliverable-chain closure, and whether `publicReady` was set truthfully.
-
-### Manual Mode (when you know what you want)
-
-If you specifically want to design, review, or audit agents:
-
-```text
-Design an agent for handling data export jobs in this project.
-```
-
-```text
-Audit my agent definitions - are the boundaries clean?
-```
-
-```text
-My agents keep overlapping responsibilities. Fix the organizational structure.
-```
-
-## Repository Structure
-
-(Tree-style ASCII can misalign in some viewers; this table matches the repo layout.)
-
-<div align="center">
-
-| Path | Description |
-| --- | --- |
-| `canonical/` | Runtime-neutral source of agents, skills, and runtime assets |
-| `.claude/` | Claude projection: generated agents, skills, hooks, settings |
-| `.codex/` | Codex custom agent mirrors |
-| `.agents/` | Codex project-level skill mirror |
-| `codex/` | Codex global config example |
-| `openclaw/` | OpenClaw workspaces, skills, config templates |
-| `.cursor/` | Cursor agent and MCP projection (generated) |
-| `config/contracts/` | Runtime governance contracts |
-| `docs/` | Internal/private notes plus selected tracked runtime docs |
-| `scripts/` | Sync, validation, discovery, MCP, health scripts |
-| `shared-skills/` | Shared skill mirrors across runtimes |
-| `README.md` | English primary README (many anchor links assume this file) |
-| `README.zh-CN.md` | Simplified Chinese |
-| `README.ja-JP.md` | Japanese |
-| `README.ko-KR.md` | Korean |
-| `CLAUDE.md` | Claude Code project entry |
-| `AGENTS.md` | Codex project entry |
-| `CHANGELOG.md` | Changelog |
-
-</div>
-
-### Files You Should Usually Edit
-
-If you are maintaining Meta_Kim, start with these:
-
-- `canonical/agents/*.md`
-- `canonical/skills/meta-theory/SKILL.md`
-- `canonical/skills/meta-theory/references/*.md`
-- `config/contracts/workflow-contract.json`
-- `README.md`
-- `README.zh-CN.md`
-- `README.ja-JP.md`
-- `README.ko-KR.md`
-- `CLAUDE.md`
-- `AGENTS.md`
-
-### Files You Usually Should Not Edit By Hand
-
-Unless you know exactly why, do not treat these as the long-term maintenance source:
-
-- `.codex/agents/*.toml`
-- `.agents/skills/meta-theory/`
-- `.codex/skills/meta-theory.md`
-- `shared-skills/meta-theory.md`
-- `openclaw/skills/meta-theory.md`
-- `openclaw/workspaces/*`
-- `.cursor/agents/*.md`
-- `.cursor/skills/meta-theory/`
-- `.cursor/mcp.json`
-
-Those are normally maintained by:
-
-- `npm run sync:runtimes`
-
-### Why There Is a `codex/` Folder
-
-Codex uses two configuration layers:
-
-- repo-local assets, which live in `.codex/` and `.agents/`
-- user-global configuration, which cannot live directly inside the repository root
-
-So:
-
-- `.codex/` is the repo content Codex reads directly
-- `codex/` is only the example directory for wiring `~/.codex/config.toml`
-
-## Hooks (Claude Code)
-
-Meta_Kim ships 8 hook command scripts in `.claude/settings.json` (the `Stop` event runs two of them in sequence):
-
-<div align="center">
-
-| Hook                           | Type                   | Purpose                                                             |
-| ------------------------------ | ---------------------- | ------------------------------------------------------------------- |
-| `block-dangerous-bash.mjs`   | PreToolUse/Bash        | block destructive commands (`rm -rf`, `DROP TABLE`, force-push) |
-| `pre-git-push-confirm.mjs`   | PreToolUse/Bash        | remind to review before `git push`                                |
-| `post-format.mjs`            | PostToolUse/Edit,Write | auto-format JS/TS files with prettier                               |
-| `post-typecheck.mjs`         | PostToolUse/Edit,Write | run type checks after editing `.ts` / `.tsx`                    |
-| `post-console-log-warn.mjs`  | PostToolUse/Edit,Write | warn about `console.log` in edited files                          |
-| `subagent-context.mjs`       | SubagentStart          | inject project context into spawned subagents                       |
-| `stop-console-log-audit.mjs` | Stop                   | audit modified files for `console.log` before the session ends    |
-| `stop-completion-guard.mjs`  | Stop                   | optional weak guard against premature “done” (off unless env set)   |
-
-</div>
-
-Codex and OpenClaw use their own native mechanisms for equivalent behavior.
-
-## Code Knowledge Graph (graphify) (advanced)
-
-Meta_Kim can leverage [graphify](https://github.com/safishamsi/graphify) (`pip install graphifyy`) to generate compressed code knowledge graphs for **target projects** — not Meta_Kim itself. This provides up to **71x token compression** via subgraph extraction instead of raw file reading.
-
-### How It Works
-
-1. **graphify** generates `graphify-out/graph.json` in the target project root (NetworkX node-link JSON with nodes, edges, and confidence scores)
-2. Meta_Kim's Fetch stage auto-detects the graph — no manual intervention needed
-3. All dispatched agents receive graph context via the `subagent-context.mjs` hook
-4. For complex projects (>50 graph nodes), a **project-level conductor** can be auto-created via the Type B pipeline
-
-### Auto-Trigger Conditions
-
-Graph context is used automatically when **all** conditions are met:
-- Source files > 20 (excluding `node_modules/`, `.git/`, `dist/`)
-- Python 3.10+ installed
-- graphify installed (`pip install graphifyy`)
-- Current project is NOT Meta_Kim itself
-
-### Installation
-
-```bash
-# Via setup.mjs (interactive, auto-detects Python)
-node setup.mjs
-
-# Via install-deps.sh
-npm run deps:install
-
-# Manual
-pip install graphifyy && python -m graphify claude install
-
-# Check status
-npm run graphify:check
-```
-
-### Quality Gate
-
-- AMBIGUOUS nodes > 30% → graph marked low-quality, agents use direct `Read` as primary
-- Total nodes < 10 → graph too sparse, fall back to `Glob`/`Grep`
-- God nodes (high in-degree) → flagged as serial bottlenecks for `meta-conductor`
-
-## Quick Start (Clone to Working in 5 Minutes)
-
-**How to read on from here:** complete **One-Click / Manual Setup** below, then follow [Runtime Entry Points](#runtime-entry-points) → [How To Use It](#how-to-use-it) → [Commands](#commands). Everything **before** this Quick Start section explains product intent, [Meta Architecture diagrams](#meta-kim-visual-maps-en), and the governance spine; for deeper charts use [Development Governance Spine](#complex-spine-en) and [Workflow Relation Map](#task-routing-en). **In Claude Code**, invoke the governance playbook with **`/meta-theory`** ([meta-theory skill](#meta-theory-skill-en)).
-
-### Prerequisites
-
-- **Node.js** v18+ (for sync, validate, and OpenClaw scripts)
-- **Git** (to clone)
-- **Python** 3.10+ (optional, for graphify code knowledge graph)
-- **Claude Code CLI** (optional, only needed for `eval:agents`)
-- **Codex CLI** (optional, only needed for `eval:agents`)
-- **OpenClaw CLI** (optional, only needed for `npm run prepare:openclaw-local`)
-
-### One-Click Setup (Recommended)
-
-**Without cloning first** (`npx` fetches the repo temporarily and runs the same wizard as `setup.mjs`):
+If you just want to try it quickly, run:
 
 ```bash
 npx --yes github:KimYx0207/Meta_Kim meta-kim
 ```
 
-**UI language + check only (no writes, no install):** `--lang` matches `setup.mjs`: `en`, `zh-CN`, `ja-JP`, `ko-KR`.
-
-<div align="center">
-
-| UI language | Command |
-| --- | --- |
-| English | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang en --check` |
-| 简体中文 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang zh-CN --check` |
-| 日本語 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ja-JP --check` |
-| 한국어 | `npx --yes github:KimYx0207/Meta_Kim meta-kim -- --lang ko-KR --check` |
-
-</div>
-
-**Classic flow** (clone, then enter the directory):
+Or install it the traditional way:
 
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
@@ -1032,364 +48,734 @@ cd Meta_Kim
 node setup.mjs
 ```
 
-<div align="center">
+If you plan to maintain the repository, edit `canonical/` and `config/contracts/workflow-contract.json` first, then run:
 
-| Usage                              | Description                                              |
-| ---------------------------------- | -------------------------------------------------------- |
-| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | Same as `node setup.mjs`; skips manual `git clone` / `cd` |
-| `node setup.mjs`                   | Interactive setup (language → install / update / check; choose local active runtimes)  |
-| `node setup.mjs --targets claude,codex` | Non-interactive runtime activation selection | saves local `activeTargets` then syncs/install only for those runtimes |
-| `node setup.mjs --lang en`         | Skip language selection, English UI                      |
-| `node setup.mjs --lang zh-CN`      | Skip language selection, Chinese UI                      |
-| `node setup.mjs --lang ja-JP`      | Skip language selection, Japanese UI                     |
-| `node setup.mjs --lang ko-KR`      | Skip language selection, Korean UI                       |
-| `node setup.mjs --update`          | Update all skills and dependencies (asks for install scope)  |
-| `node setup.mjs --check`           | Environment + dependency + cross-runtime sync check      |
-| `node setup.mjs --silent`          | Non-interactive (CI / scripts)                           |
-| `node setup.mjs --targets claude,codex,openclaw` | Non-interactive multi-runtime activation             |
+```bash
+npm run sync:runtimes
+npm run validate
+```
 
-</div>
+Recommended reading order:
 
-Wizard flow and `--check` behavior are summarized in the table above; for the full narrative see [Manual setup (step by step)](#manual-install-en) below.
-
-> **Third-party meta-skill `findskill`:** treat **Meta_Kim as canonical**. `setup.mjs` installs **`KimYx0207/findskill`** into `~/.claude/skills/findskill/`. **Agents and docs in this repo use the name `findskill` only** — do not mix legacy spellings. Avoid parallel duplicate installs from other channels.
-
-> Pure Node.js script — works on Windows / macOS / Linux without bash.
+1. This file, `README.md`
+2. `AGENTS.md`
+3. `docs/runtime-capability-matrix.md`
 
 ---
 
-<a id="manual-install-en"></a>
+## Contact
 
-### Manual Setup (Step by Step)
+![Contact QR](docs/images/contact-qr.png)
 
-The following is the fuller maintainer flow. It covers the core work `node setup.mjs` does, and also adds runtime-mirror sync, global capability discovery, and optional portable global `meta-theory` sync.
+GitHub <a href="https://github.com/KimYx0207">KimYx0207</a> |
+X <a href="https://x.com/KimYx0207">@KimYx0207</a> |
+Website <a href="https://www.aiking.dev/">aiking.dev</a> |
+WeChat Official Account: <strong>老金带你玩AI</strong>
 
-#### 1. Clone and install dependencies
+Feishu knowledge base:
+<a href="https://my.feishu.cn/wiki/OhQ8wqntFihcI1kWVDlcNdpznFf">long-term updates</a>
+
+### Buy me a coffee
+
+If Meta_Kim has been useful, support the project with a coffee.
+
+| WeChat Pay | Alipay |
+| --- | --- |
+| ![WeChat Pay QR](docs/images/wechat-pay.jpg) | ![Alipay QR](docs/images/alipay.jpg) |
+
+### Method basis
+
+Meta_Kim’s methodological foundation comes from research on meta-based intent amplification, authored by this project’s maintainer (KimYx0207):
+
+- Paper: <https://zenodo.org/records/18957649>
+- DOI: `10.5281/zenodo.18957649`
+
+---
+
+## Architecture: Hidden Skeleton + Dynamic Dealing
+
+This is the core design idea of Meta_Kim. If you only read one section, read this one.
+
+### First, split the core terms so they do not get mixed up later
+
+| Concept | What it is | What it is not |
+| --- | --- | --- |
+| **Hidden skeleton** | The backend framework that always exists under the visible workflow | A fixed list of responsibilities written in advance |
+| **8-stage workflow** | The human-readable execution spine exposed by the hidden skeleton | The whole governance logic |
+| **10-stage workflow** | A more complex progression layered on top of the 8 stages after classification | A replacement for the 8 stages |
+| **Dealing** | Dynamic control built around the 8-stage workflow and agent units | Simple task assignment |
+| **Gate** | A pass/fail condition | The stage itself |
+| **Contract** | The structured output a node must produce | Slogans or abstract values |
+| **Agent-unit governance** | A practical way to manage boundaries, capabilities, upgrades, and rollback | A role menu |
+| **Three-layer memory** | Long-term memory split across memory / graphify / SQL | One mixed notebook |
+
+If you only want one sentence to remember:
+
+> **The 8-stage workflow moves execution forward, gates decide whether a stage can pass, contracts define the required outputs, and dealing adds dynamic intervention.**
+
+### 8 stages = the hidden skeleton
+
+Meta_Kim has 8 fixed execution stages. This is the **hidden skeleton**:
+
+```mermaid
+flowchart LR
+    C[Critical<br/>Clarify the request] --> F[Fetch<br/>Search capabilities]
+    F --> T[Thinking<br/>Plan the approach]
+    T --> E[Execution<br/>Dispatch the work]
+    E --> R[Review<br/>Inspect the result]
+    R --> MR[Meta-Review<br/>Review the review]
+    MR --> V[Verification<br/>Verify reality]
+    V --> EV[Evolution<br/>Write back lessons]
+
+    style C fill:#fbbf24,color:#000
+    style F fill:#34d399,color:#000
+    style T fill:#60a5fa,color:#000
+    style E fill:#f87171,color:#fff
+    style R fill:#a78bfa,color:#fff
+    style MR fill:#a78bfa,color:#fff
+    style V fill:#34d399,color:#000
+    style EV fill:#fbbf24,color:#000
+```
+
+**Critical - pin down the real problem first**
+
+When the request is vague, ask clarifying questions instead of guessing. This stage produces `intentPacket`, which locks down the real user intent, success criteria, and exclusions. If the request is already clear, the system records an explicit skip reason instead of quietly skipping.
+
+**Fetch - search existing capabilities before inventing new ones**
+
+Search whether existing agents, skills, tools, or MCP integrations already cover the need. The core idea here is **capability-first**: define the capability first, then search for the owner that declares it, then dispatch to the best match. Do not start by hardcoding a specific agent name.
+
+**Thinking - define boundaries, owners, sequence, deliverables, risks, and stop conditions**
+
+Break the task into subtasks, assign owners, and make dependencies and parallel groups explicit. This stage produces a `dispatchBoard`: who does what, what can run in parallel, and who is responsible for merging the result. At least two solution paths should be explored; do not lock into a single route too early.
+
+**Execution - produce the actual work while still under governance**
+
+Dispatch the subtasks to specialist agents. Each subtask is wrapped in a `workerTaskPacket`, including file context, constraints, review owner, and verification owner. Independent subtasks should run in parallel when possible. **Execution is not completion** - the output still has to pass review and verification.
+
+**Review - check quality and boundary compliance**
+
+Inspect code quality, security, architecture compliance, and boundary violations. Produce a structured `reviewPacket` with findings. Each finding has a severity from CRITICAL to LOW. This is not a formality - unresolved findings cannot move forward.
+
+**Meta-Review - inspect whether the review standard itself is biased or too loose**
+
+Review the review. If the review standard is too weak, the system is not really reviewing. If it is biased, it is reviewing the wrong thing. This stage protects the quality of the review system itself.
+
+**Verification - confirm that reality matches the claim**
+
+Verify whether the fixes really closed the review findings. This stage produces `verificationResult` and `closeFindings`. If the fix did not actually close the finding, go back and repair it before verifying again. This is the most honest gate in the system.
+
+**Evolution - write capability gaps and reusable patterns back into the system**
+
+Convert experience into structural upgrades: reusable patterns go into memory, failures become learning artifacts, capability gaps are handed to Scout, and agent boundaries are written back into canonical sources. Every run must end with a `writebackDecision`: either write back something concrete or explicitly explain why there is nothing to persist. **A run that does not preserve learning is wasted work.**
+
+---
+
+The 8 stages together form the execution spine.
+
+Why are they only "relatively" fixed? Because some stages can be skipped in simple cases - but the system must explicitly record why they were skipped. Nothing is skipped silently.
+
+### 10 stages = a progression workflow built on the skeleton
+
+If the 8-stage workflow is the skeleton, then the 10-stage workflow is the **more complex progression** that grows on top of it:
+
+```text
+direction -> planning -> execution -> review -> meta_review -> revision -> verify -> summary -> feedback -> evolve
+```
+
+It is not a second system. It is derived from the 8-stage skeleton. The difference is:
+
+- **The 8 stages** focus on execution logic - "what order should work happen in"
+- **The 10 stages** focus on governance - "what each stage must deliver and how completion is defined"
+
+```mermaid
+flowchart TB
+    subgraph spine["8-stage workflow (hidden skeleton)"]
+        direction LR
+        C1[Critical] --> F1[Fetch] --> T1[Thinking] --> E1[Execution] --> R1[Review] --> MR1[Meta-Review] --> V1[Verification] --> EV1[Evolution]
+    end
+
+    subgraph workflow["10-stage workflow (progression)"]
+        direction LR
+        D2[direction] --> P2[planning] --> EX2[execution] --> RE2[review] --> MET2[meta_review] --> REV2[revision] --> VER2[verify] --> SUM2[summary] --> FB2[feedback] --> EVO2[evolve]
+    end
+
+    C1 -.-> D2
+    F1 -.-> P2
+    T1 -.-> P2
+    E1 -.-> EX2
+    R1 -.-> RE2
+    MR1 -.-> MET2
+    V1 -.-> VER2
+    EV1 -.-> EVO2
+
+    style spine fill:#1e1b4b,stroke:#7c3aed,color:#e0e7ff
+    style workflow fill:#14532d,stroke:#22c55e,color:#dcfce7
+```
+
+The 10-stage workflow adds `revision`, `summary`, and `feedback`, so the process is not only about "getting it done" but also about getting it done well and closing the loop correctly.
+
+### Contracts = what each node must deliver
+
+Workflow alone is not enough. Each stage also needs to define **what it must output**. That is what the contracts do.
+
+Meta_Kim contracts are not verbal agreements. They are **structured packets**:
+
+| Contract artifact | Stage | Purpose |
+| --- | --- | --- |
+| `intentPacket` | Critical | Lock the real intent and prevent drift |
+| `dispatchBoard` | Thinking | Define owners, dependencies, and parallel groups |
+| `workerTaskPacket` | Execution | Carry the full context for each subtask |
+| `reviewPacket` | Review | Record structured findings |
+| `revisionResponse` | Revision | Respond to each review finding |
+| `verificationResult` | Verification | Confirm whether the issue was actually closed |
+| `summaryPacket` | Summary | Final summary before public release |
+| `evolutionWriteback` | Evolution | Define what should be written back |
+
+```mermaid
+flowchart LR
+    subgraph packets["Contract artifact flow"]
+        direction LR
+        IP[intentPacket<br/>Intent lock] --> DP[dispatchBoard<br/>Dispatch board]
+        DP --> WTP[workerTaskPacket<br/>Task packet]
+        WTP --> RP[reviewPacket<br/>Review findings]
+        RP --> RR[revisionResponse<br/>Revision response]
+        RR --> VR[verificationResult<br/>Verification result]
+        VR --> SP[summaryPacket<br/>Final summary]
+        SP --> EW[evolutionWriteback<br/>Learning writeback]
+    end
+
+    IP ~~~ C2["Critical"]
+    DP ~~~ T2["Thinking"]
+    WTP ~~~ E2["Execution"]
+    RP ~~~ R2["Review"]
+    RR ~~~ REV2["Revision"]
+    VR ~~~ V2["Verification"]
+    SP ~~~ S2["Summary"]
+    EW ~~~ EV2["Evolution"]
+
+    style packets fill:#1a1a2e,stroke:#e94560,color:#fff
+```
+
+These artifacts are not optional documents. They are the system’s source of truth. Without contracts, the next node is not "handing off" - it is guessing what the previous node meant. That is why so much AI collaboration falls apart on complex work.
+
+The current implementation carries these artifacts explicitly: `taskClassification` before execution, `cardPlanPacket` before dealing, `dispatchEnvelopePacket` before dispatch, `reviewPacket.findings` after review, `revisionResponses` + `verificationResults` + `closeFindings` between revision and verification, `summaryPacket` before external publication, and `writebackDecision` before evolution.
+
+`npm run validate:run` checks whether these artifact chains close completely.
+
+### Gates = stage reached does not mean stage passed
+
+Contracts define what each node must deliver. Gates define whether that delivery is good enough to move forward.
+
+In one sentence:
+
+> **A stage tells you where you are; a gate tells you whether you are allowed to move on.**
+
+```mermaid
+flowchart LR
+    A["Reach a stage"] --> B{"Gate decision"}
+    B -->|Pass| C["Release: move forward"]
+    B -->|Fail| D["Revision: add evidence / fix output"]
+    B -->|Hold| E["Pause: wait for conditions to mature"]
+    B -->|Escalate| F["Higher-level intervention"]
+
+    style A fill:#dbeafe,stroke:#2563eb,color:#000
+    style B fill:#7c3aed,stroke:#4c1d95,color:#fff
+    style C fill:#dcfce7,stroke:#16a34a,color:#000
+    style D fill:#fee2e2,stroke:#dc2626,color:#000
+    style E fill:#e0f2fe,stroke:#0284c7,color:#000
+    style F fill:#fef3c7,stroke:#f59e0b,color:#000
+```
+
+Key gates in the system:
+
+| Gate | What it blocks | Pass condition |
+| --- | --- | --- |
+| **planning gate** | Moving from planning into execution | Boundaries, owners, deliverables, and risks are defined |
+| **metaReview gate** | Whether meta-review is strong enough | The review standard itself is not biased, missing, or too loose |
+| **verify gate** | Whether the fix really closed the issue | `finding -> revision -> verification` closes cleanly |
+| **summary gate** | Whether the result can be published | Verification passed + summary completed |
+| **publicDisplay gate** | Whether the system can claim "done" | `verifyPassed + summaryClosed + singleDeliverableMaintained + deliverableChainClosed` |
+
+The most important one is the **publicDisplay gate**. If verification has not passed, the summary is not closed, or the deliverable chain is broken, the system cannot pretend that the work is finished.
+
+The relationship between gates and contracts:
+
+- **Contracts** answer "what must this node deliver" - they are about delivery obligations
+- **Gates** answer "is this good enough to move forward" - they are about release decisions
+- Without contracts, gates have nothing to judge
+- Without gates, contracts are just a ceremony
+
+### Dynamic dealing = flexibility layered on top of the skeleton
+
+The 8-stage skeleton is relatively fixed, but real tasks vary too much to be handled by one rigid path. That is why Meta_Kim introduces **dynamic dealing**.
+
+Dealing corresponds to the 8 stages, but not as a simple 1:1 map. The 10 cards are:
+
+| Card | Trigger condition | Attention cost |
+| --- | --- | --- |
+| **Clarify** | The request is vague | Low |
+| **Shrink scope** | The repository is too large or has too many files | Low |
+| **Options** | The request is clear but there are many possible paths | Medium |
+| **Execute** | The plan is decided | High |
+| **Verify** | Execution is complete | Medium |
+| **Fix** | Verification failed | Medium |
+| **Rollback** | Risk is spreading | High |
+| **Risk** | Security, global, or multi-party impact is involved | High |
+| **Nudge** | The user is stuck and needs a light push | Low |
+| **Pause** | Three high-cost cards have been used in a row | Zero |
+
+The important part is that some cards are dynamic:
+
+- When three high-attention cards are dealt consecutively, the system forcibly inserts **Pause** - it does not wait for the user to notice
+- When security risk appears, **Risk** preempts the current flow
+- When the user already knows something, the corresponding card is skipped
+- When task iteration exceeds the upper bound, the system escalates to **Warden adjudication**
+
+Dynamic dealing gives the fixed skeleton some breathing room: strict where it must be strict, flexible where flexibility helps.
+
+```mermaid
+flowchart TD
+    START[Current card completed] --> SKIP{Check next card<br/>skip_condition}
+    SKIP -->|Satisfied, skip| NEXT[Continue to the next card]
+    SKIP -->|Not satisfied| INTR{Check interrupt queue}
+    INTR -->|Security risk preempts| RISK[Risk card<br/>highest priority]
+    INTR -->|No preemption| PAUSE{Three or more<br/>high-cost cards?}
+    PAUSE -->|Yes, force a break| P[Pause card<br/>zero attention]
+    PAUSE -->|No| DEAL[Deal by priority]
+    RISK --> DEAL
+    P --> DEAL
+    DEAL --> COUNT{Iterations over<br/>max_iterations?}
+    COUNT -->|Yes| WARDEN[Escalate to Warden adjudication]
+    COUNT -->|No| START
+
+    style RISK fill:#dc2626,color:#fff
+    style P fill:#1e3a5f,color:#93c5fd
+    style WARDEN fill:#7c3aed,color:#fff
+    style DEAL fill:#16a34a,color:#fff
+```
+
+### Closed loop = iterate, generate, improve
+
+Once the skeleton, progression workflow, contracts, and dynamic dealing are in place, the system forms a **closed loop**:
+
+```text
+Request arrives -> skeleton starts -> dealing decision -> dispatch execution -> review and verify -> preserve lessons -> upgrade agents -> next run starts stronger
+```
+
+The loop is not one-and-done. Each round can:
+
+1. **Generate the missing agent** - if a capability gap appears, the system can create a new agent through the Type B pipeline
+2. **Improve agent capability** - Evolution writes back changes to SOUL.md, skill loadouts, and toolchains
+3. **Clarify every agent’s boundary** - each agent owns one class of work; boundary violations are intercepted by Sentinel
+
+```mermaid
+flowchart TD
+    INPUT[Request arrives] --> SPINE[Hidden skeleton starts]
+    SPINE --> CARD[Dynamic dealing decision]
+    CARD --> DISPATCH[Dispatch to specialist agent]
+    DISPATCH --> REVIEW[Review + verification]
+    REVIEW --> |Pass| EVOLVE[Preserve lessons]
+    REVIEW --> |Fail| FIX[Fix + review again]
+    FIX --> REVIEW
+    EVOLVE --> UPGRADE[Upgrade agent capability]
+    UPGRADE --> |Capability gap found| CREATE[Type B pipeline<br/>auto-create new agent]
+    UPGRADE --> |Boundary needs adjustment| BOUNDARY[Adjust agent boundary]
+    CREATE --> INPUT2[Next run starts stronger]
+    BOUNDARY --> INPUT2
+
+    style INPUT fill:#fbbf24,color:#000
+    style EVOLVE fill:#34d399,color:#000
+    style CREATE fill:#f87171,color:#fff
+    style INPUT2 fill:#fbbf24,color:#000
+```
+
+### Agent boundaries + skill integration
+
+The 8 meta roles each own a different domain:
+
+| Role | Responsibility | What it does not own |
+| --- | --- | --- |
+| **meta-warden** | Coordination, arbitration, final synthesis | Does not directly write code |
+| **meta-conductor** | Workflow and rhythm control | Does not do security review |
+| **meta-genesis** | Agent design and SOUL.md | Does not choose tools |
+| **meta-artisan** | Skill, MCP, and tool matching | Does not define persona |
+| **meta-sentinel** | Security, permissions, rollback | Does not choreograph rhythm |
+| **meta-librarian** | Memory and continuity | Does not execute code |
+| **meta-prism** | Quality review and anti-slop | Does not search for capabilities |
+| **meta-scout** | External capability discovery | Does not coordinate internally |
+
+Each agent can load powerful **skills** and **commands** as needed. Meta_Kim ships with 9 community skills and supports custom extension.
+
+```mermaid
+flowchart TD
+    WARDEN[meta-warden<br/>Coordination / arbitration / synthesis] --> CONDUCTOR[meta-conductor<br/>Workflow / rhythm]
+    WARDEN --> GENESIS[meta-genesis<br/>Agent design]
+    WARDEN --> ARTISAN[meta-artisan<br/>Skill / tool matching]
+    WARDEN --> SENTINEL[meta-sentinel<br/>Security / permissions / rollback]
+    WARDEN --> LIBRARIAN[meta-librarian<br/>Memory / continuity]
+    WARDEN --> PRISM[meta-prism<br/>Quality review]
+    WARDEN --> SCOUT[meta-scout<br/>External capability discovery]
+
+    GENESIS -.-> |SOUL.md| ARTISAN
+    ARTISAN -.-> |Skill loadout| GENESIS
+    CONDUCTOR -.-> |Task board| WARDEN
+    SENTINEL -.-> |Security interception| WARDEN
+    PRISM -.-> |Review report| WARDEN
+    SCOUT -.-> |Capability candidates| ARTISAN
+    LIBRARIAN -.-> |Context memory| WARDEN
+
+    SKILLS[9 community skills<br/>+ custom extensions] --> ARTISAN
+    HOOKS[Hook automation<br/>intercept / format / check] --> SENTINEL
+
+    style WARDEN fill:#7c3aed,color:#fff
+    style CONDUCTOR fill:#60a5fa,color:#000
+    style GENESIS fill:#fbbf24,color:#000
+    style ARTISAN fill:#34d399,color:#000
+    style SENTINEL fill:#f87171,color:#fff
+    style LIBRARIAN fill:#a78bfa,color:#fff
+    style PRISM fill:#fb923c,color:#000
+    style SCOUT fill:#2dd4bf,color:#000
+```
+
+### Hook automation
+
+In Claude Code, Meta_Kim uses **hooks** for automation:
+
+- **Dangerous command blocking**: operations like `rm -rf` and `DROP TABLE` are blocked automatically
+- **Git push reminder**: remind you to check before pushing
+- **Formatting**: automatically format JS/TS files after edits
+- **Type checking**: run TypeScript checks after edits
+- **console.log warning**: remind you to remove `console.log`
+- **Session-end audit**: check for leftover issues before the session ends
+- **Subagent context injection**: automatically inject project context into subagents
+
+These hooks are not optional polish. They are the execution-layer guardrails of the governance system.
+
+### Cross-platform mapping
+
+**The whole architecture can be mapped onto any project that supports agents and agent-to-agent communication.**
+
+Meta_Kim currently maps to four platforms:
+
+| Platform | Status | Mapping style |
+| --- | --- | --- |
+| **Claude Code** | Fully supported | `.claude/agents/*.md` + `SKILL.md` + hooks + MCP |
+| **Codex** | Fully supported | `.codex/agents/*.toml` + skills + commands |
+| **OpenClaw** | Fully supported | `openclaw/` directory structure + workspaces |
+| **Cursor** | Fully supported | `.cursor/agents/*.md` + skills + MCP |
+
+The core logic is the same (`canonical/`), and the repository projects it into different platform-specific file structures through `npm run sync:runtimes`.
+
+```mermaid
+flowchart TB
+    CANONICAL["canonical/<br/>(single source layer)"]
+
+    CANONICAL --> |npm run sync:runtimes| CLAUDE[".claude/<br/>Claude Code<br/>agents + skills + hooks"]
+    CANONICAL --> |npm run sync:runtimes| CODEX[".codex/<br/>Codex<br/>agents.toml + skills"]
+    CANONICAL --> |npm run sync:runtimes| OPENCLAW["openclaw/<br/>OpenClaw<br/>workspaces + skills"]
+    CANONICAL --> |npm run sync:runtimes| CURSOR[".cursor/<br/>Cursor<br/>agents + skills + MCP"]
+
+    NEW[New platform...] -.-> |config mapping| CANONICAL
+
+    style CANONICAL fill:#7c3aed,color:#fff
+    style CLAUDE fill:#fbbf24,color:#000
+    style CODEX fill:#34d399,color:#000
+    style OPENCLAW fill:#60a5fa,color:#000
+    style CURSOR fill:#f87171,color:#fff
+    style NEW fill:#555,color:#aaa
+```
+
+You can keep adding platform mappings over time as long as the platform supports agents and agent communication.
+
+But there is an important caveat: the four runtimes are not equal. Claude Code currently has the most complete execution surface and is the primary editing runtime.
+
+| Capability surface | Claude Code | Codex | OpenClaw | Cursor |
+| --- | --- | --- | --- | --- |
+| **Agents** | Native agents/subagents, mature at both project and user scope | Strong custom agents/subagents | Workspace-style agents, supports agent-to-agent | Lightweight agent projection |
+| **Skills / references** | Native skills, references, and a mature global ecosystem | `.agents/skills/` works well | Workspace skills and installable skills | Lighter skill/reference support |
+| **Hooks / automation** | Project hooks + settings.json + plugin ecosystem | No repo-level native hook file surface | Workspace boot/hook-style capabilities | Weakest native governance hooks |
+| **MCP / configuration** | Full native MCP and config surface | Can connect via runtime adapters and MCP | Clear workspace config | Can use MCP, but the surface is lighter |
+| **Governance loop capacity** | **Highest** | High, but below Claude Code | High, but different in form | Lightest |
+
+The reason is not sentiment. Claude Code natively supports agents, skills, references, hooks, settings, MCP, plugins, and global capability discovery, which makes the whole loop - dealing -> contracts -> gates -> automation guardrails -> writeback - easier to carry end to end.
+
+### Four-layer repository structure
+
+| Layer | Location | Purpose |
+| --- | --- | --- |
+| **Canonical source** | `canonical/`, `config/contracts/workflow-contract.json` | Preferred place for long-term edits |
+| **Runtime projections** | `.claude/`, `.codex/`, `.agents/skills/`, `openclaw/`, `.cursor/` | Same capability projected into different runtimes |
+| **Local state** | `.meta-kim/state/{profile}/`, `.meta-kim/local.overrides.json` | Profile-level state, run index, continuity |
+| **Scripts and checks** | `scripts/`, `npm run *` | Sync, validate, discover, and accept |
+
+### Three state layers (project / global / local)
+
+These three layers are easy to mix up, so they must stay separate:
+
+| Layer | Storage location | What it decides |
+| --- | --- | --- |
+| **Project-level** | Current repository `canonical/`, contracts, runtime projections, docs, scripts | What this project itself defines |
+| **Global-level** | `~/.claude/`, `~/.codex/`, `~/.openclaw/`, `~/.cursor/`, `~/.meta-kim/global/` | What can still be discovered on this machine |
+| **Local-level** | `.meta-kim/state/{profile}/run-index.sqlite`, `compaction/`, `profile.json` | What a run left behind for this profile |
+
+#### What lives inside `.meta-kim/`?
+
+`.meta-kim/` is Meta_Kim's local save file. It does three things:
+
+**1. Remembers your choices** — `local.overrides.json`
+
+When you run `node setup.mjs` for the first time and pick "I want Claude Code and Codex", that choice is saved here. Next time you run setup, you don't have to choose again.
+
+*Example: You have Claude Code, Codex, and OpenClaw installed, but only want the first two. This file stores that preference — all scripts read it to know which runtimes to install skills for.*
+
+**2. Records work history** — `state/{profile}/run-index.sqlite`
+
+When you run a governed workflow (e.g. "use the 8-stage spine to review some code"), the result can be indexed into a SQLite database. Later you can query "what did I review last time, what was found, what's still unresolved?"
+
+*Example: Last week you asked meta-prism to review the auth module. This week you changed the auth module again. The system checks `.meta-kim/state/` and finds "last review found 3 issues, 2 were fixed, 1 is still open" — you don't have to repeat yourself.*
+
+**3. Cross-session recovery** — `state/{profile}/compaction/`
+
+When you're halfway through a conversation and your token budget runs out, the compaction packet saves your current progress (which step you're on, what's still pending) so you can pick up where you left off in a new session.
+
+*Example: You ask Meta_Kim to do a complex multi-file refactor. You get through step 6 before the session ends. Next session, the system reads the compaction packet: "at step 6, step 7 hasn't started" — picks up from step 7, no need to start over.*
+
+**Other files:** `doctor-cache/` stores `npm run doctor:governance` results, `migrations/` tracks schema upgrades between Meta_Kim versions, `profile.json` stores profile metadata. All managed by scripts — you never edit them by hand.
+
+**Quick reference:**
+
+| Path | What it does | When written |
+| --- | --- | --- |
+| `local.overrides.json` | Remembers your runtime selection from `setup.mjs` | Auto — first `setup.mjs` run |
+| `state/{profile}/profile.json` | Profile metadata (creation time, name) | Auto — `setup.mjs` creates the `default` profile |
+| `state/{profile}/run-index.sqlite` | Indexed governed run records — who ran what, what was found, what's still open | On demand — `npm run index:runs -- <artifact>` |
+| `state/{profile}/compaction/` | Cross-session handoff packets: unfinished steps, pending findings, open verification gates | On demand — governed run that needs to survive a session break |
+| `state/{profile}/doctor-cache/` | Cached results from `npm run doctor:governance` | On demand — `doctor:governance` writes here |
+| `state/{profile}/migrations/` | State migration tracking (schema upgrades between versions) | Auto — when state schema changes between versions |
+
+### What works globally vs. in-repo only
+
+Meta_Kim's gates and protocols work on three enforcement layers. After global installation (`node setup.mjs`), here is what works in any project versus what requires the Meta_Kim repo:
+
+| Enforcement layer | Global install | Needs Meta_Kim repo |
+| --- | --- | --- |
+| **Prompt layer** (agents + skills enforce gates/protocols) | Works — installed to `~/.claude/skills/` and `~/.claude/agents/` | — |
+| **Hook layer** (session-end gate checks, dangerous command blocking) | Works — configured in `.claude/settings.json` | — |
+| **Config layer** (contract definitions are referenced in skill prompts) | Works — AI reads the rules from the installed skill | — |
+| **Code validation** (`npm run validate:run` hard-checks packet chains) | — | Required — script lives in `scripts/validate-run-artifact.mjs` |
+
+The first three layers are the primary defense and work everywhere. Code validation is a final safety net that requires running from the Meta_Kim repo (or pointing to its scripts).
+
+---
+
+## Three-Layer Memory
+
+Meta_Kim does not use a single memory layer. It uses three, each with a different job, so agents can keep improving while becoming more familiar with the project.
+
+**All three layers activate automatically after running `node setup.mjs`.** No manual configuration required — dependencies are installed, git hooks are registered, and the system manages data lifecycle on its own.
+
+### Layer 1: Memory (agent upgrade memory)
+
+- **Responsibility**: agent upgrades and continuous learning
+- **Storage**: `.claude/projects/*/memory/`
+- **Mechanism**: before each run ends, the system reads memory and uses it to decide whether the agent should be upgraded or its boundary should change
+- **Core value**: agents get smarter over time instead of restarting from zero each time
+- **Activation**: automatic — AI reads and writes memory during each session
+- **Query**: ask AI directly — "what did we learn from previous sessions about this project?"
+
+### Layer 2: Graphify (project-level LLM wiki)
+
+- **Responsibility**: project-level code knowledge graph
+- **Storage**: `graphify-out/graph.json` (NetworkX node-link format)
+- **Mechanism**: `node setup.mjs` installs graphify, registers git hooks (auto-rebuild on commit/checkout), and generates the initial graph — all automatic
+- **Core value**:
+  - Make memory increasingly familiar with the project - not by remembering raw code, but by understanding structure and relationships
+  - **Reduce hallucinations** - agents answer from graph facts instead of guessing
+  - **Cut token usage** - subgraph extraction replaces raw file reads, with up to 71x compression
+- **Quality threshold**:
+  - Fuzzy nodes > 30% -> mark the graph as low quality and fall back to direct file reads
+  - Total nodes < 10 -> the graph is too sparse and should fall back to Glob/Grep
+  - A "god node" with too many incoming edges -> mark as a serial bottleneck
+- **Activation**: `node setup.mjs` handles everything — install, dependency check (networkx >= 3.4), git hooks, initial graph generation
+- **Query**: `python -m graphify query "your question"` — natural language query against the code graph
+
+### Layer 3: SQL (vector-level session retrieval)
+
+- **Responsibility**: vector storage and retrieval for project sessions
+- **Storage**: SQLite + vector extension (`sqlite-vec`)
+- **Mechanism**: store key session information as vectors, then retrieve later by semantic similarity
+- **Core value**:
+  - Cross-session continuity - pick up where the last conversation left off
+  - Vector-level retrieval - semantic understanding instead of keyword matching
+  - Precise recall - find the most relevant context from historical sessions
+- **Activation**: automatic — sessions are indexed as they complete; `npm run index:runs -- <artifact>` for manual indexing of validated run artifacts
+- **Query**: `npm run query:runs -- --owner <agent>` — find past runs by agent, or ask AI to recall relevant past sessions
+
+### How the three layers work together
+
+```mermaid
+flowchart TB
+    subgraph memory["Layer 1: Memory"]
+        M_IN[Before the run ends<br/>read memory] --> M_JUDGE[Decide whether the agent<br/>needs an upgrade]
+        M_JUDGE --> M_OUT[Update boundary<br/>adjust capability]
+    end
+
+    subgraph graphify["Layer 2: Graphify"]
+        G_IN[When source files > 20<br/>auto-generate graph] --> G_COMPRESS[Subgraph extraction<br/>up to 71x compression]
+        G_COMPRESS --> G_QUERY[Agent answers from graph<br/>facts]
+    end
+
+    subgraph sql["Layer 3: SQL"]
+        S_IN[Session key information<br/>stored as vectors] --> S_INDEX[SQLite + sqlite-vec<br/>vector index]
+        S_INDEX --> S_RECALL[Semantic similarity<br/>precise recall]
+    end
+
+    memory <--> graphify
+    graphify <--> sql
+    sql <--> memory
+
+    GOAL1[Reduce hallucinations<br/>answer from facts, not invention]
+    GOAL2[Reduce token usage<br/>compression instead of full reads]
+
+    memory --> GOAL1
+    graphify --> GOAL1
+    graphify --> GOAL2
+    sql --> GOAL2
+
+    style memory fill:#fbbf24,color:#000
+    style graphify fill:#34d399,color:#000
+    style sql fill:#60a5fa,color:#000
+    style GOAL1 fill:#dc2626,color:#fff
+    style GOAL2 fill:#dc2626,color:#fff
+```
+
+The three memory layers work together toward two core goals:
+
+1. **Greatly reduce hallucinations** - agents answer from facts and context instead of inventing details
+2. **Greatly reduce token usage** - use graph compression instead of full-file reads and vector retrieval instead of brute-force search
+
+---
+
+## Ops Command Quick Reference
+
+### Daily use
+
+| Command | Purpose |
+| --- | --- |
+| `node setup.mjs` | Interactive install / update / check wizard |
+| `node setup.mjs --update` | Update all skills and dependencies |
+| `node setup.mjs --check` | Environment check without writing |
+| `node setup.mjs --lang zh-CN` | Force the Chinese UI |
+
+### Sync and validation
+
+| Command | Purpose |
+| --- | --- |
+| `npm run sync:runtimes` | Sync from canonical sources to all four runtimes |
+| `npm run check:runtimes` | Check whether the four runtimes are in sync |
+| `npm run validate` | Validate repository integrity |
+| `npm run verify:all` | Full validation, including runtime smoke checks |
+| `npm run doctor:governance` | Governance health check |
+
+### Skills and dependencies
+
+| Command | Purpose |
+| --- | --- |
+| `npm run deps:install` | Install the 9 community skills globally |
+| `npm run deps:install:all-runtimes` | Install them into all runtimes |
+| `npm run discover:global` | Scan global capabilities |
+| `npm run sync:global:meta-theory` | Sync meta-theory to the user-level runtime |
+
+### Advanced ops
+
+| Command | Purpose |
+| --- | --- |
+| `npm run validate:run -- <file.json>` | Validate governed run artifacts |
+| `npm run eval:agents` | Lightweight runtime smoke test |
+| `npm run eval:agents:live` | Live prompt-backed acceptance |
+| `npm run probe:clis` | Probe local CLI tools |
+| `npm run test:mcp` | MCP self-test |
+| `npm run index:runs -- <dir>` | Index validated run artifacts |
+| `npm run query:runs -- --owner <agent>` | Query the run index |
+| `npm run migrate:meta-kim -- <dir> --apply` | Import an older prompt pack |
+
+---
+
+## FAQ
+
+### Q: What is different about Meta_Kim compared with a normal AI coding assistant?
+
+A normal AI coding assistant does what you ask, with no governance layer in between. Meta_Kim inserts several layers between "ask" and "do": first it confirms what you actually want, then it plans who should do it, then it reviews the result, then it verifies the fix, and finally it preserves the lesson. **It is not another AI; it is engineering discipline for AI.**
+
+### Q: I only need to change one file. Do I need Meta_Kim?
+
+**No.** Meta_Kim is for cross-file, cross-module, and multi-capability tasks. If you are only changing one function inside one file, plain Claude Code is enough. Do not use a cannon to hit a mosquito.
+
+### Q: What is the relationship between the 8-stage workflow and the 10-stage workflow?
+
+The 8-stage workflow is the **execution skeleton** (`Critical -> Fetch -> Thinking -> Execution -> Review -> Meta-Review -> Verification -> Evolution`) and stays relatively fixed. The 10-stage workflow is a **governance workflow** derived from that skeleton (`direction -> planning -> execution -> review -> meta_review -> revision -> verify -> summary -> feedback -> evolve`) and focuses more on deliverable flow and closure. It does not replace the 8 stages; it adds governance depth on top.
+
+### Q: What does dynamic dealing mean?
+
+The 8-stage workflow is fixed, but real tasks vary too much. Dealing gives the system flexibility inside that fixed path - for example, after three high-intensity actions in a row, the system can auto-pause with **Pause**; when a security issue appears, **Risk** can preempt the current flow. **The fixed skeleton protects the baseline, and dynamic dealing provides adaptability.**
+
+### Q: Will the three-layer memory be too heavy?
+
+No. The three layers have separate jobs:
+
+- Memory is very light - just a few markdown files
+- Graphify only activates when source files exceed 20, and the graph can be reused after generation
+- SQL uses local SQLite and does not require an extra database service
+
+Together, they cost far less than asking AI to reread the entire project from scratch every time.
+
+### Q: Which platforms are supported?
+
+Claude Code, Codex, OpenClaw, and Cursor are all fully supported. The core logic lives in `canonical/` and is projected into each platform through sync scripts. In theory, any platform that supports agents and agent-to-agent communication can be mapped in.
+
+### Q: Is the installation complicated?
+
+One command is enough:
+
+```bash
+npx --yes github:KimYx0207/Meta_Kim meta-kim
+```
+
+Or clone the repository and run:
 
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
-npm install
+node setup.mjs
 ```
 
-#### 2. Sync the runtime mirrors
+The wizard will guide you through language, platform, and installation scope.
 
-```bash
-npm run sync:runtimes
-```
+### Q: Why is it called "Meta"?
 
-This rebuilds the Claude, Codex, OpenClaw, and shared-skill projections from the neutral `canonical/` source.
+In Meta_Kim, **meta means the smallest governable unit**. A valid meta unit must:
 
-If you only want to check whether they are already in sync, use:
+- Own one clear class of responsibility
+- Define what it refuses
+- Be reviewable on its own
+- Be replaceable
+- Be safe to roll back
 
-```bash
-npm run check:runtimes
-```
+Not everything deserves to be called meta. Only what meets that bar counts.
 
-#### 3. Install meta-skill dependencies (optional, but recommended)
+### Q: How does this project relate to MCP?
 
-```bash
-npm run deps:install
-```
+Meta_Kim uses MCP (Model Context Protocol) to expand the capability boundary of agents. Through the `.mcp.json` configuration, agents can call external tools and services. But Meta_Kim itself is not an MCP server - it is a governance framework, and MCP is only one of its integrated tools.
 
-This installs the 9 community skills Meta_Kim depends on into `~/.claude/skills/`.
+## Further Reading
 
-Notes:
+- [README.zh-CN.md](README.zh-CN.md)
+- [AGENTS.md](AGENTS.md)
+- [config/contracts/workflow-contract.json](config/contracts/workflow-contract.json)
+- [docs/runtime-capability-matrix.md](docs/runtime-capability-matrix.md)
 
-- this is a **global Claude Code ecosystem install**, not a repo-local install
-- the script runs through `bash install-deps.sh`
-- **Windows users need `bash` available**, typically via Git Bash or WSL
-
-To update those dependencies later:
-
-```bash
-npm run deps:update
-```
-
-#### 4. Discover global capabilities
-
-```bash
-npm run discover:global
-```
-
-This scans your machine and generates:
-
-```text
-.claude/capability-index/meta-kim-capabilities.json
-.claude/capability-index/global-capabilities.json   # compatibility mirror
-```
-
-It covers:
-
-- `~/.claude/`: agents, skills, hooks, plugins, commands
-- `~/.openclaw/`: agents, skills, hooks, commands
-- `~/.codex/`: agents, skills, commands
-
-If you want to inspect CLI detection first, run:
-
-```bash
-npm run probe:clis
-```
-
-#### 5. Optional: sync the portable global `meta-theory` skill
-
-```bash
-npm run show:global:meta-theory-targets
-npm run sync:global:meta-theory
-```
-
-This syncs the canonical `canonical/skills/meta-theory/` into your user-level runtime homes. By default it uses your local `activeTargets`; pass `--targets claude,codex` to override:
-
-- `~/.claude/skills/meta-theory`
-- `~/.openclaw/skills/meta-theory`
-- `~/.codex/skills/meta-theory`
-
-If you only want to check for drift, use:
-
-```bash
-npm run check:global:meta-theory
-```
-
-If you need to override the resolved runtime homes explicitly, set:
-
-- `META_KIM_CLAUDE_HOME` or `CLAUDE_HOME`
-- `META_KIM_OPENCLAW_HOME` or `OPENCLAW_HOME`
-- `META_KIM_CODEX_HOME` or `CODEX_HOME`
-
-#### 6. Run the integrity validation
-
-```bash
-npm run validate
-```
-
-This checks:
-
-- required files
-- workflow contract integrity
-- Claude agent definitions
-- OpenClaw workspaces
-- cross-runtime `SKILL.md` sync
-- Codex agent definitions
-- hooks, MCP config, and package scripts
-
-#### 7. Run the MCP self-test
-
-```bash
-npm run test:mcp
-```
-
-This self-tests `meta-runtime-server`, and it is also part of what `node setup.mjs` runs by default.
-
-#### 8. Run runtime smoke only when you need it
-
-```bash
-npm run eval:agents
-```
-
-Default `eval:agents` is the lightweight, no-LLM runtime smoke step:
-
-- installed and healthy runtimes report `passed`
-- optional runtimes that are missing or unavailable may report `skipped`
-- broken config or registry wiring report `failed`
-- it does **not** open live prompt sessions with Claude / Codex / OpenClaw
-
-If you explicitly want the slower live runtime check that talks to the runtimes:
-
-```bash
-npm run eval:agents:live
-```
-
-Run the full maintenance stack with:
-
-```bash
-npm run verify:all
-```
-
-And the full live stack with:
-
-```bash
-npm run verify:all:live
-```
-
-If you have a recorded run artifact and want to validate the actual packet chain:
-
-```bash
-npm run validate:run -- tests/fixtures/run-artifacts/valid-run.json
-```
-
-#### 9. Prepare OpenClaw locally only if you plan to use it
-
-```bash
-npm run prepare:openclaw-local
-```
-
-You only need this when you want to run the OpenClaw side on your own machine.
-
-#### 10. Run a health check
-
-```bash
-node scripts/agent-health-report.mjs
-```
-
-This gives you a quick view of version, frontmatter completeness, boundary definitions, workspace files, and skill sync status across all 8 agents.
-
-#### 11. Start using it (in Claude Code)
-
-You can simply say:
-
-```text
-I need to refactor the authentication system - it is spread across 5 files and nobody knows which one handles token refresh anymore.
-```
-
-```text
-Design me an agent that can handle data export jobs for this project.
-```
-
-```text
-Something is wrong - my agents keep writing code that conflicts with each other.
-```
-
-The system routes each request through the matching governance stage.
-
-## Commands
-
-<div align="center">
-
-| Command                                  | When to use it                                   | What it does                                                          |
-| ---------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
-| `npx --yes github:KimYx0207/Meta_Kim meta-kim` | **without cloning first**                  | same as `node setup.mjs` (`npx` fetches this repo)                    |
-| `node setup.mjs`                       | **first setup**                            | interactive wizard: language → install / update / check + choose local active runtimes |
-| `node setup.mjs --update`              | when skills/deps need updating                   | update all skills + optional runtime sync                      |
-| `node setup.mjs --check`               | when you want an environment preflight          | env + dependency + cross-runtime sync verification             |
-| `npm install`                          | manual setup                                     | installs Node dependencies                                            |
-| `npm run sync:runtimes`                | after editing canonical source                   | rebuilds runtime mirrors (default: project scope → repo-local dirs)  |
-| `npm run sync:runtimes -- --scope project` | project-local sync                              | writes to `.claude/`, `.codex/`, `openclaw/`, `shared-skills/`    |
-| `npm run sync:runtimes -- --scope global` | global runtime homes                            | writes to `~/.claude/`, `~/.codex/`, `~/.openclaw/`                 |
-| `npm run sync:runtimes -- --scope both`   | both scopes simultaneously                       | writes to both repo-local and global dirs                              |
-| `npm run sync:runtimes -- --scope global --targets claude` | global, single runtime                | writes to `~/.claude/` only                                         |
-| `npm run sync:runtimes -- --check`     | preview changes without writing                   | shows which files would be updated                                     |
-| `npm run check:runtimes`               | when you only want a diff check                  | verifies mirrors are current without rewriting                        |
-| `npm run show:global:meta-theory-targets` | before touching user-level runtime homes       | prints the resolved global `meta-theory` sync targets and Claude hook paths |
-| `npm run sync:global:meta-theory`      | after changing canonical `meta-theory` or `canonical/runtime-assets/claude/hooks` | syncs user-level `meta-theory` for local `activeTargets`; when Claude is active, also copies hooks to `~/.claude/hooks/meta-kim/` and merges entries into `~/.claude/settings.json` |
-| `npm run sync:global:meta-theory -- --skip-global-hooks` | when you must not touch user `settings.json`/hooks | same as above but skips Claude global hooks merge |
-| `npm run check:global:meta-theory`     | when you want a read-only drift check            | verifies global `meta-theory` mirrors and Claude `hooks/meta-kim` copy without rewriting |
-| `npm run deps:install`                 | first Claude ecosystem setup                     | installs 9 global meta-skills                                         |
-| `npm run deps:update`                  | when skill dependencies need updating            | updates installed meta-skills                                         |
-| `npm run deps:install:all-runtimes`    | when local `activeTargets` need the same skill set | clones the same 9 skill repos into the selected runtime homes; runs `claude plugin install superpowers@claude-plugins-official` when Claude is active and `claude` is on PATH |
-| `npm run deps:update:all-runtimes`     | refresh all four skill trees                    | same as above with `--update`                                         |
-| `npm run deps:install:claude-plugins`  | only official CC plugin bundles                | runs `claude plugin install …` only (no git clones)                  |
-| `npm run graphify:check`              | check graphify availability                     | verifies Python 3.10+ and graphify CLI                               |
-| `npm run graphify:install`            | install graphify                                | `pip install graphifyy` + register Claude skill                      |
-| `npm run graphify:update`             | update project graph                            | incremental `graphify --update` on target project                    |
-| `npm run discover:global`              | first setup and after adding global capabilities | rebuilds `.claude/capability-index/meta-kim-capabilities.json` (and the compatibility mirror `global-capabilities.json`) |
-| `npm run index:runs -- <dir-or-file>`  | after recording governed runs                    | validates artifacts first, then indexes only valid runs into `.meta-kim/state/{profile}/run-index.sqlite` |
-| `npm run query:runs -- --owner meta-warden` | when you want continuity / retrieval fast     | queries the local run index by flow, owner, publicReady, and open findings |
-| `npm run rebuild:run-index -- <dir-or-file>` | when you want to reset the local index       | clears and rebuilds the profile-local SQLite run index |
-| `npm run migrate:meta-kim -- <source-dir> --apply` | when importing a prompt pack / single-agent repo | stages persona / skill / contract-adjacent assets into local migration state and refuses unverified run state |
-| `npm run probe:clis`                   | when CLI availability is unclear                 | probes Claude / Codex / OpenClaw CLIs                                 |
-| `npm run test:mcp`                     | after changing MCP-related code                  | self-tests `meta-runtime-server`                                    |
-| `npm run test:meta-theory`             | after changing `meta-theory`, contracts, or its tests | runs `tests/meta-theory/*.test.mjs`                               |
-| `npm run validate`                     | before committing                                | runs static integrity validation                                      |
-| `npm run validate:run -- <run.json>`   | when you want to verify a recorded real run      | validates packet lineage, summary/public-ready truthfulness, and finding closure |
-| `npm run doctor:governance`            | before release or when mirrors/hooks drift       | layered health check: canonical contract + mirror parity + runtime hooks + local profile/run-index health |
-| `npm run prompt:next-iteration -- <run.json>` | when a run failed validation or findings are open | prints the next closure checklist from the artifact                         |
-| `npm run check`                        | when you want a quick static pass                | runs `check:runtimes + validate`                                    |
-| `npm run eval:agents`                  | for fast runtime smoke                           | runs CLI/config/hook/runtime-registry smoke without LLM prompt checks |
-| `npm run eval:agents:live`             | when you want live runtime acceptance            | runs the slower Claude / Codex / OpenClaw prompt-backed evaluation    |
-| `npm run verify:all`                   | before release or after bigger changes           | runs `check + check:global:meta-theory + lightweight eval + tests` |
-| `npm run verify:all:live`              | before runtime-sensitive releases                | runs `check + check:global:meta-theory + live eval + tests`        |
-| `node scripts/agent-health-report.mjs` | when you want an overview                        | generates a health report for all 8 agents                            |
-
-</div>
-
-**Windows / PATH:** a Node process started from a GUI app or editor task may inherit a shorter `PATH` than your terminal. If `eval:agents` cannot find a CLI, first check `%APPDATA%\\npm\\`, then `where.exe`, and if needed set absolute paths through:
-
-- `META_KIM_CLAUDE_BIN`
-- `META_KIM_CODEX_BIN`
-- `META_KIM_OPENCLAW_BIN`
-
-## A Safe Maintenance Loop
-
-If you are changing agents, skills, README files, or runtime-facing config, the safest loop is:
-
-1. edit canonical `canonical/` sources or shared documentation
-2. if the change affects run discipline, gates, or deliverable policy, update `config/contracts/workflow-contract.json`
-3. run `npm run sync:runtimes`
-4. if you changed canonical `meta-theory` and you maintain user-level runtime homes, run `npm run sync:global:meta-theory`
-5. run `npm run discover:global`
-6. run `npm run validate`
-7. if MCP runtime wiring changed, run `npm run test:mcp`
-8. run `npm run eval:agents` when smoke-level runtime acceptance matters
-9. only run `npm run eval:agents:live` when you truly need live prompt-backed acceptance
-
-That keeps the four runtime projections aligned.
-
-## Newcomer FAQ
-
-### 1. Do I need Claude Code, Codex, OpenClaw, and Cursor all installed?
-
-No. Meta_Kim is cross-runtime by design, but you do not have to use all four.
-
-### 2. Can I maintain this by editing only `.codex/` or `openclaw/`?
-
-Technically yes, but that is not the intended maintenance path. In most cases, edit `.claude/` first and then sync.
-
-### 3. Should I commit the `discover:global` output?
-
-Usually no. `meta-kim-capabilities.json` and the compatibility mirror `global-capabilities.json` are machine-local capability inventories with local absolute paths.
-
-### 4. How do I migrate an older prompt pack or single-agent repo?
-
-Use the local migration helper:
-
-```bash
-npm run migrate:meta-kim -- ../old-agent-repo --apply
-```
-
-It stages only persona / skill / contract-adjacent assets into `.meta-kim/state/{profile}/migrations/...` and explicitly blocks unverified run state, SQLite caches, logs, and artifacts. Review the generated `manifest.json` before moving anything into `canonical/` or `config/contracts/`.
-
-### 4. If `eval:agents` says `skipped`, is the project broken?
-
-Not necessarily. `skipped` usually means a runtime is optional and currently unavailable or not installed. Real failures are reported as `failed`.
-
-### 5. What is the difference between `eval:agents` and `eval:agents:live`?
-
-`eval:agents` is lightweight runtime smoke. It checks CLI availability, registry/config wiring, and runtime-specific scaffolding without opening LLM-backed prompt sessions.
-
-`eval:agents:live` is the heavier live acceptance step. It opens real Claude / Codex / OpenClaw runtime interactions and is slower by design.
-
-### 6. Why is the default front door not a menu of 8 agents?
-
-Because Meta_Kim is designed to receive one user request through one public entry point, then do specialization backstage.
-
-### 7. When can a task skip agents entirely?
-
-Only for pure `Q / Query` work: explanation or Q&A with no code change, no external side effect, and no deliverable / handoff chain. Once the task executes, produces artifacts, or enters review / verification, it needs an owner.
-
-### 8. Is `.claude/skills/meta-theory/references/meta-theory.md` required reading?
-
-No. It is the long-form theory manuscript mirrored from the canonical skill references. Start with this README instead.
-
-### 9. I only want the directory map. What should I read?
-
-Use the repository tree section in this README.
-
-### 10. I want the runtime differences. What should I read?
-
-Internal note: runtime parity reference lives under `docs/` and is not part of the public surface.
-
-## Simplest Starting Path
-
-The [Quick Start section](#quick-start-clone-to-working-in-5-minutes) above already takes you from clone to working.
-
-If this is your first time here, the lowest-friction order is:
-
-1. start with `README.md`
-2. then read [CLAUDE.md](CLAUDE.md) or [AGENTS.md](AGENTS.md)
-3. then review the repository tree section above
-4. only read `.claude/skills/meta-theory/references/meta-theory.md` when you want the deeper theory
-
-Contact links, payment QR codes, and paper / DOI are in [Contact and support](#contact-and-support) above (no second copy here).
+---
 
 ## License
 

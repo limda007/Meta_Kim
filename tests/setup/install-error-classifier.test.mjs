@@ -5,6 +5,7 @@ import {
   classifyGitInstallFailure,
   parseGitHubRepoUrl,
   shouldUseArchiveFallback,
+  shouldUseArchiveFallbackForUnknownClone,
 } from "../../scripts/install-error-classifier.mjs";
 
 describe("install error classifier", () => {
@@ -67,7 +68,7 @@ fatal: unable to access 'https://github.com/KimYx0207/agent-teams-playbook.git/'
 Failed to connect to 127.0.0.1 port 15236 after 21076 ms: Could not connect to server
     `);
     assert.equal(category, "proxy_network");
-    assert.equal(shouldUseArchiveFallback(category), false);
+    assert.equal(shouldUseArchiveFallback(category), true);
   });
 
   test("classifies connection refused errors", () => {
@@ -75,7 +76,7 @@ Failed to connect to 127.0.0.1 port 15236 after 21076 ms: Could not connect to s
       "fatal: unable to access: Connection refused",
     );
     assert.equal(category, "proxy_network");
-    assert.equal(shouldUseArchiveFallback(category), false);
+    assert.equal(shouldUseArchiveFallback(category), true);
   });
 
   test("classifies OpenSSL TLS unexpected eof", () => {
@@ -84,5 +85,45 @@ Failed to connect to 127.0.0.1 port 15236 after 21076 ms: Could not connect to s
     );
     assert.equal(category, "tls_transport");
     assert.equal(shouldUseArchiveFallback(category), true);
+  });
+
+  test("classifies connection reset as proxy/network and allows archive fallback", () => {
+    const category = classifyGitInstallFailure(
+      "fatal: unable to access 'https://github.com/OthmanAdi/planning-with-files.git/': Recv failure: Connection was reset",
+    );
+    assert.equal(category, "proxy_network");
+    assert.equal(shouldUseArchiveFallback(category), true);
+  });
+
+  test("classifies partial clone retry collision (destination not empty) as proxy_network", () => {
+    const category = classifyGitInstallFailure(`
+fatal: destination path 'C:/Temp/meta-kim-staging-abc/findskill' already exists and is not an empty directory.
+    `);
+    assert.equal(category, "proxy_network");
+    assert.equal(shouldUseArchiveFallback(category), true);
+  });
+
+  test("classifies bare schannel line as tls_transport", () => {
+    const category = classifyGitInstallFailure(
+      "schannel: next InitializeSecurityContext failed",
+    );
+    assert.equal(category, "tls_transport");
+  });
+
+  test("unknown clone on GitHub may use archive fallback when stderr is empty", () => {
+    assert.equal(
+      shouldUseArchiveFallbackForUnknownClone(
+        "https://github.com/KimYx0207/findskill.git",
+        "",
+      ),
+      true,
+    );
+    assert.equal(
+      shouldUseArchiveFallbackForUnknownClone(
+        "https://github.com/KimYx0207/findskill.git",
+        "fatal: repository 'https://github.com/x/y.git/' not found",
+      ),
+      false,
+    );
   });
 });

@@ -4,11 +4,11 @@ export function readProcessText(result) {
   const stdout =
     typeof result?.stdout === "string"
       ? result.stdout
-      : result?.stdout?.toString?.("utf8") ?? "";
+      : (result?.stdout?.toString?.("utf8") ?? "");
   const stderr =
     typeof result?.stderr === "string"
       ? result.stderr
-      : result?.stderr?.toString?.("utf8") ?? "";
+      : (result?.stderr?.toString?.("utf8") ?? "");
   return [stdout, stderr].filter(Boolean).join("\n").trim();
 }
 
@@ -95,4 +95,32 @@ export function runPythonModule(
 export function extractPipShowVersion(text) {
   const match = text.match(/Version:\s*(.+)/i);
   return match ? match[1].trim() : null;
+}
+
+// networkx < 3.4 lacks louvain_communities(max_level=...) which graphify needs
+const NETWORKX_MIN_MAJOR = 3;
+const NETWORKX_MIN_MINOR = 4;
+
+export function meetsMinimumVersion(versionString, minMajor, minMinor) {
+  const match = versionString.match(/(\d+)\.(\d+)/);
+  if (!match) return false;
+  const major = Number.parseInt(match[1], 10);
+  const minor = Number.parseInt(match[2], 10);
+  return major > minMajor || (major === minMajor && minor >= minMinor);
+}
+
+export function checkNetworkx(python, spawnFn = spawnSync) {
+  const result = runPythonModule(
+    python,
+    ["-m", "pip", "show", "networkx"],
+    spawnFn,
+  );
+  if (result.status !== 0) {
+    return { installed: false, version: null, meets: false };
+  }
+  const version = extractPipShowVersion(readProcessText(result));
+  const meets = version
+    ? meetsMinimumVersion(version, NETWORKX_MIN_MAJOR, NETWORKX_MIN_MINOR)
+    : false;
+  return { installed: true, version, meets };
 }

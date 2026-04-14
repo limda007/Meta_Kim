@@ -41,13 +41,16 @@ describe("validate-run-artifact.mjs", () => {
     return JSON.parse(stdout);
   }
 
-  async function writeTempFixture(mutate) {
+  async function writeTempFixture(t, mutate) {
     const raw = await fs.readFile(validFixture, "utf8");
     const artifact = JSON.parse(raw);
     mutate(artifact);
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "meta-kim-validate-"));
     const file = path.join(dir, "fixture.json");
     await fs.writeFile(file, `${JSON.stringify(artifact, null, 2)}\n`, "utf8");
+    t.after(async () => {
+      await fs.rm(dir, { recursive: true, force: true });
+    });
     return file;
   }
 
@@ -85,8 +88,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects dispatch envelopes without ownerAgent", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects dispatch envelopes without ownerAgent", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.ownerAgent = "";
     });
     await assert.rejects(
@@ -98,8 +101,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects dispatch envelopes with overlapping allowed/blocked capabilities", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects dispatch envelopes with overlapping allowed/blocked capabilities", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.blockedCapabilities = [
         ...artifact.dispatchEnvelopePacket.blockedCapabilities,
         artifact.dispatchEnvelopePacket.allowedCapabilities[0],
@@ -114,8 +117,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects dispatch envelopes with illegal memoryMode", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects dispatch envelopes with illegal memoryMode", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.memoryMode = "inherit_random_context";
     });
     await assert.rejects(
@@ -127,8 +130,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects missing fetchPacket for governed runs", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects missing fetchPacket for governed runs", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       delete artifact.fetchPacket;
     });
     await assert.rejects(
@@ -142,8 +145,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects current-project fetch packets that check other projects", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects current-project fetch packets that check other projects", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.fetchPacket.projectsChecked = [
         ...artifact.fetchPacket.projectsChecked,
         {
@@ -164,8 +167,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects review findings that do not name a source project", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects review findings that do not name a source project", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       delete artifact.reviewPacket.findings[0].sourceProject;
     });
     await assert.rejects(
@@ -179,8 +182,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects dispatch envelopes missing reviewOwner", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects dispatch envelopes missing reviewOwner", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.reviewOwner = "";
     });
     await assert.rejects(
@@ -192,8 +195,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects dispatch envelopes missing verificationOwner", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects dispatch envelopes missing verificationOwner", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.verificationOwner = "";
     });
     await assert.rejects(
@@ -205,8 +208,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects missing orchestration task board for non-query flows", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects missing orchestration task board for non-query flows", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       delete artifact.orchestrationTaskBoardPacket;
     });
     await assert.rejects(
@@ -220,8 +223,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects missing capability gap packet when owner creation is required", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects missing capability gap packet when owner creation is required", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.taskClassification.upgradeReasons = [
         ...artifact.taskClassification.upgradeReasons,
         "owner_creation_required",
@@ -239,8 +242,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects execution agent card gaps when factory action is create_execution_agent", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects execution agent card gaps when factory action is create_execution_agent", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.taskClassification.upgradeReasons = [
         ...artifact.taskClassification.upgradeReasons,
         "owner_creation_required",
@@ -290,8 +293,8 @@ describe("validate-run-artifact.mjs", () => {
     assert.equal(result.ok, true);
   });
 
-  test("rejects cross-project runs that use project_only route", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects cross-project runs that use project_only route", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.taskClassification.queryScope = "all_projects";
       artifact.taskClassification.crossProjectReason =
         "user_explicit_cross_project_request";
@@ -309,8 +312,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects cross-project runs that use project_only memoryMode", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects cross-project runs that use project_only memoryMode", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.taskClassification.queryScope = "all_projects";
       artifact.taskClassification.crossProjectReason =
         "user_explicit_cross_project_request";
@@ -328,8 +331,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects current-project runs with cross_project route", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects current-project runs with cross_project route", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.dispatchEnvelopePacket.route = "cross_project";
       artifact.dispatchEnvelopePacket.memoryMode = "cross_project_readonly";
     });
@@ -346,8 +349,8 @@ describe("validate-run-artifact.mjs", () => {
 
   // ── Cross-project contamination check tests ──────────────────────────
 
-  test("rejects review with crossProjectContaminationCheck=fail but revisionNeeded=false", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects review with crossProjectContaminationCheck=fail but revisionNeeded=false", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.reviewPacket.crossProjectContaminationCheck = "fail";
       artifact.reviewPacket.revisionNeeded = false;
     });
@@ -362,8 +365,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects summaryPacket.sourceProjects missing a review source project", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects summaryPacket.sourceProjects missing a review source project", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.reviewPacket.sourceProjects = [
         "project-auth-refresh-hardening",
         "project-other",
@@ -391,8 +394,8 @@ describe("validate-run-artifact.mjs", () => {
     );
   });
 
-  test("rejects summaryPacket.sourceProjects referencing unchecked projects", async () => {
-    const tempFixture = await writeTempFixture((artifact) => {
+  test("rejects summaryPacket.sourceProjects referencing unchecked projects", async (t) => {
+    const tempFixture = await writeTempFixture(t, (artifact) => {
       artifact.summaryPacket.sourceProjects = [
         "project-auth-refresh-hardening",
         "project-never-checked",
