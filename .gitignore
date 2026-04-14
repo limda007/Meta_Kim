@@ -37,6 +37,10 @@ docs/todo-list.md
 docs/agent-health-report.md
 scripts/generate-todo-list.mjs
 
+# ========== Test run output (generated; keep tests/*.test.mjs & fixtures tracked) ==========
+tests/output/
+tests/.cache/
+
 # ========== Backup / Temporary ==========
 .backup/
 

@@ -622,9 +622,10 @@ describe("Part G: Memory & Knowledge Graph", async () => {
       const graphExists = await fileExists("graphify-out/graph.json");
       if (graphExists) {
         const graphData = await readJson("graphify-out/graph.json");
+        const hasEdges = graphData.edges ?? graphData.links;
         assert.ok(
-          graphData.nodes && graphData.edges,
-          "graphify-out/graph.json must have nodes and edges",
+          graphData.nodes && hasEdges,
+          "graphify-out/graph.json must have nodes and edges or links",
         );
       }
     }

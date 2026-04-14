@@ -12,6 +12,7 @@ tools:
 description: |
   Meta Arsenal — governance skill for meta architecture, agent design/review, and rhythm orchestration.
   Distinguish meta architecture from project technical architecture before acting.
+  Evolution writeback may record capability gaps and patterns under memory/ when configured.
   Complex development work follows the 8-stage execution spine:
   Critical → Fetch → Thinking → Execution → Review → Meta-Review → Verification → Evolution.
 ---
