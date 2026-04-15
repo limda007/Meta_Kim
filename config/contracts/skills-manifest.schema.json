@@ -49,6 +49,15 @@
               "default": { "type": "string" }
             }
           },
+          "installRoot": {
+            "type": "string",
+            "enum": ["skills", "plugins"],
+            "description": "Primary deploy folder under each runtime home (default: skills). Rare: use plugins when the canonical tree must live under plugins/; then a skills/<id> symlink/junction is created for discovery. Prefer pluginHookCompat when upstream hooks expect plugins/ but the canonical tree should stay in skills/."
+          },
+          "pluginHookCompat": {
+            "type": "boolean",
+            "description": "When true: deploy to skills/<id>/ (default), then create plugins/<id> as symlink/junction to skills/<id> so upstream Stop hooks that default to ~/.{runtime}/plugins/{id}/ still resolve. Do not combine with installRoot: plugins."
+          },
           "claudePlugin": {
             "type": "string",
             "description": "Claude Code marketplace plugin identifier if this skill is also an official plugin"
@@ -62,7 +71,7 @@
             "description": "Which runtimes this skill applies to. If omitted, applies to all runtimes.",
             "items": {
               "type": "string",
-              "enum": ["claude", "codex", "openclaw"]
+              "enum": ["claude", "codex", "openclaw", "cursor"]
             }
           }
         }

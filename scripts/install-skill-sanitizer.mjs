@@ -166,18 +166,9 @@ export async function listSkillFiles(rootDir) {
  * This is a curated list of known issues in Meta_Kim's dependency skills.
  * Add entries here when a dependency skill has a bug that would cause hook failures.
  * The fix is applied locally during install — it does NOT patch the upstream repo.
+ * Set `silent: true` on a pattern to apply the fix without a yellow installer warning.
  */
-const KNOWN_BROKEN_HOOK_PATTERNS = [
-  {
-    /** planning-with-files Stop hook: uses plugins/ instead of skills/ */
-    find: "${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/plugins/planning-with-files}/scripts",
-    replace:
-      "${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/planning-with-files}/scripts",
-    skill: "planning-with-files",
-    reason:
-      "Stop hook references non-existent plugins/ directory; correct path is skills/",
-  },
-];
+const KNOWN_BROKEN_HOOK_PATTERNS = [];
 
 /**
  * Returns a new string with all known broken hook patterns replaced,
@@ -195,6 +186,7 @@ function applyHookPathFixes(rawContent) {
         reason: pattern.reason,
         replaced: pattern.find,
         with: pattern.replace,
+        silent: Boolean(pattern.silent),
       });
     }
   }

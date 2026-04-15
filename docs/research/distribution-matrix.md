@@ -77,12 +77,12 @@ Notes: 140K+ stars, 38 agent templates, 156 skills. Content lives in `skills/` s
 
 | Platform | Decision | Install Method | Rationale |
 |----------|----------|---------------|-----------|
-| Claude Code | DISTRIBUTE | sparse checkout `skills/planning-with-files/` | Content in nested subdir |
-| Codex | DISTRIBUTE | sparse checkout `skills/planning-with-files/` | 16+ platforms supported |
-| OpenClaw | DISTRIBUTE | sparse checkout `skills/planning-with-files/` | 16+ platforms supported |
-| Cursor | DISTRIBUTE | sparse checkout `skills/planning-with-files/` | 16+ platforms supported |
+| Claude Code | DISTRIBUTE | sparse checkout `skills/planning-with-files/` → deploy `skills/planning-with-files` + `plugins/planning-with-files` alias | `pluginHookCompat` for upstream Stop hook path |
+| Codex | DISTRIBUTE | same | 16+ platforms supported |
+| OpenClaw | DISTRIBUTE | same | 16+ platforms supported |
+| Cursor | DISTRIBUTE | same | 16+ platforms supported |
 
-Notes: Has hooks for lifecycle management. Content in `skills/planning-with-files/` subdir.
+Notes: Has hooks for lifecycle management. Repo content lives under `skills/planning-with-files/`; Meta_Kim installs under each runtime’s `skills/planning-with-files/` and adds `plugins/planning-with-files` pointing at it for hook resolution.
 
 ### 7. cli-anything
 

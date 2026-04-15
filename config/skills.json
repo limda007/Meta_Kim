@@ -61,6 +61,7 @@
       "id": "planning-with-files",
       "repo": "OthmanAdi/planning-with-files",
       "subdir": "skills/planning-with-files",
+      "pluginHookCompat": true,
       "targets": [
         "claude",
         "codex",

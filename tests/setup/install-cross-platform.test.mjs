@@ -47,6 +47,11 @@ describe("install platform config", () => {
     );
   });
 
+  test("planning-with-files uses skills/ as canonical + pluginHookCompat for hooks", () => {
+    assert.equal(planningWithFilesSkill.pluginHookCompat, true);
+    assert.equal(planningWithFilesSkill.installRoot, undefined);
+  });
+
   test("legacy setup fallback only applies when requested", () => {
     const plainSkill = { id: "plain-skill" };
     assert.equal(resolveManifestSkillSubdir(plainSkill, "linux"), undefined);

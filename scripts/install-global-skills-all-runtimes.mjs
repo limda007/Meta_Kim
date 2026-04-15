@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 /**
- * Cross-runtime install: clone the same third-party skill repos into
- * ~/.claude/skills, ~/.codex/skills, and ~/.openclaw/skills (plus optional
- * `claude plugin install …` for bundles that ship as official CC plugins).
+ * Cross-runtime install: clone third-party skill repos into each runtime home.
+ * Default: `skills/<id>/`. `pluginHookCompat: true` keeps the canonical tree in
+ * `skills/<id>/` and adds `plugins/<id>` → `skills/<id>` for upstream hooks that
+ * default to plugins/. Rare `installRoot: "plugins"` does the inverse (canonical
+ * in plugins, `skills/<id>` alias). Optional `claude plugin install …` for
+ * marketplace plugin bundles.
  *
  * Flags:
  *   --update          git pull / re-clone skill dirs
@@ -253,6 +256,8 @@ function loadSkillsManifest() {
         ...(subdir ? { subdir } : {}),
         targets: skill.targets || ["claude", "codex", "openclaw"],
         ...(skill.claudePlugin ? { claudePlugin: skill.claudePlugin } : {}),
+        ...(skill.installRoot ? { installRoot: skill.installRoot } : {}),
+        ...(skill.pluginHookCompat ? { pluginHookCompat: true } : {}),
       });
     }
 
@@ -322,6 +327,26 @@ function resolveCompatibilitySkillRoots(runtimeId, primarySkillsRoot) {
   }
 
   return [legacyCodexSkillsRoot];
+}
+
+/** Primary deploy segment under each runtime home: skills/ (default) or plugins/ (rare). */
+function skillInstallRootSegment(spec) {
+  if (spec.pluginHookCompat) {
+    return "skills";
+  }
+  return spec.installRoot === "plugins" ? "plugins" : "skills";
+}
+
+function resolveSkillTargetDir(runtimeHome, spec) {
+  return path.join(runtimeHome, skillInstallRootSegment(spec), spec.id);
+}
+
+/** Legacy Codex ~/.agents mirror: skills/ vs plugins/ sibling layout. */
+function resolveCompatSkillTargetDir(legacySkillsRoot, spec) {
+  if (skillInstallRootSegment(spec) === "plugins") {
+    return path.join(path.dirname(legacySkillsRoot), "plugins", spec.id);
+  }
+  return path.join(legacySkillsRoot, spec.id);
 }
 
 function assertUnderHome(resolved) {
@@ -545,10 +570,13 @@ async function sanitizeManagedSkillTarget(skillId, targetDir) {
 
   const result = await sanitizeInstalledSkillTree(targetDir, { dryRun });
 
-  // Log hook path fixes (e.g. planning-with-files Stop hook plugins/ -> skills/)
+  // Log hook path fixes unless marked silent (expected upstream vs install-layout normalization)
   if (result.hookPathFixes && result.hookPathFixes.length > 0) {
     for (const patch of result.hookPathFixes) {
       for (const fix of patch.fixes) {
+        if (fix.silent) {
+          continue;
+        }
         console.warn(
           `${C.yellow}⚠${C.reset} ${C.bold}${skillId}${C.reset}: hook path auto-patched — ${fix.reason}`,
         );
@@ -591,7 +619,7 @@ async function sanitizeCompatibilityRoots(runtimeId, primarySkillsRoot, spec) {
     primarySkillsRoot,
   );
   for (const extraRoot of extraRoots) {
-    const targetDir = path.join(extraRoot, spec.id);
+    const targetDir = resolveCompatSkillTargetDir(extraRoot, spec);
     if (!(await pathExists(targetDir))) {
       continue;
     }
@@ -619,6 +647,7 @@ async function sanitizeCompatibilityRoots(runtimeId, primarySkillsRoot, spec) {
     } else {
       await sanitizeManagedSkillTarget(spec.id, targetDir);
     }
+    await ensureHookLayoutAliases(path.dirname(extraRoot), spec);
   }
 }
 
@@ -1363,13 +1392,15 @@ async function installSkillCreator(targetBaseSkills) {
   );
 }
 
-async function installAllSkillsForRuntime(label, skillsRoot, runtimeId) {
+async function installAllSkillsForRuntime(label, runtimeHome, runtimeId) {
+  const skillsRoot = path.join(runtimeHome, "skills");
   console.log(
-    `\n${C.bold}${AMBER}${t.skillsHeader(label, skillsRoot)}${C.reset}`,
+    `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
   );
-  assertUnderHome(skillsRoot);
+  assertUnderHome(runtimeHome);
   if (!dryRun) {
     await fs.mkdir(skillsRoot, { recursive: true });
+    await fs.mkdir(path.join(runtimeHome, "plugins"), { recursive: true });
   }
 
   for (const spec of SKILL_REPOS) {
@@ -1379,7 +1410,7 @@ async function installAllSkillsForRuntime(label, skillsRoot, runtimeId) {
       );
       continue;
     }
-    const targetDir = path.join(skillsRoot, spec.id);
+    const targetDir = resolveSkillTargetDir(runtimeHome, spec);
     if (spec.subdir) {
       await installGitSkillFromSubdir(
         spec.id,
@@ -1391,6 +1422,7 @@ async function installAllSkillsForRuntime(label, skillsRoot, runtimeId) {
       await installGitSkill(spec.id, targetDir, spec.repo);
     }
     await sanitizeCompatibilityRoots(runtimeId, skillsRoot, spec);
+    await ensureHookLayoutAliases(runtimeHome, spec);
   }
   const hasManifestSkillCreator = SKILL_REPOS.some(
     (spec) => spec.id === "skill-creator",
@@ -1535,6 +1567,61 @@ async function cleanupLegacyGlobalArtifacts(homes) {
   if (cleaned.length > 0) {
     console.log(`${C.green}✓${C.reset} ${t.okRemovedObsolete(cleaned.length)}`);
     console.log(`${C.dim}  ${t.noteSettingsNotAffected}${C.reset}`);
+  }
+}
+
+/**
+ * Align skills/ vs plugins/ for discovery vs upstream hook defaults.
+ * - pluginHookCompat: canonical in skills/<id>, add plugins/<id> -> skills/<id>
+ * - installRoot plugins (no compat): canonical in plugins/<id>, add skills/<id> -> plugins/<id>
+ */
+async function ensureHookLayoutAliases(runtimeHome, spec) {
+  const skillsDir = path.resolve(runtimeHome, "skills", spec.id);
+  const pluginsDir = path.resolve(runtimeHome, "plugins", spec.id);
+
+  if (spec.pluginHookCompat) {
+    if (!(await pathExists(skillsDir))) {
+      return;
+    }
+    if (dryRun) {
+      console.log(
+        t.dryRun(
+          `symlink ${pluginsDir} -> ${skillsDir} (upstream Stop hook expects plugins/)`,
+        ),
+      );
+      return;
+    }
+    await fs.rm(pluginsDir, { recursive: true, force: true }).catch(() => {});
+    await fs.mkdir(path.dirname(pluginsDir), { recursive: true });
+    if (process.platform === "win32") {
+      await fs.symlink(skillsDir, pluginsDir, "junction");
+    } else {
+      const rel = path.relative(path.dirname(pluginsDir), skillsDir);
+      await fs.symlink(rel, pluginsDir, "dir");
+    }
+    return;
+  }
+
+  if (skillInstallRootSegment(spec) !== "plugins") {
+    return;
+  }
+  if (!(await pathExists(pluginsDir))) {
+    return;
+  }
+  if (dryRun) {
+    console.log(
+      t.dryRun(`symlink ${skillsDir} -> ${pluginsDir} (skill discovery alias)`),
+    );
+    return;
+  }
+
+  await fs.rm(skillsDir, { recursive: true, force: true }).catch(() => {});
+  await fs.mkdir(path.dirname(skillsDir), { recursive: true });
+  if (process.platform === "win32") {
+    await fs.symlink(pluginsDir, skillsDir, "junction");
+  } else {
+    const rel = path.relative(path.dirname(skillsDir), pluginsDir);
+    await fs.symlink(rel, skillsDir, "dir");
   }
 }
 
@@ -1794,15 +1881,31 @@ async function installSkillsToMultipleRuntimes(
       }
     }
 
+    // Sanitize each staged tree once (hook path fixes, etc.) so Phase 2 copies are clean
+    // and we do not repeat the same warning per runtime.
+    for (const spec of SKILL_REPOS) {
+      const staged = stagedSkills.get(spec.id);
+      if (!staged?.success) continue;
+      if (
+        !(await pathExists(staged.stagedPath)) ||
+        (await isEmptyDir(staged.stagedPath))
+      ) {
+        continue;
+      }
+      await sanitizeManagedSkillTarget(spec.id, staged.stagedPath);
+    }
+
     // Phase 2: Deploy staged skills to each runtime
     for (const runtimeId of targetRuntimeIds) {
-      const skillsRoot = path.join(homes[runtimeId], "skills");
+      const runtimeHome = homes[runtimeId];
+      const skillsRoot = path.join(runtimeHome, "skills");
       const label = runtimeLabels[runtimeId] || `${runtimeId} skills`;
       console.log(
-        `\n${C.bold}${AMBER}${t.skillsHeader(label, skillsRoot)}${C.reset}`,
+        `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
       );
       assertUnderHome(skillsRoot);
       await fs.mkdir(skillsRoot, { recursive: true });
+      await fs.mkdir(path.join(runtimeHome, "plugins"), { recursive: true });
 
       for (const spec of SKILL_REPOS) {
         if (spec.targets && !spec.targets.includes(runtimeId)) {
@@ -1813,7 +1916,7 @@ async function installSkillsToMultipleRuntimes(
         }
 
         const staged = stagedSkills.get(spec.id);
-        const targetDir = path.join(skillsRoot, spec.id);
+        const targetDir = resolveSkillTargetDir(runtimeHome, spec);
 
         if (staged?.success) {
           await deployStagedSkill(
@@ -1837,6 +1940,7 @@ async function installSkillsToMultipleRuntimes(
         }
 
         await sanitizeCompatibilityRoots(runtimeId, skillsRoot, spec);
+        await ensureHookLayoutAliases(runtimeHome, spec);
       }
 
       // skill-creator fallback (if not in manifest)
@@ -1868,10 +1972,10 @@ async function main() {
 
   if (!pluginsOnly) {
     const runtimeLabels = {
-      claude: "Claude Code skills",
-      codex: "Codex skills",
-      openclaw: "OpenClaw skills",
-      cursor: "Cursor skills",
+      claude: t.skillsRuntimeSectionClaude,
+      codex: t.skillsRuntimeSectionCodex,
+      openclaw: t.skillsRuntimeSectionOpenclaw,
+      cursor: t.skillsRuntimeSectionCursor,
     };
 
     const targetRuntimeIds = activeTargets.filter(
@@ -1881,11 +1985,7 @@ async function main() {
     if (targetRuntimeIds.length === 1) {
       // Single runtime: install directly (no staging overhead)
       const rid = targetRuntimeIds[0];
-      await installAllSkillsForRuntime(
-        runtimeLabels[rid],
-        path.join(homes[rid], "skills"),
-        rid,
-      );
+      await installAllSkillsForRuntime(runtimeLabels[rid], homes[rid], rid);
     } else if (targetRuntimeIds.length > 1) {
       // Multiple runtimes: clone once, deploy everywhere
       await installSkillsToMultipleRuntimes(
@@ -2012,15 +2112,20 @@ async function main() {
       );
     }
 
-    // Report hook path auto-fixes (e.g. planning-with-files Stop hook)
     const allHookFixes = sanitizedSkillIssues.flatMap(
       (item) => item.hookPathFixes || [],
     );
-    if (allHookFixes.length > 0) {
+    const loudHookFixes = allHookFixes
+      .map((patch) => ({
+        ...patch,
+        fixes: (patch.fixes || []).filter((f) => !f.silent),
+      }))
+      .filter((patch) => patch.fixes.length > 0);
+    if (loudHookFixes.length > 0) {
       console.log(
         `\n${C.yellow}⚠ Hook path auto-fixed during install:${C.reset}`,
       );
-      for (const patch of allHookFixes) {
+      for (const patch of loudHookFixes) {
         for (const fix of patch.fixes) {
           console.log(`${C.yellow}  •${C.reset} ${fix.skill}: ${fix.reason}`);
         }

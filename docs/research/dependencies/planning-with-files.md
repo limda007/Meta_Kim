@@ -34,6 +34,7 @@ README claims support for 16+ agent platforms.
   "id": "planning-with-files",
   "repo": "OthmanAdi/planning-with-files",
   "subdir": "skills/planning-with-files",
+  "pluginHookCompat": true,
   "targets": ["claude", "codex", "openclaw", "cursor"]
 }
 ```
@@ -50,6 +51,10 @@ README claims support for 16+ agent platforms.
 - Hooks are Claude Code-specific but don't prevent other platforms from using the core SKILL.md
 - Nested subdir path (`skills/planning-with-files`) is the deepest subdir among all dependencies
 - Broadest platform support claim (16+ agents)
+
+### Meta_Kim install layout
+
+Upstream **Stop** hook uses `${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/plugins/planning-with-files}/scripts`. Meta_Kim sets **`pluginHookCompat: true`** in `config/skills.json`: the canonical tree is deployed to **`skills/planning-with-files/`** under each runtime home (same as other skills), then **`plugins/planning-with-files` → `skills/planning-with-files`** (symlink on Unix, junction on Windows) so the default hook path resolves without rewriting `SKILL.md`.
 
 ## Data Source
 

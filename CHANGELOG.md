@@ -6,6 +6,10 @@ When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the
 
 ## [2.0.6] - 2026-04-15
 
+### Changed
+
+- **planning-with-files install path**: Global install deploys the canonical tree to `skills/planning-with-files` under each runtime home and adds `plugins/planning-with-files` → `skills/planning-with-files` (`pluginHookCompat` in `config/skills.json`) so upstream Stop-hook paths resolve without rewriting `SKILL.md`. Manifest schema adds optional `pluginHookCompat` (boolean) and optional `installRoot` (`skills` | `plugins`) for rare primary-in-plugins layouts.
+
 ### Added
 
 - **Principle enforcement via 3 execution lanes (PRIN-01~05)**: Added mandatory principle compliance checks across the meta-agent governance chain to close the gap between "principles defined" and "principles enforced":
@@ -20,7 +24,7 @@ When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the
 - **Dual-end Warden architecture (Type A/B/C/D/E routing)**: meta-theory SKILL.md now explicitly models Warden as BOTH entry gate (clarification + solution enumeration via brainstorming) AND exit gate (quality gate + final synthesis) for ALL dispatch types. Conductor now orchestrates ALL types, not just Type C.
 - **findskill dependency for all 8 meta agents**: Added `findskill` discovery step to Dependency Skill Invocations of all 8 canonical agents (warden, conductor, genesis, artisan, scout, sentinel, librarian, prism). Artisan and Scout already had findskill; others are new.
 - **superpowers/brainstorming for Warden entry gate**: Warden now uses `superpowers/brainstorming` at the entry gate for solution enumeration (≥2 approaches before dispatch).
-- **Hook path auto-fix during install**: `install-skill-sanitizer.mjs` now scans installed skill SKILL.md files for known broken hook command paths and patches them in-place. Currently fixes `planning-with-files` Stop hook (incorrectly uses `plugins/` instead of `skills/`). Logs each fix with dry-run support.
+- **Hook path auto-fix during install**: `install-skill-sanitizer.mjs` can scan installed skill SKILL.md files for known broken hook command paths and patch them in-place (curated list; optional `silent` per pattern). Dry-run supported.
 
 ### Changed
 
