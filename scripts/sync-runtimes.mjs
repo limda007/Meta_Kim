@@ -537,6 +537,116 @@ async function writeGeneratedJson(filePath, value) {
   return writeGeneratedFile(filePath, nextContent);
 }
 
+// ── Runtime skill path substitution ─────────────────────────────────────
+// The canonical SKILL.md and its references use canonical/ paths.
+// During sync, these are substituted to runtime-specific paths so that
+// the skill works correctly in each runtime projection.
+//
+// IMPORTANT: These rules must match the actual synced directory structure.
+// When the sync config (meta-kim-sync-config.mjs) changes, these rules
+// MUST be updated to match.
+
+/**
+ * Build a path substitution map for a given runtime target.
+ * canonical/ paths are replaced with the runtime's actual projection paths.
+ * @param {"claude"|"codex"|"openclaw"|"cursor"} targetId
+ * @returns {{pattern:RegExp, replacement:string}[]}
+ */
+function buildRuntimeSkillMap(targetId) {
+  const maps = {
+    claude: [
+      // Skill references: canonical/ → runtime-specific for Claude
+      {
+        pattern: /canonical\/skills\/meta-theory\/references\//g,
+        replacement: ".claude/skills/meta-theory/references/",
+      },
+      // Agent definitions: canonical/ → runtime-specific for Claude
+      { pattern: /canonical\/agents\//g, replacement: ".claude/agents/" },
+      // Hook files: stay in .claude/hooks/ (no canonical equivalent)
+      { pattern: /\.claude\/hooks\//g, replacement: ".claude/hooks/" },
+      // Capability index: stays in .claude/capability-index/
+      {
+        pattern: /\.claude\/capability-index\//g,
+        replacement: ".claude/capability-index/",
+      },
+      // Legacy .claude/skills/ references in canonical source → canonical/skills/ (normalize to canonical/)
+      { pattern: /\.claude\/skills\//g, replacement: "canonical/skills/" },
+    ],
+    codex: [
+      // Skill references: canonical/ → .codex/skills/references/
+      {
+        pattern: /canonical\/skills\/meta-theory\/references\//g,
+        replacement: ".codex/skills/references/",
+      },
+      // Skill root: canonical/skills/ → .codex/skills/
+      { pattern: /canonical\/skills\//g, replacement: ".codex/skills/" },
+      // Agent definitions: canonical/ → .codex/agents/
+      { pattern: /canonical\/agents\//g, replacement: ".codex/agents/" },
+      // Hooks: Codex doesn't have hooks — strip to safe fallback
+      { pattern: /\.claude\/hooks\//g, replacement: ".codex/" },
+      // Capability index: strip
+      { pattern: /\.claude\/capability-index\//g, replacement: ".codex/" },
+      // Legacy .claude/skills/ references in source → canonical/skills/
+      { pattern: /\.claude\/skills\//g, replacement: "canonical/skills/" },
+    ],
+    openclaw: [
+      // Skill references: canonical/ → openclaw/skills/references/
+      {
+        pattern: /canonical\/skills\/meta-theory\/references\//g,
+        replacement: "openclaw/skills/references/",
+      },
+      // Skill root: canonical/skills/ → openclaw/skills/
+      { pattern: /canonical\/skills\//g, replacement: "openclaw/skills/" },
+      // Agent definitions: OpenClaw uses workspace-per-agent model.
+      // Each workspace has AGENTS.md containing all agent definitions.
+      {
+        pattern: /canonical\/agents\//g,
+        replacement: "openclaw/workspaces/{workspace}/AGENTS.md#",
+      },
+      // Hooks: OpenClaw doesn't have hooks — strip
+      { pattern: /\.claude\/hooks\//g, replacement: "openclaw/" },
+      // Capability index: strip
+      { pattern: /\.claude\/capability-index\//g, replacement: "openclaw/" },
+      // Legacy .claude/skills/ references in source → canonical/skills/
+      { pattern: /\.claude\/skills\//g, replacement: "canonical/skills/" },
+    ],
+    cursor: [
+      // Skill references: canonical/ → .cursor/skills/meta-theory/references/
+      {
+        pattern: /canonical\/skills\/meta-theory\/references\//g,
+        replacement: ".cursor/skills/meta-theory/references/",
+      },
+      // Skill root: canonical/skills/ → .cursor/skills/
+      { pattern: /canonical\/skills\//g, replacement: ".cursor/skills/" },
+      // Agent definitions: canonical/ → .cursor/agents/
+      { pattern: /canonical\/agents\//g, replacement: ".cursor/agents/" },
+      // Hooks: Cursor doesn't have hooks
+      { pattern: /\.claude\/hooks\//g, replacement: ".cursor/" },
+      // Capability index: strip
+      { pattern: /\.claude\/capability-index\//g, replacement: ".cursor/" },
+      // Legacy .claude/skills/ references in source → canonical/skills/
+      { pattern: /\.claude\/skills\//g, replacement: "canonical/skills/" },
+    ],
+  };
+
+  return maps[targetId] || maps.claude;
+}
+
+/**
+ * Apply runtime-specific path substitutions to skill content.
+ * @param {string} content - The skill file content
+ * @param {"claude"|"codex"|"openclaw"|"cursor"} targetId
+ * @returns {string}
+ */
+function applyRuntimePaths(content, targetId) {
+  const rules = buildRuntimeSkillMap(targetId);
+  let result = content;
+  for (const { pattern, replacement } of rules) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
+
 async function syncClaudeProjection(
   dirs,
   agents,
@@ -570,7 +680,7 @@ async function syncClaudeProjection(
     (
       await writeGeneratedFile(
         path.join(claudeSkillProjectionRoot, "SKILL.md"),
-        portableSkill,
+        applyRuntimePaths(portableSkill, "claude"),
       )
     ).changed
   ) {
@@ -788,7 +898,7 @@ Examples:
           dirs.openclawUsesDirectorySkill
             ? path.join(dirs.openclawSkillRoot, "SKILL.md")
             : path.join(dirs.openclawSkillRoot, "meta-theory.md"),
-          portableSkill,
+          applyRuntimePaths(portableSkill, "openclaw"),
         )
       ).changed
     ) {
@@ -803,7 +913,7 @@ Examples:
         (
           await writeGeneratedFile(
             path.join(dirs.openclawSkillRoot, "references", reference.name),
-            reference.content,
+            applyRuntimePaths(reference.content, "openclaw"),
           )
         ).changed
       ) {
@@ -821,7 +931,7 @@ Examples:
           dirs.codexUsesDirectorySkill
             ? path.join(dirs.codexSkillRoot, "SKILL.md")
             : path.join(dirs.codexSkillRoot, "meta-theory.md"),
-          portableSkill,
+          applyRuntimePaths(portableSkill, "codex"),
         )
       ).changed
     ) {
@@ -836,7 +946,7 @@ Examples:
         (
           await writeGeneratedFile(
             path.join(dirs.codexSkillRoot, "references", reference.name),
-            reference.content,
+            applyRuntimePaths(reference.content, "codex"),
           )
         ).changed
       ) {
@@ -848,7 +958,7 @@ Examples:
         (
           await writeGeneratedFile(
             path.join(dirs.codexProjectSkillRoot, "SKILL.md"),
-            portableSkill,
+            applyRuntimePaths(portableSkill, "codex"),
           )
         ).changed
       ) {
@@ -875,7 +985,7 @@ Examples:
                 "references",
                 reference.name,
               ),
-              reference.content,
+              applyRuntimePaths(reference.content, "codex"),
             )
           ).changed
         ) {
@@ -937,7 +1047,7 @@ Examples:
       (
         await writeGeneratedFile(
           path.join(dirs.cursorSkillRoot, "SKILL.md"),
-          portableSkill,
+          applyRuntimePaths(portableSkill, "cursor"),
         )
       ).changed
     ) {
@@ -948,7 +1058,7 @@ Examples:
         (
           await writeGeneratedFile(
             path.join(dirs.cursorSkillRoot, "references", reference.name),
-            reference.content,
+            applyRuntimePaths(reference.content, "cursor"),
           )
         ).changed
       ) {

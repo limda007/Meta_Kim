@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-artisan
 description: Match the right skills, tools, and capability packages for a Meta_Kim agent or workflow.
 type: agent
@@ -84,7 +84,8 @@ ROI = (Task Coverage x Usage Frequency) / (Context Cost + Learning Curve)
 | **findskill** | Coarse filter phase | Invoke the **findskill** skill in the current runtime to search the Skills.sh ecosystem and discover external Skill candidates. **Must follow the 3-step fallback chain** (from agent-teams-playbook): Step 1 scan locally installed -> Step 2 search externally -> Step 3 if no match, fallback to generic subagent. All 3 steps must be executed, no skipping |
 | **skill-creator** | After refined selection (optional) | Use skill-creator's description optimization workflow to improve trigger descriptions of newly created Skills, increasing automatic trigger accuracy |
 | **everything-claude-code** | Refined selection phase | As the CC platform candidate pool: match from current CC ecosystem skills and subagent types (reference `meta-kim-capabilities.json`; compatibility mirror: `global-capabilities.json`). Reference specific skill names directly during ROI Scoring |
-| **superpowers** | Validation phase | Use `verification-before-completion` to ensure all 3 scenario tests (normal/edge/exception) have fresh evidence, not "should be able to cover" |
+| **superpowers** (brainstorming) | When scoring has ties | When multiple candidates have equal ROI, enumerate alternatives using brainstorming to break the tie |
+| **superpowers** (verification) | Validation phase | Use `verification-before-completion` to ensure all 3 scenario tests (normal/edge/exception) have fresh evidence, not "should be able to cover" |
 
 ## Collaboration
 

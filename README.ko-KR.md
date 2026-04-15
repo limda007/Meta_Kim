@@ -572,7 +572,10 @@ Meta_Kim의 문과 프로토콜은 4계층 실행 보장이 있습니다. 전역
 
 Meta_Kim은 단일 기억 레이어를 사용하지 않습니다. 세 가지 다른 역할을 가진 3개 레이어를 사용하여 agent가 지속적으로 개선되면서 프로젝트에 익숙해집니다.
 
-**3층 모두 `node setup.mjs` 실행 후全自动으로 활성화됩니다.** 수동 설정 불필요——의존성은 자동 설치, git hook은 자동 등록, 데이터 라이프사이클은 시스템이 자동 관리합니다.
+3층 기억은 각각 다른 활성화 방식을 가지고 있습니다:
+- **1층**은 Claude Code에 내장——Claude Code 런타임 필요（`~/.claude/projects/*/memory/` 에서 자동 읽기/쓰기）
+- **2층**은 `node setup.mjs` 가 자동 설치
+- **3층**은 `node setup.mjs` 가 설치하지만 서버를 수동으로 시작해야 함（3층 활성화 참고）
 
 ### 1층: Memory (agent 업그레이드 기억)
 
@@ -608,8 +611,12 @@ Meta_Kim은 단일 기억 레이어를 사용하지 않습니다. 세 가지 다
   - 세션 간 연속성 — 지난번 어디까지 했는지 이번에 이어서 가능
   - 벡터 수준 검색 — 키워드 매칭이 아닌 의미 이해
   - 정밀 리콜 — 과거 세션에서 가장 관련성 높은 문맥 검색
-- **활성화**: 자동——세션 완료 시 자동 인덱싱; `npm run index:runs -- <artifact>`로 수동 인덱싱도 가능
-- **쿼리**: `npm run query:runs -- --owner <agent>`——agent별로 과거 run 검색, 또는 AI에 직접 관련 세션 회상 요청
+- **활성화**: `node setup.mjs` 가 MCP Memory Service（3층）를 설치하고 설정합니다；설치 후 서버를 수동으로 시작해야 합니다.
+  - **Claude Code**: SessionStart Hook 은 `node setup.mjs` 시 자동 등록
+  - **기타 도구**: `mcp-memory-service/claude-hooks/` 참조하여 수동 설치
+- **서버 시작**: `npm start`（mcp-memory-service 디렉토리）또는 `python -m mcp_memory_service`，그 다음 `http://localhost:8888` 접속
+- **Hook**: Claude Code 자동 등록；기타 도구는 mcp-memory-service 문서 참조
+- **쿼리**: `npm run query:runs -- --owner <agent>`——agent별로 과거 run 검색，또는 `npm run index:runs -- <artifact>`로 수동 인덱싱
 
 ### 3층 협업
 
@@ -652,7 +659,7 @@ flowchart TB
 3층 기억이 함께 작용하여 두 가지 핵심 목표를 달성합니다:
 
 1. **환각 대폭 감소** — agent가 빈공간에서 지어내지 않고 사실과 문맥에 기반하여 응답
-2. **토큰 소비 대폭 감소** — 전문 읽기 대신 그래프 압축, 무차별 검색 대신 벡터 검색
+2. **토큰 소비 대폭 감소** — 전문 읽기 대신 그래프 압축, 역검색 대신 벡터 검색 활용
 
 ---
 

@@ -142,44 +142,58 @@ The `prompt` must contain everything the agent needs — files, context, user re
 
 ## Type Routing
 
-| User intent | Type | Flow |
-|---|---|---|
-| Discuss meta-theory, evaluate agents, Five Criteria | **A** | Analysis → meta-prism audit → meta-warden synthesis |
-| Create new agent, split existing agent | **B** | Read `.claude/skills/meta-theory/references/create-agent.md` → station pipeline |
-| Complex dev task, feature implementation | **C** | 8-stage spine (below) |
-| Review existing proposal/article | **D** | meta-prism + meta-scout → meta-warden |
-| Rhythm/card play/orchestration strategy | **E** | Read `.claude/skills/meta-theory/references/rhythm-orchestration.md` |
+> **Dual-End Warden Architecture**: Warden is the **entry gate** (clarification + solution enumeration) for ALL types, AND the **exit gate** (quality gate + final synthesis). Conductor orchestrates ALL types through their execution phase.
+
+| User intent | Type | Entry Warden | Full Flow |
+|---|---|---|---|
+| Discuss meta-theory, evaluate agents, Five Criteria | **A** | Clarify ambiguous intent; Enumerate solution approaches | meta-theory classify → **Warden entry** (clarify + enumerate) → **Conductor orchestrate** → Prism audit → **Warden exit** (synthesize) |
+| Create new agent, split existing agent | **B** | Confirm gap is real; Enumerate creation approaches | meta-theory classify → **Warden entry** (confirm + enumerate) → **Conductor orchestrate** → Station pipeline → **Warden exit** (synthesize) |
+| Complex dev task, feature implementation | **C** | Confirm scope/constraints; Enumerate implementation approaches | meta-theory classify → **Warden entry** (confirm + enumerate) → **Conductor orchestrate** (8-stage spine) → **Warden exit** (synthesize) |
+| Review existing proposal/article | **D** | Confirm review scope; Enumerate verification approaches | meta-theory classify → **Warden entry** (confirm + enumerate) → **Conductor orchestrate** → Prism + Scout → **Warden exit** (synthesize) |
+| Rhythm/card play/orchestration strategy | **E** | Confirm rhythm problem; Enumerate orchestration approaches | meta-theory classify → **Warden entry** (confirm + enumerate) → **Conductor orchestrate** (card deck) → **Warden exit** (synthesize) |
 
 ---
 
 ## Type A: Meta-Theory Analysis
 
-1. Read agent definitions: `Glob .claude/agents/meta-*.md`
+### Entry Gate (Warden)
+**Warden's entry role**: Clarify ambiguous intent; enumerate ≥2 solution approaches using `superpowers/brainstorming` before committing to analysis direction.
+
+### Orchestration (Conductor)
+Conductor sequences the analysis work and manages the dispatch board.
+
+### Execution
+1. Read agent definitions: `Glob canonical/agents/*.md`
 2. Dispatch quality audit:
    ```
    Agent(subagent_type: "meta-prism", description: "Agent quality audit",
      prompt: "Audit these meta-agent definitions against Five Criteria and Four Death Patterns.
-     Read: Glob .claude/agents/meta-*.md AND Read .claude/skills/meta-theory/references/meta-theory.md.
+     Read: Glob canonical/agents/*.md AND Read canonical/skills/meta-theory/references/meta-theory.md.
      Output: evidence table per agent + quality rating + fix operations.")
    ```
-3. Dispatch synthesis:
-   ```
-   Agent(subagent_type: "meta-warden", description: "Synthesize audit results",
-     prompt: "Aggregate the following audit findings into an actionable report with ratings and next steps.
-     Findings: [paste meta-prism output here]")
-   ```
-4. Present combined output to user
+
+### Exit Gate (Warden)
+```
+Agent(subagent_type: "meta-warden", description: "Synthesize audit results",
+  prompt: "Aggregate the following audit findings into an actionable report with ratings and next steps.
+  Findings: [paste meta-prism output here]")
+```
+Warden synthesizes audit results into final report with S/A/B/C/D ratings and action items.
 
 ## Type B: Agent Creation
 
-**Dispatch map (Type B):** **`meta-genesis`** and **`meta-artisan`** are mandatory; **`meta-prism`** and **`meta-warden`** handle review and synthesis; **`meta-scout`**, **`meta-sentinel`**, and **`meta-librarian`** are optional factory stations by trigger; **`meta-conductor`** stays orchestration-only.
+### Entry Gate (Warden)
+**Warden's entry role**: Confirm the capability gap is real (not already covered by existing agents); enumerate ≥2 creation approaches. Uses `superpowers/brainstorming` for solution enumeration.
 
-Read `.claude/skills/meta-theory/references/create-agent.md` for the full pipeline. Quick summary:
+### Orchestration (Conductor)
+Conductor owns the dispatch board, card deck, worker task board, and handoff plan for the station pipeline. **`meta-genesis`** and **`meta-artisan`** are mandatory stations; **`meta-prism`** and **`meta-warden`** handle review and synthesis; **`meta-scout`**, **`meta-sentinel`**, and **`meta-librarian`** are optional factory stations by trigger.
+
+Read `canonical/skills/meta-theory/references/create-agent.md` for the full pipeline. Quick summary:
 1. Discovery → data collection → coupling grouping → user confirmation
 2. Pre-design → check if global agent already covers the need
 3. Design → Warden gap approval → Conductor task board → Genesis (identity) → Artisan (loadout) → optional Scout/Sentinel/Librarian → Prism review → Warden approval
 4. Review → meta-prism quality check
-5. Integration → write `.claude/agents/{name}.md`
+5. Integration → write `canonical/agents/{name}.md`
 
 **Factory artifacts (Type B execution-agent mode):**
 - `capabilityGapPacket`
@@ -212,12 +226,16 @@ Rule: a station only counts as complete when its deliverables are explicit enoug
 
 ## Type C: Development Governance
 
-Read `.claude/skills/meta-theory/references/dev-governance.md` for the complete spec. Core flow:
+### Entry Gate (Warden)
+**Warden's entry role**: Confirm scope, goal, and constraints are clear; enumerate ≥2 implementation approaches using `superpowers/brainstorming`. If ≥2 dimensions are ambiguous, Warden asks clarification questions before the spine begins.
+
+### Orchestration (Conductor)
+Conductor executes the 8-stage spine. Read `canonical/skills/meta-theory/references/dev-governance.md` for the complete spec. Core flow:
 
 | Stage | Name | YOUR action |
 |---|---|---|
 | 1 | Critical | Clarify scope, ask if ambiguous |
-| 2 | Fetch | Search who can do this: `Glob .claude/agents/*.md` |
+| 2 | Fetch | Search who can do this: `Glob canonical/agents/*.md` |
 | 3 | Thinking | Plan sub-tasks with owners and dependencies |
 | 4 | **Execution** | **Dispatch to agents via `Agent()` tool** |
 | 5 | Review | Inspect agent outputs |
@@ -249,6 +267,13 @@ Stage 4 rules:
 
 ## Type D: Review
 
+### Entry Gate (Warden)
+**Warden's entry role**: Confirm review scope and what verification is needed; enumerate ≥2 verification approaches using `superpowers/brainstorming`.
+
+### Orchestration (Conductor)
+Conductor sequences the review work and manages the dispatch board.
+
+### Execution
 1. Read the proposal/document
 2. Dispatch audit:
    ```
@@ -261,27 +286,35 @@ Stage 4 rules:
    Agent(subagent_type: "meta-scout", description: "Verify external claims",
      prompt: "Verify these claims against external sources: [list claims]")
    ```
-4. Dispatch synthesis:
-   ```
-   Agent(subagent_type: "meta-warden", description: "Review synthesis",
-     prompt: "Aggregate these review findings: [paste all outputs]. Final rating + action items.")
-   ```
-5. Present to user
+
+### Exit Gate (Warden)
+```
+Agent(subagent_type: "meta-warden", description: "Review synthesis",
+  prompt: "Aggregate these review findings: [paste all outputs]. Final rating + action items.")
+```
+Warden synthesizes review findings into final rating with action items.
 
 ## Type E: Rhythm Orchestration
 
-Read `.claude/skills/meta-theory/references/rhythm-orchestration.md` for attention cost model and card dealing rules. Then:
+### Entry Gate (Warden)
+**Warden's entry role**: Confirm the rhythm problem is real; enumerate ≥2 orchestration approaches using `superpowers/brainstorming`.
+
+### Orchestration (Conductor)
+Conductor reads `canonical/skills/meta-theory/references/rhythm-orchestration.md` for attention cost model and card dealing rules, then designs the card deck:
+
 1. Diagnose rhythm issues
 2. Dispatch card deck design:
    ```
    Agent(subagent_type: "meta-conductor", description: "Design card deck",
      prompt: "Design Event Card Deck for this scenario: [details]. Cards need: id, type, priority, cost, skip_condition, interrupt_trigger.")
    ```
-3. Dispatch synthesis:
-   ```
-   Agent(subagent_type: "meta-warden", description: "Orchestration plan",
-     prompt: "Synthesize this card deck into an actionable orchestration plan: [paste output]")
-   ```
+
+### Exit Gate (Warden)
+```
+Agent(subagent_type: "meta-warden", description: "Orchestration plan",
+  prompt: "Synthesize this card deck into an actionable orchestration plan: [paste output]")
+```
+Warden synthesizes the card deck into an actionable orchestration plan.
 
 ---
 
@@ -312,12 +345,12 @@ Constitutional principles for ALL Meta_Kim agents and every system they create o
 
 ## References
 
-Theory and detailed specs live in `.claude/skills/meta-theory/references/`:
-- `.claude/skills/meta-theory/references/meta-theory.md` — Five Criteria, Four Death Patterns, Organizational Mirror
-- `.claude/skills/meta-theory/references/dev-governance.md` — Full 8-stage spine with Stage 3 artifact contracts
-- `.claude/skills/meta-theory/references/create-agent.md` — Type B agent creation pipeline with station templates
-- `.claude/skills/meta-theory/references/rhythm-orchestration.md` — Attention cost model, card dealing rules
-- `.claude/skills/meta-theory/references/ten-step-governance.md` — Complete 10-step governance path
-- `.claude/skills/meta-theory/references/intent-amplification.md` — Intent Core + Delivery Shell model
+Theory and detailed specs live in `canonical/skills/meta-theory/references/`:
+- `canonical/skills/meta-theory/references/meta-theory.md` — Five Criteria, Four Death Patterns, Organizational Mirror
+- `canonical/skills/meta-theory/references/dev-governance.md` — Full 8-stage spine with Stage 3 artifact contracts
+- `canonical/skills/meta-theory/references/create-agent.md` — Type B agent creation pipeline with station templates
+- `canonical/skills/meta-theory/references/rhythm-orchestration.md` — Attention cost model, card dealing rules
+- `canonical/skills/meta-theory/references/ten-step-governance.md` — Complete 10-step governance path
+- `canonical/skills/meta-theory/references/intent-amplification.md` — Intent Core + Delivery Shell model
 
 Read these files when the corresponding Type requires deep methodology.

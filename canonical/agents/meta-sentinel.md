@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-sentinel
 description: Design security boundaries, hooks, permissions, and rollback rules for Meta_Kim agents.
 type: agent
@@ -82,6 +82,7 @@ trigger: "New capability admission, supply chain changes, security incidents, ho
 | **hookprompt** | Shield Design phase | Use hookprompt's auto prompt optimization to harden PreToolUse hooks: validate that user prompts reaching agents are sanitized against injection patterns. hookprompt's Google prompt engineering rules also help detect prompt-level security risks (e.g., instruction override attempts, role confusion injections) before they reach the agent's SOUL.md context |
 | **superpowers** (systematic-debugging) | Attack Verification phase | Use the systematic debugging 4-phase method for threat root cause analysis: Phase 1 Reproduce -> Phase 2 Pattern Analysis -> Phase 3 Hypothesis Testing -> Phase 4 Fix Verification. **Iron Rule: No fix proposal without identifying root cause** |
 | **superpowers** (verification) | After Hardening | 5+2 attack scenario verifications must have fresh evidence (actual test output), not "theoretically secure" |
+| **findskill** | When discovering security tools | Search Skills.sh ecosystem for new security auditing, hook validation, or supply-chain security tools to enhance Sentinel's threat modeling capabilities |
 
 ## Collaboration
 

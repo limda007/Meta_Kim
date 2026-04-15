@@ -4,6 +4,31 @@ All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
+## [2.0.5] - 2026-04-15
+
+### Added
+
+- **Dual-end Warden architecture (Type A/B/C/D/E routing)**: meta-theory SKILL.md now explicitly models Warden as BOTH entry gate (clarification + solution enumeration via brainstorming) AND exit gate (quality gate + final synthesis) for ALL dispatch types. Conductor now orchestrates ALL types, not just Type C.
+- **findskill dependency for all 8 meta agents**: Added `findskill` discovery step to Dependency Skill Invocations of all 8 canonical agents (warden, conductor, genesis, artisan, scout, sentinel, librarian, prism). Artisan and Scout already had findskill; others are new.
+- **superpowers/brainstorming for Warden entry gate**: Warden now uses `superpowers/brainstorming` at the entry gate for solution enumeration (≥2 approaches before dispatch).
+
+### Changed
+
+- **meta-theory SKILL.md Type Routing table**: Rewrote the routing table with clear entry/exit gate separation. Each Type (A/B/C/D/E) now shows Warden entry role, Conductor orchestration, execution steps, and Warden exit role.
+- **meta-theory SKILL.md Type A/B/C/D/E detail sections**: Added Entry Gate (Warden) / Orchestration (Conductor) / Execution / Exit Gate (Warden) structure to all five Type sections.
+- **sync-runtimes.mjs cross-runtime path substitution**: Added `applyRuntimePaths()` function that substitutes canonical/ paths to runtime-specific paths (`.claude/`, `.codex/`, `openclaw/`, `.cursor/`) during sync. OpenClaw agent references use workspace-per-agent format (`openclaw/workspaces/{workspace}/AGENTS.md#`).
+- **canonical/meta-theory/SKILL.md canonical paths**: All `.claude/` path references in the canonical SKILL.md replaced with `canonical/` format, enabling correct cross-runtime sync.
+
+## [2.0.4] - 2026-04-15
+
+- **README Layer 3 correction**: Fixed false "All three layers activate automatically" claim. Layer 1 requires Claude Code runtime, Layer 2 is auto-installed by setup.mjs, Layer 3 requires manual server startup on port 8888. All 4 languages (EN/ZH/JA/KO) synchronized.
+- **setup.mjs Layer 3 install**: Added Step 4.6 for MCP Memory Service (mcp-memory-service) installation — pip install, .mcp.json registration, i18n strings across all 4 languages.
+- **install-mcp-memory-hooks.mjs**: New script to install Claude Code SessionStart hooks for MCP Memory Service — verifies server health, registers hooks, warns if server not running.
+
+### Changed
+
+- **README Layer 3 description**: Expanded activation details with tool-specific instructions (Claude Code auto-hooks vs. Codex/OpenClaw/Cursor manual setup), explicit server startup command, and hook registration notes.
+
 ## [2.0.3] - 2026-04-14
 
 ### Changed

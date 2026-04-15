@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-librarian
 description: Design memory, knowledge persistence, and continuity strategy for Meta_Kim agents.
 type: agent
@@ -78,6 +78,7 @@ trigger: "Memory issues, session continuity problems, when an agent needs memory
 | **planning-with-files** | When designing memory architecture | Leverage Manus-style file-based planning patterns: `findings.md` pattern -> design agent's topic file layering; `progress.md` pattern -> design Continuity section's "session recovery" protocol; `task_plan.md` Error Tracking -> design Expiration Policy for error patterns. **Specifically reference the 5-Question Reboot Test** (Where am I? Where am I going? What's the goal? What have I learned? What have I done?) as the standard recovery template for each agent's Continuity section |
 | **superpowers** (verification) | After 5-session simulation | Verify each simulation result must have fresh evidence: Session 1->2 retention check, Session 3->4 isolation check, Session 4->5 retrieval check, each checkmark/cross must reference specific data |
 | **cli-anything** | When auditing file-system memory state | Use cli-anything to inspect memory file layouts, verify directory structures match the 3-layer architecture, and check file sizes / staleness. Particularly useful for automated expiration enforcement: scanning `memory/` for files past their shelf life and moving them to `memory/archive/` |
+| **findskill** | When discovering memory strategies | Search Skills.sh ecosystem for new knowledge persistence, memory architecture, or cross-session continuity frameworks to enhance Librarian's memory strategy capabilities |
 
 ## Claude Code Auto-Memory Integration
 

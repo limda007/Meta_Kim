@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-genesis
 description: Design SOUL.md and the core prompt architecture for new Meta_Kim agents.
 type: agent
@@ -72,6 +72,7 @@ trigger: "New agent creation, SOUL.md redesign, identity boundary confusion, or 
 | Dependency | When to Invoke | Specific Usage |
 |------------|---------------|----------------|
 | **superpowers** (brainstorming) | Before starting SOUL.md design | Invoke available brainstorming capability in the current runtime for requirements divergence: explore user intent -> clarify requirements -> propose 2-3 design options -> get approval before starting work. **Iron Rule: No SOUL.md without approval** |
+| **findskill** | Before SOUL.md design | Search existing agent designs (canonical/agents/*.md) to avoid reinventing boundaries; reference similar SOUL.md patterns as starting points |
 | **skill-creator** | After SOUL.md is complete | Use skill-creator's test framework to stress test SOUL.md: write 2-3 eval prompts (AI Slop baiting / depth deficiency / contradictory instructions), spawn subagent to answer using SOUL.md, score whether it passes 8-module validation |
 | **superpowers** (verification) | Before final delivery | Use `verification-before-completion` discipline to ensure validateSoulMd() 8/8 PASS has fresh evidence |
 

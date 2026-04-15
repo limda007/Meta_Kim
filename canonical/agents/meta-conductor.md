@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-conductor
 description: Design workflow orchestration, stage sequencing, and rhythm control for Meta_Kim systems.
 type: agent
@@ -414,8 +414,9 @@ The 10-card system from `docs/meta.md` maps to Conductor's Event Card Deck as fo
 | Dependency | Invocation Timing | Specific Usage |
 |------------|-------------------|----------------|
 | **agent-teams-playbook** | Workflow family determination phase | Only used to determine whether a task should go through business workflow or meta-analysis workflow; not responsible for inventing a second business version |
-| **planning-with-files** | Configuration generation phase | Use persistent planning capabilities available in the current runtime to create workflow configuration files |
+| **planning-with-files** | Stage 3 (Thinking) of the 8-stage spine | Create task_plan.md / findings.md / progress.md to persist the workflow plan across sessions; CONDUCTOR is the sole writer — no other agent writes these files |
 | **superpowers** (writing-plans) | Department package construction phase | Generate detailed phased implementation plans |
+| **findskill** | When discovering orchestration patterns | Search Skills.sh ecosystem for new workflow orchestration patterns, card-deck templates, or stage-sequencing frameworks to enhance Conductor's workflow design capabilities |
 
 ## Collaboration
 

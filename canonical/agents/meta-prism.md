@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-prism
 description: Review Meta_Kim outputs for quality drift, AI slop, and evolution signals.
 type: agent
@@ -192,6 +192,7 @@ When Warden triggers Stage 6 **Meta-Review** (review of review standards), Prism
 | **everything-claude-code** (code-reviewer) | Code-level review | Invoke code review capability available in the current runtime for quality/security/maintainability review |
 | **superpowers** (systematic-debugging) | Performance regression detection | Perform root cause analysis when Quality Drift is detected: single-variable isolation |
 | **gstack** (/review, /qa, /cso) | Assertion-based evaluation phase | Use gstack's specialist review skills as supplementary review lenses: `/review` for structured code review, `/qa` for quality assurance checklists, `/cso` for security officer perspective. gstack's 29 specialist skills provide domain-specific evaluation criteria that complement Prism's generic assertion framework |
+| **findskill** | When discovering new evaluation methods | Search Skills.sh ecosystem for new quality detection, AI-slop identification, or testing frameworks to enhance Prism's evaluation capabilities |
 
 ## Collaboration
 

@@ -1,5 +1,5 @@
 ---
-version: 1.0.9
+version: 1.1.0
 name: meta-warden
 description: Coordinate the Meta_Kim agent team, quality gates, and final synthesis across the other meta agents.
 type: agent
@@ -260,8 +260,9 @@ Rule: another operator must be able to read these deliverables and understand wh
 | Dependency | Invocation Timing | Specific Usage |
 |------------|-------------------|----------------|
 | **agent-teams-playbook** | When assigning analysis tasks | Use 6-phase framework to orchestrate parallel work, Scenario 4 (Lead-Member) mode |
-| **planning-with-files** | When initiating agent creation process | Create task_plan.md to track progress, findings.md to record discoveries |
-| **superpowers** | During Quality Gate review | verification-before-completion discipline: quality judgments must have fresh evidence |
+| **superpowers** (brainstorming) | Entry gate — solution enumeration | Enumerate ≥2 solution approaches before committing to dispatch plan. **Iron Rule: No dispatch without enumeration** |
+| **superpowers** (verification) | During Quality Gate review | verification-before-completion discipline: quality judgments must have fresh evidence |
+| **findskill** | When resolving capability gaps | Search Skills.sh ecosystem for external capabilities when internal agents cannot cover a gap; Scout handles execution but Warden authorizes the search |
 
 ## Core Functions
 

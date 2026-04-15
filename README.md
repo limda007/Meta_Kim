@@ -573,7 +573,10 @@ The first three layers are the primary defense and work everywhere. Code validat
 
 Meta_Kim does not use a single memory layer. It uses three, each with a different job, so agents can keep improving while becoming more familiar with the project.
 
-**All three layers activate automatically after running `node setup.mjs`.** No manual configuration required — dependencies are installed, git hooks are registered, and the system manages data lifecycle on its own.
+Each layer has different activation requirements:
+- **Layer 1** is built into Claude Code — requires Claude Code runtime (auto-memory at `~/.claude/projects/*/memory/`)
+- **Layer 2** is installed automatically by `node setup.mjs`
+- **Layer 3** is installed by `node setup.mjs` but requires manual server startup (see Layer 3 activation below)
 
 ### Layer 1: Memory (agent upgrade memory)
 
@@ -609,8 +612,12 @@ Meta_Kim does not use a single memory layer. It uses three, each with a differen
   - Cross-session continuity - pick up where the last conversation left off
   - Vector-level retrieval - semantic understanding instead of keyword matching
   - Precise recall - find the most relevant context from historical sessions
-- **Activation**: automatic — sessions are indexed as they complete; `npm run index:runs -- <artifact>` for manual indexing of validated run artifacts
-- **Query**: `npm run query:runs -- --owner <agent>` — find past runs by agent, or ask AI to recall relevant past sessions
+- **Activation**: `node setup.mjs` installs and configures the MCP Memory Service (Layer 3); the server must be started manually after installation.
+  - For **Claude Code**: SessionStart hooks are auto-registered during `node setup.mjs`
+  - For **other tools** (Codex, OpenClaw, Cursor): check `mcp-memory-service/claude-hooks/` for manual hook setup
+- **Start server**: `npm start` in the mcp-memory-service directory (or `python -m mcp_memory_service`), then access at `http://localhost:8888`
+- **Hooks**: auto-registered for Claude Code; for other tools see the mcp-memory-service documentation
+- **Query**: `npm run query:runs -- --owner <agent>` — find past runs by agent, or `npm run index:runs -- <artifact>` for manual indexing of validated run artifacts
 
 ### How the three layers work together
 

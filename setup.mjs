@@ -250,6 +250,34 @@ const I18N = {
     cmdCheck: "Check environment",
     cmdDoctor: "Diagnose Meta_Kim health",
     cmdVerify: "Full verification",
+    // Post-install notes
+    postInstallNotesHeading: "Post-install notes:",
+    postInstallNotesIntro:
+      "After installation, here is what is available and how each layer activates:",
+    postInstallNotesPlatformSync: "Platform capability sync:",
+    platformClauleCode: "Claude Code",
+    platformClauleCodeCap:
+      "agents + skills + hooks (Layer 1 Memory auto / Layer 2 Graphify auto / Layer 3 SQL needs server startup)",
+    platformCodex: "Codex",
+    platformCodexCap:
+      "agents + skills (Layer 1 Memory needs manual hook config / Layer 2 Graphify auto / Layer 3 SQL needs server startup)",
+    platformOpenClaw: "OpenClaw",
+    platformOpenClawCap:
+      "workspace + skills (Layer 1 Memory needs manual hook config / Layer 2 Graphify auto / Layer 3 SQL needs server startup)",
+    platformCursor: "Cursor",
+    platformCursorCap:
+      "agents + skills (Layer 1 Memory needs manual hook config / Layer 2 Graphify auto / Layer 3 SQL needs server startup)",
+    postInstallNotesLayerActivation: "Three-layer memory activation:",
+    layer1Label: "Layer 1 (Memory)",
+    layer1Note: "automatic — built into Claude Code",
+    layer2Label: "Layer 2 (Graphify)",
+    layer2Note: "automatic after graphify install (pip install graphifyy)",
+    layer3Label: "Layer 3 (SQL / MCP Memory Service)",
+    layer3Note:
+      "requires server startup: python -m mcp_memory_service (then http://localhost:8888)",
+    postInstallNotesReminder: "Reminder:",
+    postInstallNotesReminderText:
+      "Run node setup.mjs --check to verify your installation at any time.",
     setupError: "Setup error:",
     selectLang: "Select language / 选择语言 / 言語を選択 / 언어 선택",
     choose: (n) => `Choose (1-${n})`,
@@ -345,6 +373,20 @@ const I18N = {
     graphifyHookInstalled:
       "graphify git hooks installed (auto-rebuild on commit/checkout)",
     graphifyHookFailed: "graphify git hook installation failed (non-blocking)",
+    stepMcpMemory: "MCP Memory Service (Layer 3)",
+    mcpMemoryInstalling: "Installing MCP Memory Service (Layer 3)...",
+    mcpMemoryInstalled: "MCP Memory Service installed",
+    mcpMemoryInstallFailed:
+      "MCP Memory Service installation failed (non-blocking)",
+    mcpMemoryAlreadyInstalled: (v) =>
+      `MCP Memory Service ${v} — already installed`,
+    mcpMemoryServerRegistered: "MCP Memory Service registered in .mcp.json",
+    mcpMemoryServerExists: ".mcp.json already has MCP Memory Service",
+    askMcpMemoryInstall:
+      "Install MCP Memory Service (Layer 3)? Provides vector-level session memory with sqlite-vec.",
+    mcpMemorySkipped: "MCP Memory Service skipped",
+    mcpMemoryServerStartHint:
+      "MCP Memory Service installed — start with: python -m mcp_memory_service  (or: uv run memory server -s hybrid)",
     updateHeading: "Update Mode",
     updateNpm: "Reinstalling npm dependencies...",
     updateSkills: "Updating all skills...",
@@ -419,6 +461,7 @@ const I18N = {
     proxySaved: (url) => `Proxy saved: ${url}`,
     stepLabel: (n, label) => `Step ${n}: ${label}`,
     progressInstallPython: "Install Python graphify tool",
+    progressInstallMcpMemory: "Install MCP Memory Service (Layer 3)",
     checkTargets: (active, supported) =>
       `activeTargets=${active} supportedTargets=${supported}`,
     localStateHeader: "Local state",
@@ -517,12 +560,38 @@ const I18N = {
     cmdCheck: "检查环境",
     cmdDoctor: "诊断 Meta_Kim 健康状态",
     cmdVerify: "完整验证",
+    // 安装后注意事项
+    postInstallNotesHeading: "安装后注意事项：",
+    postInstallNotesIntro: "安装完成后，各层能力的使用方式如下：",
+    postInstallNotesPlatformSync: "各平台能力同步情况：",
+    platformClauleCode: "Claude Code",
+    platformClauleCodeCap:
+      "agents + skills + hooks（第1层 Memory 自动 / 第2层 Graphify 自动 / 第3层 SQL 需启动服务）",
+    platformCodex: "Codex",
+    platformCodexCap:
+      "agents + skills（第1层 Memory 需手动配置 hooks / 第2层 Graphify 自动 / 第3层 SQL 需启动服务）",
+    platformOpenClaw: "OpenClaw",
+    platformOpenClawCap:
+      "workspace + skills（第1层 Memory 需手动配置 hooks / 第2层 Graphify 自动 / 第3层 SQL 需启动服务）",
+    platformCursor: "Cursor",
+    platformCursorCap:
+      "agents + skills（第1层 Memory 需手动配置 hooks / 第2层 Graphify 自动 / 第3层 SQL 需启动服务）",
+    postInstallNotesLayerActivation: "三层记忆激活方式：",
+    layer1Label: "第一层（Memory）",
+    layer1Note: "自动激活——内置于 Claude Code",
+    layer2Label: "第二层（Graphify）",
+    layer2Note: "安装 graphifyy 后自动激活（pip install graphifyy）",
+    layer3Label: "第三层（SQL / MCP Memory Service）",
+    layer3Note:
+      "需手动启动服务器：python -m mcp_memory_service（然后访问 http://localhost:8888）",
+    postInstallNotesReminder: "提醒：",
+    postInstallNotesReminderText:
+      "随时可运行 node setup.mjs --check 验证安装状态。",
     setupError: "安装出错：",
     selectLang: "Select language / 选择语言 / 言語を選択 / 언어 선택",
     choose: (n) => `选择 (1-${n})`,
     inquirerSingleHotkeys: "↑↓ 移动选项 · ⏎ 确认",
-    inquirerMultiHotkeys:
-      "↑↓ 移动 · 空格 勾选/取消 · ⏎ 确认 · a 全选 · i 反选",
+    inquirerMultiHotkeys: "↑↓ 移动 · 空格 勾选/取消 · ⏎ 确认 · a 全选 · i 反选",
     globalInstallPrompt:
       "Meta_Kim 技能安装到 ~/.claude/skills/（全局）。是否全局安装？",
     globalDirReady: (p) => `全局技能目录就绪：${p}`,
@@ -601,6 +670,18 @@ const I18N = {
     graphifyHookInstalled:
       "graphify git hook 已安装（commit/checkout 时自动重建图谱）",
     graphifyHookFailed: "graphify git hook 安装失败（不影响其他功能）",
+    stepMcpMemory: "MCP Memory Service（第三层）",
+    mcpMemoryInstalling: "正在安装 MCP Memory Service（第三层）...",
+    mcpMemoryInstalled: "MCP Memory Service 已安装",
+    mcpMemoryInstallFailed: "MCP Memory Service 安装失败（不影响其他功能）",
+    mcpMemoryAlreadyInstalled: (v) => `MCP Memory Service ${v} — 已安装`,
+    mcpMemoryServerRegistered: "MCP Memory Service 已注册到 .mcp.json",
+    mcpMemoryServerExists: ".mcp.json 已包含 MCP Memory Service",
+    askMcpMemoryInstall:
+      "安装 MCP Memory Service（第三层）？提供向量级会话记忆（sqlite-vec）",
+    mcpMemorySkipped: "MCP Memory Service 已跳过",
+    mcpMemoryServerStartHint:
+      "MCP Memory Service 已安装——启动方式：python -m mcp_memory_service  （或：uv run memory server -s hybrid）",
     updateHeading: "更新模式",
     updateNpm: "正在重新安装 npm 依赖...",
     updateSkills: "正在更新所有技能...",
@@ -671,6 +752,7 @@ const I18N = {
     proxySaved: (url) => `已保存代理：${url}`,
     stepLabel: (n, label) => `步骤 ${n}：${label}`,
     progressInstallPython: "安装 Python graphify 工具",
+    progressInstallMcpMemory: "安装 MCP Memory Service（第三层）",
     checkTargets: (active, supported) =>
       `activeTargets=${active} supportedTargets=${supported}`,
     localStateHeader: "本地状态",
@@ -776,12 +858,38 @@ const I18N = {
     cmdCheck: "環境をチェック",
     cmdDoctor: "Meta_Kim の健全性を診断",
     cmdVerify: "フル検証",
+    // インストール後の注意事項
+    postInstallNotesHeading: "インストール後の注意事項：",
+    postInstallNotesIntro: "インストール完了後、各層の使い方は以下の通りです：",
+    postInstallNotesPlatformSync: "各プラットフォームの同期状況：",
+    platformClauleCode: "Claude Code",
+    platformClauleCodeCap:
+      "agents + skills + hooks（第1層 Memory 自動 / 第2層 Graphify 自動 / 第3層 SQL サーバー起動必要）",
+    platformCodex: "Codex",
+    platformCodexCap:
+      "agents + skills（第1層 Memory hooks手動設定必要 / 第2層 Graphify 自動 / 第3層 SQL サーバー起動必要）",
+    platformOpenClaw: "OpenClaw",
+    platformOpenClawCap:
+      "workspace + skills（第1層 Memory hooks手動設定必要 / 第2層 Graphify 自動 / 第3層 SQL サーバー起動必要）",
+    platformCursor: "Cursor",
+    platformCursorCap:
+      "agents + skills（第1層 Memory hooks手動設定必要 / 第2層 Graphify 自動 / 第3層 SQL サーバー起動必要）",
+    postInstallNotesLayerActivation: "3層メモリの有効化方法：",
+    layer1Label: "第1層（Memory）",
+    layer1Note: "自動有効 — Claude Code に組み込み済み",
+    layer2Label: "第2層（Graphify）",
+    layer2Note: "graphifyy インストール後は自動有効（pip install graphifyy）",
+    layer3Label: "第3層（SQL / MCP Memory Service）",
+    layer3Note:
+      "サーバー手動起動が必要：python -m mcp_memory_service（次に http://localhost:8888 にアクセス）",
+    postInstallNotesReminder: "補足：",
+    postInstallNotesReminderText:
+      "node setup.mjs --check でいつでも導入状態を確認できます。",
     setupError: "セットアップエラー：",
     selectLang: "Select language / 选择语言 / 言語を選択 / 언어 선택",
     choose: (n) => `選択 (1-${n})`,
     inquirerSingleHotkeys: "↑↓ 移動 · ⏎ 確定",
-    inquirerMultiHotkeys:
-      "↑↓ 移動 · Space 切替 · ⏎ 確定 · a 全選択 · i 反転",
+    inquirerMultiHotkeys: "↑↓ 移動 · Space 切替 · ⏎ 確定 · a 全選択 · i 反転",
     globalInstallPrompt:
       "Meta_Kim スキルは ~/.claude/skills/（グローバル）にインストールされます。グローバルインストールしますか？",
     globalDirReady: (p) => `グローバルスキルディレクトリ準備完了：${p}`,
@@ -869,6 +977,22 @@ const I18N = {
     graphifyHookInstalled:
       "graphify git hookインストール完了（commit/checkout時に自動再構築）",
     graphifyHookFailed: "graphify git hookインストール失敗（非ブロッキング）",
+    stepMcpMemory: "MCP Memory Service（第三層）",
+    mcpMemoryInstalling: "MCP Memory Service（第三層）をインストール中...",
+    mcpMemoryInstalled: "MCP Memory Service がインストールされました",
+    mcpMemoryInstallFailed:
+      "MCP Memory Service インストール失敗（非ブロッキング）",
+    mcpMemoryAlreadyInstalled: (v) =>
+      `MCP Memory Service ${v} — すでにインストール済み`,
+    mcpMemoryServerRegistered:
+      "MCP Memory Service が .mcp.json に登録されました",
+    mcpMemoryServerExists:
+      ".mcp.json にはすでに MCP Memory Service がありません",
+    askMcpMemoryInstall:
+      "MCP Memory Service（第三層）をインストールしますか？sqlite-vec によるベクトル級セッション記憶を提供します。",
+    mcpMemorySkipped: "MCP Memory Service をスキップしました",
+    mcpMemoryServerStartHint:
+      "MCP Memory Service がインストールされました——起動方法：python -m mcp_memory_service  （または：uv run memory server -s hybrid）",
     updateHeading: "アップデートモード",
     updateNpm: "npm依存関係を再インストール中...",
     updateSkills: "すべてのスキルを更新中...",
@@ -953,6 +1077,7 @@ const I18N = {
     proxySaved: (url) => `プロキシを保存：${url}`,
     stepLabel: (n, label) => `ステップ ${n}：${label}`,
     progressInstallPython: "Python graphify ツールをインストール",
+    progressInstallMcpMemory: "MCP Memory Service（第三層）をインストール",
     checkTargets: (active, supported) =>
       `activeTargets=${active} supportedTargets=${supported}`,
     localStateHeader: "ローカル状態",
@@ -1056,6 +1181,33 @@ const I18N = {
     cmdCheck: "환경 확인",
     cmdDoctor: "Meta_Kim 상태 진단",
     cmdVerify: "전체 검증",
+    // 설치 후 주의사항
+    postInstallNotesHeading: "설치 후 주의사항:",
+    postInstallNotesIntro: "설치 완료 후 각 층의 사용 방식은 다음과 같습니다:",
+    postInstallNotesPlatformSync: "각 플랫폼 동기화 현황:",
+    platformClauleCode: "Claude Code",
+    platformClauleCodeCap:
+      "agents + skills + hooks (Layer 1 Memory 자동 / Layer 2 Graphify 자동 / Layer 3 SQL 서버 시작 필요)",
+    platformCodex: "Codex",
+    platformCodexCap:
+      "agents + skills (Layer 1 Memory hooks 수동 설정 필요 / Layer 2 Graphify 자동 / Layer 3 SQL 서버 시작 필요)",
+    platformOpenClaw: "OpenClaw",
+    platformOpenClawCap:
+      "workspace + skills (Layer 1 Memory hooks 수동 설정 필요 / Layer 2 Graphify 자동 / Layer 3 SQL 서버 시작 필요)",
+    platformCursor: "Cursor",
+    platformCursorCap:
+      "agents + skills (Layer 1 Memory hooks 수동 설정 필요 / Layer 2 Graphify 자동 / Layer 3 SQL 서버 시작 필요)",
+    postInstallNotesLayerActivation: "3층 메모리 활성화 방식:",
+    layer1Label: "제1층 (Memory)",
+    layer1Note: "자동 활성화 — Claude Code에 내장됨",
+    layer2Label: "제2층 (Graphify)",
+    layer2Note: "graphifyy 설치 후 자동 활성화 (pip install graphifyy)",
+    layer3Label: "제3층 (SQL / MCP Memory Service)",
+    layer3Note:
+      "서버 수동 시작 필요: python -m mcp_memory_service (그러면 http://localhost:8888 에 접속)",
+    postInstallNotesReminder: "참고:",
+    postInstallNotesReminderText:
+      "node setup.mjs --check로 언제든지 설치 상태를 확인할 수 있습니다.",
     setupError: "설정 오류:",
     selectLang: "Select language / 选择语言 / 言語を選択 / 언어 선택",
     choose: (n) => `선택 (1-${n})`,
@@ -1144,6 +1296,18 @@ const I18N = {
     graphifyHookInstalled:
       "graphify git hook 설치 완료 (commit/checkout 시 자동 재구축)",
     graphifyHookFailed: "graphify git hook 설치 실패 (비차단)",
+    stepMcpMemory: "MCP Memory Service（3층）",
+    mcpMemoryInstalling: "MCP Memory Service（3층） 설치 중...",
+    mcpMemoryInstalled: "MCP Memory Service 설치 완료",
+    mcpMemoryInstallFailed: "MCP Memory Service 설치 실패 (비차단)",
+    mcpMemoryAlreadyInstalled: (v) => `MCP Memory Service ${v} — 이미 설치됨`,
+    mcpMemoryServerRegistered: "MCP Memory Service 가 .mcp.json 에 등록됨",
+    mcpMemoryServerExists: ".mcp.json 에 이미 MCP Memory Service 있음",
+    askMcpMemoryInstall:
+      "MCP Memory Service（3층）를 설치하시겠습니까? sqlite-vec 로 벡터 수준 세션 기억을 제공합니다.",
+    mcpMemorySkipped: "MCP Memory Service 건너뜀",
+    mcpMemoryServerStartHint:
+      "MCP Memory Service 설치 완료——시작 방법: python -m mcp_memory_service  (또는: uv run memory server -s hybrid)",
     updateHeading: "업데이트 모드",
     updateNpm: "npm 의존성 재설치 중...",
     updateSkills: "모든 스킬 업데이트 중...",
@@ -1218,6 +1382,7 @@ const I18N = {
     proxySaved: (url) => `프록시 저장됨: ${url}`,
     stepLabel: (n, label) => `단계 ${n}：${label}`,
     progressInstallPython: "Python graphify 도구 설치",
+    progressInstallMcpMemory: "MCP Memory Service（3층） 설치",
     checkTargets: (active, supported) =>
       `activeTargets=${active} supportedTargets=${supported}`,
     localStateHeader: "로컬 상태",
@@ -1389,9 +1554,7 @@ function inquirerThemeMulti() {
 
 function formatSelectChoiceLabel(option) {
   const text =
-    typeof option === "string"
-      ? option
-      : option.label || option.toString();
+    typeof option === "string" ? option : option.label || option.toString();
   return stripAnsi(text);
 }
 
@@ -1447,9 +1610,7 @@ async function keyboardSelect(question, options) {
     theme: inquirerThemeSingle(),
   });
 
-  return typeof answer === "number" &&
-    answer >= 0 &&
-    answer < options.length
+  return typeof answer === "number" && answer >= 0 && answer < options.length
     ? answer
     : 0;
 }
@@ -2410,6 +2571,92 @@ async function installPythonTools() {
   }
 }
 
+// ── Step 4.6: Optional MCP Memory Service (Layer 3) ─────
+
+function checkMcpMemoryService(spawnFn = spawnSync) {
+  const result = spawnFn("pip", ["show", "mcp-memory-service"], {
+    encoding: "utf8",
+    shell: false,
+  });
+  if (result.status !== 0) {
+    return { installed: false, version: null };
+  }
+  const versionMatch = (result.stdout || "").match(/Version:\s*(.+)/i);
+  return {
+    installed: true,
+    version: versionMatch ? versionMatch[1].trim() : null,
+  };
+}
+
+async function installMcpMemoryServiceStep() {
+  heading(t.stepMcpMemory);
+
+  // Check if already installed
+  const existing = checkMcpMemoryService();
+  if (existing.installed) {
+    ok(t.mcpMemoryAlreadyInstalled(existing.version ?? "unknown"));
+  } else {
+    // Ask user (unless in silent mode)
+    const want = await askYesNo(t.askMcpMemoryInstall, true);
+    if (!want) {
+      skip(`${C.dim}${t.mcpMemorySkipped}${C.reset}`);
+      return;
+    }
+
+    // Install via pip
+    info(t.mcpMemoryInstalling);
+    const installResult = spawnSync("pip", ["install", "mcp-memory-service"], {
+      encoding: "utf8",
+      shell: false,
+      stdio: "pipe",
+    });
+    if (installResult.status !== 0) {
+      const stderr = readProcessText(installResult);
+      warn(t.mcpMemoryInstallFailed);
+      if (stderr) {
+        console.log(`${C.dim}${t.pipErrorDetail(stderr)}${C.reset}`);
+      }
+    } else {
+      ok(t.mcpMemoryInstalled);
+    }
+  }
+
+  // Register in .mcp.json
+  const mcpPath = join(PROJECT_DIR, ".mcp.json");
+  if (existsSync(mcpPath)) {
+    try {
+      const mcpConfig = JSON.parse(readFileSync(mcpPath, "utf8"));
+      if (mcpConfig.mcpServers?.["mcp-memory-service"]) {
+        ok(t.mcpMemoryServerExists);
+      } else {
+        if (!mcpConfig.mcpServers) mcpConfig.mcpServers = {};
+        mcpConfig.mcpServers["mcp-memory-service"] = {
+          command: "python",
+          args: ["-m", "mcp_memory_service"],
+        };
+        writeFileSync(mcpPath, JSON.stringify(mcpConfig, null, 2) + "\n");
+        ok(t.mcpMemoryServerRegistered);
+      }
+    } catch {
+      warn(t.mcpMemoryServerExists);
+    }
+  } else {
+    // Create minimal .mcp.json with just the memory service
+    const newConfig = {
+      mcpServers: {
+        "mcp-memory-service": {
+          command: "python",
+          args: ["-m", "mcp_memory_service"],
+        },
+      },
+    };
+    writeFileSync(mcpPath, JSON.stringify(newConfig, null, 2) + "\n");
+    ok(t.mcpMemoryServerRegistered);
+  }
+
+  info(t.mcpMemoryServerStartHint);
+}
+
 function ensureNetworkxCompatibility(python) {
   const nx = checkNetworkx(python);
   if (!nx.installed) {
@@ -2528,6 +2775,42 @@ function showNextSteps(runtimes) {
   );
   console.log(
     `${C.dim}npm run verify:all                # ${t.cmdVerify}${C.reset}`,
+  );
+
+  console.log("");
+  console.log(`${C.bold}${t.postInstallNotesHeading}${C.reset}`);
+  console.log(`${C.dim}${t.postInstallNotesIntro}${C.reset}`);
+  console.log("");
+  console.log(
+    `${C.bold}${C.cyan}● ${t.postInstallNotesPlatformSync}${C.reset}`,
+  );
+  const platformRows = [
+    { name: t.platformClauleCode, cap: t.platformClauleCodeCap },
+    { name: t.platformCodex, cap: t.platformCodexCap },
+    { name: t.platformOpenClaw, cap: t.platformOpenClawCap },
+    { name: t.platformCursor, cap: t.platformCursorCap },
+  ].filter(
+    (r) =>
+      runtimes[
+        r.name
+          .replace("platform", "")
+          .toLowerCase()
+          .replace("claulecode", "claude")
+      ] || r.name === t.platformClauleCode,
+  );
+  for (const row of platformRows) {
+    console.log(`${C.dim}  • ${row.name}: ${row.cap}${C.reset}`);
+  }
+  console.log("");
+  console.log(
+    `${C.bold}${C.cyan}● ${t.postInstallNotesLayerActivation}${C.reset}`,
+  );
+  console.log(`${C.dim}  ${t.layer1Label} — ${t.layer1Note}${C.reset}`);
+  console.log(`${C.dim}  ${t.layer2Label} — ${t.layer2Note}${C.reset}`);
+  console.log(`${C.dim}  ${t.layer3Label} — ${t.layer3Note}${C.reset}`);
+  console.log("");
+  console.log(
+    `${C.dim}${C.yellow}★ ${t.postInstallNotesReminder} ${t.postInstallNotesReminderText}${C.reset}`,
   );
   console.log("");
 }
@@ -2734,18 +3017,24 @@ async function main() {
       `${C.dim}${t.checkTargets(targetContext.activeTargets.join(", "), targetContext.supportedTargets.join(", "))}${C.reset}`,
     );
     const localState = await ensureProfileState();
-    console.log(`${C.bold}  ${t.localStateHeader}${C.reset}`);
+    console.log("");
+    console.log(`${C.bold}${t.localStateHeader}${C.reset}`);
     console.log(
-      `    ${C.dim}${t.localStateProfile(localState.profile, localState.metadata.profileKey)}${C.reset}`,
+      `${C.dim}  profile=${localState.profile} key=${localState.metadata.profileKey}${C.reset}`,
     );
     console.log(
-      `    ${C.dim}${t.localStateRunIndex(toRepoRelative(localState.runIndexPath))}${C.reset}`,
+      `${C.dim}  run index: ${toRepoRelative(localState.runIndexPath)}${C.reset}`,
     );
     console.log(
-      `    ${C.dim}${t.localStateCompaction(toRepoRelative(localState.compactionDir))}${C.reset}`,
+      `${C.dim}  compaction: ${toRepoRelative(localState.compactionDir)}${C.reset}`,
     );
-    console.log(`    ${C.dim}${t.localStateDispatch}${C.reset}`);
-    console.log(`    ${C.dim}${t.localStateMigration}${C.reset}\n`);
+    console.log(
+      `${C.dim}  dispatch envelope: config/contracts/workflow-contract.json -> protocols.dispatchEnvelopePacket${C.reset}`,
+    );
+    console.log(
+      `${C.dim}  migration helper: npm run migrate:meta-kim -- <source-dir> --apply${C.reset}`,
+    );
+    console.log("");
     process.exit(0);
   }
 
@@ -2892,7 +3181,16 @@ async function runInstall() {
     },
   );
 
-  // 验证：project-only 和 both 检查 repo-local；global-only 跳过 repo-local 检查
+  // [Optional] MCP Memory Service (Layer 3)
+  stepNum++;
+  await withProgress(
+    t.stepLabel(stepNum, t.progressInstallMcpMemory),
+    async () => {
+      await installMcpMemoryServiceStep();
+    },
+  );
+
+  //验证：project-only 和 both 检查 repo-local；global-only 跳过 repo-local 检查
   stepNum++;
   await withProgress(t.stepLabel(stepNum, t.progressValidate), async () => {
     if (needProject) {
@@ -2938,6 +3236,10 @@ async function runUpdate() {
   } else {
     skip(`${C.dim}${t.pythonToolsSkipped}${C.reset}`);
   }
+
+  // ── 2.5 [Optional] MCP Memory Service (Layer 3) ─────────────────
+  console.log("");
+  await installMcpMemoryServiceStep();
 
   // ── 3. sync-runtimes (scope from user selection) ──────────────────
   if (updateScope === "global") {
