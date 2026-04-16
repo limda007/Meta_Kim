@@ -262,11 +262,19 @@ Files that should usually remain derived or runtime-specific:
 
 Meta_Kim can leverage [graphify](https://github.com/safishamsi/graphify) (`pip install graphifyy`) to generate compressed code knowledge graphs for **target projects** (not Meta_Kim itself). This provides up to 71x token compression via subgraph extraction instead of raw file reading.
 
+### Three different things (do not confuse them)
+
+1. **Refreshing `graphify-out/` (data)** — `python -m graphify hook install` registers **per-repo** git hooks (post-commit / post-checkout) so the graph rebuilds when you commit or checkout; `npm run graphify:install` / `node setup.mjs` (optional Python step) also run `claude install` + `hook install` **idempotently** even if graphify was already installed via pip.
+2. **Using the graph in governance (behavior)** — `canonical/skills/meta-theory/references/dev-governance.md` Fetch **Step 0.5** tells the model to check `graphify-out/graph.json` and quality gates; this is **not** a background daemon — the skill must be followed.
+3. **Claude Code subagents (hint only)** — `subagent-context.mjs` injects a short rule to prefer `GRAPH_REPORT.md` then `graph.json`; it does **not** embed those files into context automatically.
+
+Codex / OpenClaw / Cursor do not get that SubagentStart hook from `sync:runtimes`; they still get the same **meta-theory** references after sync. Use **`python -m graphify codex install`** or **`python -m graphify claw install`** in a **target repo** if you want graphify to patch that repo’s `AGENTS.md` (see `python -m graphify --help`). Meta_Kim’s root `AGENTS.md` is maintained here; prefer the Fetch step + reading `graphify-out/GRAPH_REPORT.md` over duplicating installers unless you know the merge impact.
+
 ### How It Works
 
 1. **graphify** generates `graphify-out/graph.json` in the target project root (NetworkX node-link JSON with nodes, edges, and confidence scores)
-2. Meta_Kim's Fetch stage (Step 0.5) auto-detects the graph — no manual intervention needed
-3. All dispatched agents receive graph context via `subagent-context.mjs` hook
+2. Meta_Kim’s Fetch stage (Step 0.5 in `dev-governance.md`) describes auto-detection and refresh rules for the model — not an IDE-managed pipeline
+3. **Claude Code** dispatched subagents get the graph **hint** via `subagent-context.mjs` (see above)
 4. For complex projects (>50 graph nodes), a **project-level conductor** can be auto-created via Type B pipeline
 
 ### Auto-Trigger Conditions
@@ -280,14 +288,17 @@ Graph context is used automatically when ALL conditions are met:
 ### Installation
 
 ```bash
-# Via setup.mjs (interactive, auto-detects Python)
+# Via setup.mjs (interactive, auto-detects Python; optional step installs pip package + claude install + hook install)
 node setup.mjs
 
 # Via install-deps.sh
 bash install-deps.sh
 
+# Repo helper (pip install graphifyy + claude install + hook install for cwd)
+npm run graphify:install
+
 # Manual
-pip install graphifyy && python -m graphify claude install
+pip install graphifyy && python -m graphify claude install && python -m graphify hook install
 
 # Check status
 npm run graphify:check
@@ -365,3 +376,12 @@ For human readers:
 ## One-Line Summary
 
 Claude Code is not a separate product logic here. It is one runtime projection of the Meta_Kim governance system.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current

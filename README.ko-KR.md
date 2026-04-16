@@ -589,8 +589,9 @@ Meta_Kim은 단일 기억 레이어를 사용하지 않습니다. 세 가지 다
 ### 2층: Graphify (프로젝트 수준 LLM 위키)
 
 - **책임**: 프로젝트 수준 코드 지식 그래프
-- **저장 위치**: `graphify-out/graph.json` (NetworkX node-link 형식)
-- **메커니즘**: `node setup.mjs`가 graphify 설치, git hook 등록(commit/checkout 시 자동 재구축), 초기 그래프 생성——전부 자동
+- **저장 위치**: `graphify-out/graph.json` (NetworkX node-link 형식). 심층 탐색 시 동일 디렉터리 `GRAPH_REPORT.md` 우선
+- **메커니즘 (데이터)**: `node setup.mjs` 선택 Python 단계는 graphify 설치 후 **멱등적으로** `python -m graphify claude install` 및 `python -m graphify hook install` 실행(pip로 이미 설치된 경우에도 hook 보완). git hook은 **현재 리포지토리**에서 commit/checkout 시 재구축. `npm run graphify:install`도 동일(hook 포함).
+- **메커니즘 (사용)**: 동기화된 meta-theory `dev-governance.md` Fetch **Step 0.5**가 모델 측 검출/사용 규칙. 백그라운드 데몬 아님. Claude Code 하위 에이전트는 `subagent-context.mjs`로 **짧은 힌트**만. Codex/OpenClaw/Cursor는 SubagentStart hook 없음, `sync:runtimes` 후 동일 참조 공유. 다른 런타임은 **대상 리포지토리**에서 `python -m graphify codex install` 또는 `claw install` 선택(`python -m graphify --help`).
 - **핵심 가치**:
   - 기억이 프로젝트에 점점 익숙해집니다 — 코드 원문이 아닌 구조와 관계를 이해
   - **환각 대폭 감소** — agent가 기억에 의존해 지어내는 대신 그래프 사실에 기반하여 응답
@@ -599,7 +600,7 @@ Meta_Kim은 단일 기억 레이어를 사용하지 않습니다. 세 가지 다
   - 모호한 노드 > 30% → 저품질 그래프로 표시, 직접 파일 읽기로 대체
   - 총 노드 < 10 → 그래프가 너무 희소, Glob/Grep으로 대체
   - "갓 노드"(높은 진입도) → 직렬 병목으로 플래그
-- **활성화**: `node setup.mjs`가 올인원——설치, 의존성 체크(networkx >= 3.4), git hook, 초기 그래프 생성
+- **활성화**: 선택 Python 단계 `node setup.mjs` 또는 `npm run graphify:install`——설치/검사, networkx, Claude 측 등록, **해당 리포지토리** git hook. 최초 그래프 생성은 hook 실행 또는 수동 빌드에 따름
 - **쿼리**: `python -m graphify query "당신의 질문"`——자연어로 코드 그래프에 쿼리
 
 ### 3층: SQL (벡터 수준 세션 검색)

@@ -241,6 +241,14 @@ Files that should usually be treated as mirrors or adapters:
 - `openclaw/skills/` and `openclaw/workspaces/*`
 - `openclaw/openclaw.template.json` (from `canonical/runtime-assets/openclaw/`)
 
+## Code graph (`graphify-out/`) — Codex, OpenClaw, Cursor
+
+There is **no** `SubagentStart` hook in the Codex / OpenClaw / Cursor projections from `config/sync.json` (only `.claude/hooks/` carries `subagent-context.mjs`). Cross-runtime parity for **how to use** a graph is the synced **meta-theory** reference `canonical/skills/meta-theory/references/dev-governance.md` (Fetch **Step 0.5**).
+
+**When `graphify-out/graph.json` exists in the repo root** (this repo or a target project): for complex or multi-file work, follow Fetch Step 0.5 and **prefer reading `graphify-out/GRAPH_REPORT.md` first** when present, then `graph.json` or subgraph queries as needed.
+
+**Refreshing the graph**: per-repo git hooks from `python -m graphify hook install` (also run from `node setup.mjs` optional Python step and `npm run graphify:install`). Optional: in a **non–Meta_Kim target repo**, `python -m graphify codex install` or `python -m graphify claw install` can add graphify sections per upstream graphify CLI — do not run those blindly on Meta_Kim’s canonical `AGENTS.md` without reviewing merge impact.
+
 ## Recommended Maintenance Loop
 
 After changing canonical files:

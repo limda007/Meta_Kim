@@ -590,8 +590,9 @@ Each layer has different activation requirements:
 ### Layer 2: Graphify (project-level LLM wiki)
 
 - **Responsibility**: project-level code knowledge graph
-- **Storage**: `graphify-out/graph.json` (NetworkX node-link format)
-- **Mechanism**: `node setup.mjs` installs graphify, registers git hooks (auto-rebuild on commit/checkout), and generates the initial graph — all automatic
+- **Storage**: `graphify-out/graph.json` (NetworkX node-link format); for humans and agents, prefer `graphify-out/GRAPH_REPORT.md` when present
+- **Mechanism (data)**: `node setup.mjs` (optional Python step) installs graphify and **idempotently** runs `python -m graphify claude install` and `python -m graphify hook install` even if graphify was already installed via pip; git hooks rebuild the graph on commit/checkout in the **current repo**. `npm run graphify:install` does the same (including hooks).
+- **Mechanism (usage)**: synced meta-theory `dev-governance.md` Fetch **Step 0.5** defines how the model should detect and use the graph — not a background service. Claude Code subagents get a **short hint** via `subagent-context.mjs`, not automatic embedding of `graph.json`. Codex / OpenClaw / Cursor share the same reference after `sync:runtimes` but have no SubagentStart hook; optional `python -m graphify codex install` or `python -m graphify claw install` in a **target repo** patches that repo’s docs per graphify CLI (`python -m graphify --help`).
 - **Core value**:
   - Make memory increasingly familiar with the project - not by remembering raw code, but by understanding structure and relationships
   - **Reduce hallucinations** - agents answer from graph facts instead of guessing
@@ -600,7 +601,7 @@ Each layer has different activation requirements:
   - Fuzzy nodes > 30% -> mark the graph as low quality and fall back to direct file reads
   - Total nodes < 10 -> the graph is too sparse and should fall back to Glob/Grep
   - A "god node" with too many incoming edges -> mark as a serial bottleneck
-- **Activation**: `node setup.mjs` handles everything — install, dependency check (networkx >= 3.4), git hooks, initial graph generation
+- **Activation**: `node setup.mjs` optional Python step or `npm run graphify:install` — install/check, networkx, Claude-side registration, **this repo’s** git hooks; first graph build still depends on a hook run or a manual build command
 - **Query**: `python -m graphify query "your question"` — natural language query against the code graph
 
 ### Layer 3: SQL (vector-level session retrieval)

@@ -73,6 +73,17 @@ function installGraphify({ upgrade = false } = {}) {
   );
   if (installResult.status !== 0) {
     process.exitCode = installResult.status || 1;
+    return;
+  }
+
+  const hookResult = runPythonModule(
+    python,
+    ["-m", "graphify", "hook", "install"],
+    undefined,
+    { stdio: "inherit" },
+  );
+  if (hookResult.status !== 0) {
+    process.exitCode = hookResult.status || 1;
   }
 }
 

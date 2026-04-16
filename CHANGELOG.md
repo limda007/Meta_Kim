@@ -8,6 +8,8 @@ When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the
 
 ### Changed
 
+- **graphify (install + docs + tests)**: `setup.mjs` optional Python step and `npm run graphify:install` now **idempotently** run `python -m graphify claude install` and `python -m graphify hook install` even when `graphifyy` is already installed via pip (fixes silent skip of git hooks). `scripts/graphify-cli.mjs` `install`/`update` appends `hook install`. `install-global-skills-all-runtimes.mjs` runs the same wiring when pip reports graphify already present. **Docs** (`CLAUDE.md`, `README.md` / `README.zh-CN.md` / `README.ja-JP.md` / `README.ko-KR.md`, `AGENTS.md`): separate **data refresh** (hooks/commands) vs **Fetch Step 0.5** (model behavior) vs **Claude subagent hint** (no embedding); Codex/OpenClaw/Cursor consumption via synced `dev-governance.md` and optional `graphify codex|claw install` in target repos. **Hook** [`canonical/runtime-assets/claude/hooks/subagent-context.mjs`](canonical/runtime-assets/claude/hooks/subagent-context.mjs): prefer `graphify-out/GRAPH_REPORT.md` when present. **Tests**: [`tests/setup/graphify-wiring-contract.test.mjs`](tests/setup/graphify-wiring-contract.test.mjs) locks the contract.
+
 - **Documentation (CLAUDE.md)**: Clarified generated/runtime wiring vs canonical edit targets; Cursor as fourth runtime projection; expanded maintenance commands (`check`, `check:global:meta-theory`, `deps:update`, `graphify:install`, `prompt:next-iteration`, etc.); graphify working-directory notes.
 
 ### Fixed

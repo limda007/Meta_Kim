@@ -2540,31 +2540,31 @@ async function installPythonTools() {
     const version =
       extractPipShowVersion(readProcessText(pipShow)) ?? "unknown";
     ok(t.graphifyAlreadyInstalled(version));
-    // Still check networkx even if graphify was already installed
-    ensureNetworkxCompatibility(python);
-    return;
-  }
-
-  // Install graphify
-  info(t.graphifyInstalling);
-  const installResult = runPythonModule(
-    python,
-    ["-m", "pip", "install", "graphifyy"],
-    undefined,
-    { stdio: "pipe" },
-  );
-  if (installResult.status !== 0) {
-    const stderr = readProcessText(installResult);
-    warn(t.graphifyInstallFailed);
-    if (stderr) {
-      console.log(`${C.dim}${t.pipErrorDetail(stderr)}${C.reset}`);
+  } else {
+    // Install graphify
+    info(t.graphifyInstalling);
+    const installResult = runPythonModule(
+      python,
+      ["-m", "pip", "install", "graphifyy"],
+      undefined,
+      { stdio: "pipe" },
+    );
+    if (installResult.status !== 0) {
+      const stderr = readProcessText(installResult);
+      warn(t.graphifyInstallFailed);
+      if (stderr) {
+        console.log(`${C.dim}${t.pipErrorDetail(stderr)}${C.reset}`);
+      }
+      return;
     }
-    return;
+    ok(t.graphifyInstalled);
   }
-  ok(t.graphifyInstalled);
 
-  // Register Claude skill — use python -m graphify, not bare "graphify" command
-  // graphifyy installs a module, not a system PATH command on Windows
+  // Ensure networkx >= 3.4 for louvain_communities(max_level) compatibility
+  ensureNetworkxCompatibility(python);
+
+  // Idempotent wiring: always (re)register Claude skill + repo git hooks when graphify is present.
+  // Earlier setup skipped these when graphify was already pip-installed, leaving graphify-out stale.
   info(t.graphifySkillRegistering);
   const skillResult = runPythonModule(
     python,
@@ -2578,10 +2578,6 @@ async function installPythonTools() {
     warn(t.graphifySkillFailed);
   }
 
-  // Ensure networkx >= 3.4 for louvain_communities(max_level) compatibility
-  ensureNetworkxCompatibility(python);
-
-  // Install git hooks so graphify auto-updates on every commit/checkout
   info(t.graphifyHookInstalling);
   const hookResult = runPythonModule(
     python,

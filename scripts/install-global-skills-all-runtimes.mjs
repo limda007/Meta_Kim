@@ -2009,6 +2009,21 @@ async function main() {
       console.log(t.pythonNotFoundGraphify);
       console.log(t.pythonInstallHintGraphify);
     } else {
+      const ensureGraphifyWiring = () => {
+        runPythonModule(
+          python,
+          ["-m", "graphify", "claude", "install"],
+          undefined,
+          { stdio: "pipe" },
+        );
+        runPythonModule(
+          python,
+          ["-m", "graphify", "hook", "install"],
+          undefined,
+          { stdio: "pipe" },
+        );
+      };
+
       // Check if graphify already installed via pip show (more reliable than --version)
       const pipShow = runPythonModule(python, [
         "-m",
@@ -2020,6 +2035,7 @@ async function main() {
         const version =
           extractPipShowVersion(readProcessText(pipShow)) ?? "unknown";
         console.log(`[SKIP] ${t.skipGraphifyInstalled(version)}`);
+        ensureGraphifyWiring();
       } else {
         console.log(t.installingGraphify);
         const pipResult = runPythonModule(
@@ -2029,13 +2045,7 @@ async function main() {
           { stdio: "pipe" },
         );
         if (pipResult.status === 0) {
-          // Register Claude skill silently
-          runPythonModule(
-            python,
-            ["-m", "graphify", "claude", "install"],
-            undefined,
-            { stdio: "pipe" },
-          );
+          ensureGraphifyWiring();
           console.log(t.okGraphifyInstalled);
         } else {
           console.warn(`${C.yellow}⚠${C.reset} ${t.warnGraphifyPipFailed}`);

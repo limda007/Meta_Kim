@@ -587,8 +587,9 @@ Meta_Kim の記憶は一枚岩ではありません。3 層に分かれ、各層
 ### 第二層: Graphify（プロジェクト級 LLM Wiki）
 
 - **何を担うか**: プロジェクト単位のコード知識グラフ
-- **保存先**: `graphify-out/graph.json`（NetworkX のノードリンク形式）
-- **動き**: `node setup.mjs` が graphify をインストールし、git hook を登録し（commit/checkout 時自動再構築）、初期グラフを生成——すべて自動
+- **保存先**: `graphify-out/graph.json`（NetworkX のノードリンク形式）。深く読む場合は同ディレクトリの `GRAPH_REPORT.md` を優先
+- **動き（データ）**: `node setup.mjs` のオプション Python 手順は graphify を入れ、**冪等に** `python -m graphify claude install` と `python -m graphify hook install` を実行（pip で既に入っていても hook を補完）。git hook は **現在のリポジトリ** で commit/checkout 時に再構築。`npm run graphify:install` も同様（hook 含む）。
+- **動き（利用）**: 同期済み meta-theory の `dev-governance.md` Fetch **Step 0.5** がモデル側の検出・利用ルール。バックグラウンド常駐ではない。Claude Code 子エージェントは `subagent-context.mjs` で**短いヒント**のみ。Codex / OpenClaw / Cursor は SubagentStart hook がないが `sync:runtimes` 後は同じ参照を共有。他ランタイムは**対象リポジトリ**で `python -m graphify codex install` や `claw install` を任意で（`python -m graphify --help`）。
 - **価値**:
   - ただのコード文字列ではなく、構造と関係を理解できます
   - **幻覚を大きく減らします** - 記憶で捏造せず、グラフの事実に基づいて答えます
@@ -597,7 +598,7 @@ Meta_Kim の記憶は一枚岩ではありません。3 層に分かれ、各層
   - あいまいノードが 30% 超 → 低品質グラフとして扱い、直接ファイル読み込みへ戻す
   - 総ノード数が 10 未満 → グラフが疎すぎるので Glob/Grep へ戻す
   - 「神ノード」（入次数が高すぎる）→ 直列ボトルネックとして扱う
-- **激活**: `node setup.mjs` がオールインワン——インストール、依存チェック（networkx >= 3.4）、git hook、初期グラフ生成
+- **激活**: オプション Python 手順の `node setup.mjs` または `npm run graphify:install`——インストール/確認、networkx、Claude 側登録、**当該リポジトリ**の git hook。初回グラフ生成は hook 実行または手動ビルドに依存
 - **查询**: `python -m graphify query "あなたの質問"`——自然言語でコードグラフにクエリ
 
 ### 第三層: SQL（ベクトル級セッション検索）
