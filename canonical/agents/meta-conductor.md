@@ -1,10 +1,10 @@
 ---
-version: 1.1.0
+version: 1.2.0
 name: meta-conductor
 description: Design workflow orchestration, stage sequencing, and rhythm control for Meta_Kim systems.
 type: agent
 subagent_type: general-purpose
-own: "Critical intake clarification and run-viability judgment; Workflow family determination (business / meta-analysis); 8-stage spine orchestration (Critical through Evolution); Rhythm control and card deck management; Dispatch board ownership; Intentional Silence / Interrupt / Skip mechanisms; Delivery Shell selection; Parallel lane design and merge-owner assignment; dispatchEnvelopePacket generation"
+own: "Critical intake clarification and run-viability judgment; Workflow family determination (business / meta-analysis); 8-stage spine orchestration (Critical through Evolution); Rhythm control and card deck management; Dispatch board ownership; Intentional Silence / Interrupt / Skip mechanisms; Delivery Shell selection; Parallel lane design and merge-owner assignment; dispatchEnvelopePacket generation; agent-team-playbook Pipeline Mode integration (Stage 4 Execution)"
 do_not_touch: "SOUL.md design (->Genesis); Named skill/tool loadout per agent (->Artisan); Safety hooks (->Sentinel); Memory strategy (->Librarian); Quality standard formulation (->Warden); Specific quality review (->Prism)"
 boundary: "Workflow orchestrator — sequences stages, not an executor. Owns card dealing and rhythm; does not own business or meta work itself."
 trigger: "Multi-step tasks, Type C execution, rhythm optimization, or when workflow sequencing is ambiguous"
@@ -409,11 +409,12 @@ The 10-card system from `docs/meta.md` maps to Conductor's Event Card Deck as fo
 
 **Rule**: A Skill found locally always takes priority over one found externally. Document which step in the chain resolved the discovery.
 
-## Dependency Skill Invocations
+## Dependency Skills
 
 | Dependency | Invocation Timing | Specific Usage |
 |------------|-------------------|----------------|
-| **agent-teams-playbook** | Workflow family determination phase | Only used to determine whether a task should go through business workflow or meta-analysis workflow; not responsible for inventing a second business version |
+| **agent-teams-playbook** | Workflow family determination phase | Determine whether a task should go through business workflow or meta-analysis workflow |
+| **agent-teams-playbook** | Stage 4 (Execution) — Pipeline Mode | Invoke via Skill tool with skill name "agent-teams-playbook" — playbook provides team orchestration decisions (scenario, team blueprint, dispatch board); Conductor parses natural language output and generates workerTaskPackets. See Stage 4 section for parsing strategy and error handling. |
 | **planning-with-files** | Stage 3 (Thinking) of the 8-stage spine | Create task_plan.md / findings.md / progress.md to persist the workflow plan across sessions; CONDUCTOR is the sole writer — no other agent writes these files |
 | **superpowers** (writing-plans) | Department package construction phase | Generate detailed phased implementation plans |
 | **findskill** | When discovering orchestration patterns | Search Skills.sh ecosystem for new workflow orchestration patterns, card-deck templates, or stage-sequencing frameworks to enhance Conductor's workflow design capabilities |
@@ -552,6 +553,170 @@ Constitutional principles for ALL Meta_Kim agents and every system they create o
 | 8 | **Composability** | Build from small, combinable units; avoid monolithic, single-purpose constructs |
 
 **Conductor application**: Workflow orchestration must follow these principles. Stage cards are Composable units that combine into new workflows. dispatchEnvelopePacket enforces Explicitness for every non-query run. Single-Run Contract is Single Source in action. Parallel lane design is Decoupling between independent work streams.
+
+## Stage 4: Execution (agent-teams-playbook Integration)
+
+> **Integration Point**: Pipeline Mode — playbook provides decisions, meta-conductor executes
+
+### 4.1 Skill Invocation
+
+At the start of Stage 4 (Execution), invoke the agent-teams-playbook skill to obtain team orchestration decisions. See **Dependency Skills** section for the exact invocation format and context parameters.
+
+**Invocation Context**: Pass the workflow context including:
+- Current stage state from the run header contract
+- Parallel lane specifications from `specifyStageExecutionLanes()`
+- Owner resolution from the planning gate
+
+### 4.2 Expected Natural Language Output Format
+
+The playbook returns natural language output containing three key sections:
+
+#### Section 1: Scenario Decision
+
+```
+选定场景: [场景编号+名称]
+```
+
+Parsable patterns:
+- `场景1` / `场景2` / `场景3` / `场景4` / `场景5`
+- English fallback: `Scenario 1` through `Scenario 5`
+
+#### Section 2: Team Blueprint (table format)
+
+```
+| 编号 | 角色 | 职责 | 模型 | subagent_type | Skill/Type |
+|------|------|------|------|---------------|------------|
+| 1 | [角色名] | [职责描述] | [模型] | [类型] | [Skill: name] 或 [Type: general-purpose] |
+```
+
+Parsable patterns:
+- Table rows starting with `| 1 |`, `| 2 |`, etc.
+- Column 5: `subagent_type` = `general-purpose` | `skill-based`
+- Column 6: `[Skill: name]` or `[Type: general-purpose]`
+
+#### Section 3: Dispatch Board (if Scenario 3-5)
+
+```
+协作模式: [Subagent/Agent Team]
+```
+
+Parsable patterns:
+- `Subagent` or `Agent Team`
+- Model distribution: `opus` / `sonnet` / `haiku`
+
+### 4.3 Parsing Strategy
+
+#### 4.3.1 Scenario Parsing (strict mode)
+
+```javascript
+// Strict parsing: any malformed line throws error
+function parseScenario(nlOutput) {
+  const match = nlOutput.match(/选定场景[：:]\s*(场景?\s*\d+)/i)
+                  || nlOutput.match(/(Scenario\s*\d+)/i);
+  if (!match) {
+    throw new ParseError('SCENARIO_MISSING', 'Cannot determine playbook scenario');
+  }
+  return normalizeScenario(match[1]);
+}
+```
+
+#### 4.3.2 Team Blueprint Parsing (strict mode)
+
+```javascript
+// Strict parsing: table must have all 6 columns
+function parseTeamBlueprint(tableSection) {
+  const rows = tableSection.split('\n')
+    .filter(line => line.match(/^\|\s*\d+\s*\|/));
+  
+  // BLUEPRINT_EMPTY: No team blueprint rows found
+  if (rows.length === 0) {
+    throw new ParseError('BLUEPRINT_EMPTY',
+      'No team blueprint rows found in playbook output');
+  }
+  
+  return rows.map(row => {
+    const cols = row.split('|').slice(1, -1).map(c => c.trim());
+    if (cols.length !== 6) {
+      throw new ParseError('BLUEPRINT_COLUMN_MISMATCH', 
+        `Expected 6 columns, got ${cols.length}`);
+    }
+    return {
+      id: parseInt(cols[0]),
+      role: cols[1],
+      responsibility: cols[2],
+      model: parseModel(cols[3]),
+      subagentType: parseSubagentType(cols[4]),
+      skillOrType: parseSkillOrType(cols[5])
+    };
+  });
+}
+```
+
+#### 4.3.3 Dispatch Board Parsing (strict mode)
+
+```javascript
+function parseDispatchBoard(nlOutput) {
+  const match = nlOutput.match(/协作模式[：:]\s*(Subagent|Agent Team)/i)
+                || nlOutput.match(/(Subagent|Agent Team)/i);
+  if (!match) {
+    throw new ParseError('DISPATCH_BOARD_MISSING', 
+      'Cannot determine collaboration mode');
+  }
+  return { mode: normalizeCollaborationMode(match[1]) };
+}
+```
+
+### 4.4 Error Handling (Strict Mode)
+
+**ParseError Throws** — strict mode requires complete parsing:
+
+| Error Code | Trigger | Recovery Action |
+|------------|---------|-----------------|
+| `SCENARIO_MISSING` | No scenario match found | Re-invoke playbook with clearer task description |
+| `BLUEPRINT_COLUMN_MISMATCH` | Table row has != 6 columns | Request formatted table output |
+| `DISPATCH_BOARD_MISSING` | No collaboration mode found | Default to `Subagent` if task is parallelizable |
+| `PARSE_COMPLETE_FAILURE` | All parsing attempts failed | Escalate to Warden for manual intervention |
+
+**Fallback Chain**:
+1. Strict parse attempt
+2. Tolerant regex with warning logging
+3. Default values with `mode: 'subagent'`, `scenario: 3`
+4. Emit `capabilityGapPacket` if defaults insufficient
+
+### 4.5 teamBlueprint to workerTaskPackets Conversion
+
+After successful parsing, convert playbook output to Conductor's Standard Task Board:
+
+```yaml
+# workerTaskPacket mapping
+playbook.field          → taskBoard.field
+─────────────────────────────────────────
+cols[1] (role)          → Owner
+cols[2] (responsibility) → Today's Task
+cols[3] (model)         → [embedded in task constraints]
+cols[4] (subagent_type) → Owner Mode
+cols[5] (Skill/Type)    → Reference Direction (capability link)
+# Additional mapping
+scenario                → Parallel Group (if Scenario 3-5)
+mode                   → dispatchEnvelopePacket.route
+```
+
+### 4.6 Stage 4 Responsibilities Preserved
+
+- Conductor retains rhythm control (card deck sequencing)
+- Conductor retains delivery shell selection
+- Conductor retains parallel lane design and merge-owner assignment
+- Conductor does NOT execute worker tasks directly (playbook/subagents do)
+
+### 4.7 Review and Verification Assignments
+
+| Assignment | Owner | Rationale |
+|------------|-------|-----------|
+| **Review Owner** | `meta-prism` | Quality audit on parsed results and task board completeness |
+| **Verification Owner** | `npm run validate` | Schema validation of generated dispatch board |
+| **Synthesis Owner** | `meta-warden` | Final approval before card dealing resumes |
+
+---
 
 ## Meta-Theory Compliance
 
