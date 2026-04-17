@@ -48,32 +48,79 @@ Use the sections **Type A:** through **Type E:** below:
 
 **Gate 2: Dispatch-Not-Execute** — substantive analysis, review, and code changes belong to execution agents invoked via the `Agent` tool, not to this skill thread.
 
-**Gate 3: Warden Dispatch Validation** (MANDATORY for ALL Types) — after completing task classification and agent dispatch plan, you MUST validate with `meta-warden` before spawning any execution agents:
+**Gate 3: Capability-Matched Dispatch Validation** (MANDATORY for ALL Types) — after completing task classification and agent dispatch plan, you MUST validate before spawning any execution agents:
 
 ```
-Agent(subagent_type: "meta-warden", description: "Validate dispatch decision",
-  prompt: "Validate this meta-theory dispatch decision:
+Fetch-first: Search who declares "Own: coordination and dispatch validation"
+→ Match best → Invoke
+Task: Validate this meta-theory dispatch decision.
+Input:
   - Type: [A/B/C/D/E]
   - Task: [what the user asked]
-  - Planned agents to dispatch: [list agents]
+  - Planned agents to dispatch (capability-matched): [list]
   - Complexity: [simple/medium/complex]
   - Files affected: [count and scope]
+  - Fetch-first was followed: [yes/no]
+  - Skip-level check performed: [yes/no]
 
-  Check:
+Check:
   1. Is every executable sub-task assigned to an agent? (no self-execution)
   2. Are there any skip-level violations (meta-theory doing work that should go to agents)?
-  3. Are the correct agent types selected?
+  3. Are the correct agents selected (capability-matched, not hardcoded)?
   4. Are there any capability gaps where no agent owns the work?
   5. Is the complexity assessment correct?
 
-  Output: PASS / FAIL with specific corrections needed. If FAIL, meta-theory must fix before proceeding.")
+Output: PASS / FAIL with specific corrections needed. If FAIL, meta-theory must fix before proceeding.
 ```
 
 **Gate 3 is non-skippable.** If warden says FAIL, fix the dispatch plan and re-validate. Only proceed to agent spawning after warden PASS.
 
+**🚫 Warden FAIL Override is a governance violation** — if Warden says FAIL and you proceed anyway, you have committed a Skip-Level Self-Reflection Gate bypass. The correct response to "this task seems simple" is NOT to override the gate — it is to:
+1. Return to **Thinking (Stage 3)** and produce the missing protocol artifacts
+2. Re-validate with Warden
+3. If the task genuinely does not need full governance, state explicit justification and get user confirmation before a simplified path
+
+You may NOT proceed to Execution after a FAIL without first achieving PASS. "The task seems simple" is NOT a valid override reason.
+
 ## Fetch-first pattern (Search → Match → Invoke)
 
-Search who declares ownership of the capability, score the best match, then invoke — do not skip the search step with a hardcoded agent name.
+**MANDATORY 3-STEP CAPABILITY DISCOVERY** — for EVERY task, every time, no exceptions:
+
+```
+Step 1: Keyword scan (run FIRST, before any other action)
+  IF task contains "tdd" OR "TDD" OR "test" OR "测试" OR "测试驱动"
+    → capability = "TDD workflow, red-green-refactor, test coverage governance"
+  IF task contains "review" OR "audit" OR "审计" OR "评审" OR "quality" OR "quality review"
+    → capability = "code quality review, AI-slop detection, quality audit"
+  IF task contains "security" OR "auth" OR "permission" OR "权限" OR "安全"
+    → capability = "security analysis, vulnerability detection, permission audit"
+  IF task contains "debug" OR "debugging" OR "报错" OR "error" OR "修复"
+    → capability = "debugging, error analysis, test failure investigation"
+  IF task contains "architecture" OR "design" OR "架构" OR "设计"
+    → capability = "system architecture design, technical architecture review"
+  IF task contains "frontend" OR "ui" OR "界面" OR "react" OR "组件"
+    → capability = "frontend development, UI implementation, React components"
+  IF task contains "backend" OR "api" OR "后端" OR "server"
+    → capability = "backend development, API design, server implementation"
+  IF task contains "database" OR "db" OR "sql" OR "数据库"
+    → capability = "database design, SQL optimization, data modeling"
+  DEFAULT
+    → capability = the task's core capability need (state it explicitly)
+
+Step 2: Search for owner
+  → Search .claude/agents/*.md → score "Own" boundaries (3=perfect/1-2=partial/0=none)
+  → Search .claude/capability-index/meta-kim-capabilities.json → match by keyword
+  → Search .claude/capability-index/global-capabilities.json → match by keyword
+
+Step 3: Score and invoke
+  → Score all matches: governance meta agents = governance priority / execution agents = capability priority
+  → If governance task (analyze/audit/design/review) → prefer meta-agent
+  → If execution task (build/write/fix/test) → prefer execution agent from capability index
+  → Invoke the best match
+  → If no match found → trigger Type B creation pipeline OR use generalPurpose with explicit justification
+```
+
+**Hardcoded agent names are FORBIDDEN.** Do NOT write `meta-prism` or `meta-warden` or `meta-conductor` as dispatch targets. Always go through the 3-step discovery above.
 
 ## Parallelism Discipline
 
@@ -101,15 +148,37 @@ If you are about to produce **>3 sentences** of execution-layer analysis, review
 - ❌ "Let me just write the code first, then spawn agents for review"
 - ❌ "I'll handle this one file directly"
 - ❌ "This task doesn't need an agent"
+- ❌ "Warden said FAIL but I'll proceed anyway" ← **This session's governance violation**
+- ❌ "The task is simple enough to skip protocol artifacts"
 
 Every executable sub-task must have an explicit agent owner. Zero exceptions.
 
 ## ⛔ YOUR ONLY JOB
 
+**⚠️ BEFORE ANY EXECUTION — MANDATORY USER CONFIRMATION ⚠️**
+
+After completing Critical → Fetch → Thinking (stages 1-3), you MUST show the user the plan and get explicit confirmation BEFORE executing anything:
+
+```
+Execution Plan:
+- Type: [A/B/C/D/E]
+- Agents to dispatch: [list]
+- Files to modify: [list]
+- Next step: waiting for your confirmation
+
+Say "go" or "do it" to proceed. Say "change X" to adjust.
+Do NOT execute anything until the user confirms.
+```
+
+If you skip this confirmation step and execute without asking — you have committed a governance violation.
+
+The remaining steps are:
+
 1. **Clarify** what the user wants (ask if ≥2 dimensions are ambiguous)
 2. **Classify** the input into a Type (A/B/C/D/E)
-3. **Dispatch** execution to meta-agents via the `Agent` tool
-4. **Synthesize** agent outputs and present to the user
+3. **Show the plan and wait for user confirmation** ← MANDATORY, never skip
+4. **Dispatch** execution to meta-agents via the `Agent` tool (only after step 3)
+5. **Synthesize** agent outputs and present to the user
 
 If you are about to write analysis, code, or reviews yourself — STOP. That work belongs to an agent.
 
@@ -138,31 +207,33 @@ Use the `Agent` tool with these exact parameters:
 
 ```
 Agent(
-  subagent_type: "meta-warden",
-  description: "3-5 word summary",
+  subagent_type: "<capability-matched agent from Fetch-first discovery>",
+  description: "3-5 word summary of what this agent does",
   prompt: "Complete task brief with ALL context the agent needs to work independently"
 )
 ```
+
+**Never use a hardcoded agent name.** Always run the 3-step Fetch-first pattern first, then use the discovered agent here.
 
 The `prompt` must contain everything the agent needs — files, context, user requirements, constraints. The agent cannot see your conversation.
 
 ## Type Routing
 
-> **Dual-End Warden Architecture**: Warden is the **entry gate** (clarification + solution enumeration) for ALL types, AND the **exit gate** (quality gate + final synthesis). Conductor orchestrates ALL types through their execution phase.
+> **Dual-End Governance Architecture**: The entry gate (clarification + solution enumeration) for ALL types AND the exit gate (quality gate + final synthesis) are both capability-matched governance agents, not hardcoded names. Conductor orchestrates ALL types through their execution phase.
 
 **Universal Entry Chain** (all Types share the first two stages):
 
 ```
-SKILL trigger → Type classify → [1] Warden entry → [2] Conductor orchestrate
+SKILL trigger → Type classify → [1] Capability-matched entry gate → [2] Capability-matched conductor orchestrates
 ```
 
-| User intent | Type | Universal Entry (shared) | Type-Specific Continuation |
+| User intent | Type | Universal Entry (capability-matched) | Type-Specific Continuation |
 |---|---|---|---|
-| Discuss meta-theory, evaluate agents, Five Criteria | **A** | **Warden**: Clarify intent; Enumerate ≥2 approaches | Conductor sequences → Prism audit → **Warden exit** |
-| Create new agent, split existing agent | **B** | **Warden**: Confirm gap is real; Enumerate approaches | Conductor → Factory Station → **Warden exit** |
-| Complex dev task, feature implementation | **C** | **Warden**: Confirm scope/constraints; Enumerate approaches | Conductor (8-stage spine) → **Warden exit** |
-| Review existing proposal/article | **D** | **Warden**: Confirm scope; Enumerate approaches | Conductor → Prism + Scout → **Warden exit** |
-| Rhythm/card play/orchestration strategy | **E** | **Warden**: Confirm rhythm problem; Enumerate approaches | Conductor (card deck) → **Warden exit** |
+| Discuss meta-theory, evaluate agents, Five Criteria | **A** | Clarity + enumeration (Fetch-first: "Own: coordination") | Capability-matched conductor → Capability-matched quality reviewer → Capability-matched synthesis |
+| Create new agent, split existing agent | **B** | Gap confirmation + enumeration (Fetch-first: "Own: coordination") | Capability-matched conductor → Factory Station → Capability-matched synthesis |
+| Complex dev task, feature implementation | **C** | Scope confirmation + enumeration (Fetch-first: "Own: coordination") | Capability-matched conductor (8-stage spine) → Capability-matched synthesis |
+| Review existing proposal/article | **D** | Scope confirmation + enumeration (Fetch-first: "Own: coordination") | Capability-matched conductor → Capability-matched quality reviewer → Capability-matched synthesis |
+| Rhythm/card play/orchestration strategy | **E** | Rhythm diagnosis + enumeration (Fetch-first: "Own: coordination") | Capability-matched conductor (card deck) → Capability-matched synthesis |
 
 ## Factory Station (Collaboration Model)
 
@@ -189,43 +260,58 @@ When Conductor's task board assigns a node that requires capability matching, th
 
 ## Type A: Meta-Theory Analysis
 
-### Entry Gate (Warden)
-**Warden's entry role**: Clarify ambiguous intent; enumerate ≥2 solution approaches using `superpowers/brainstorming` before committing to analysis direction.
+### Entry Gate (capability = "clarity gate, solution enumeration, coordination")
+```
+Fetch-first: Search who declares "Own: coordination and clarity gate"
+→ Match best → Invoke
+Task: Clarify ambiguous intent. Enumerate ≥2 solution approaches.
+Input: [user's task description]
+Output: clarified scope + ≥2 enumerated approaches + type classification.
+```
 
 ### Orchestration (Conductor)
 Conductor sequences the analysis work and manages the dispatch board.
 
 ### Execution
 1. Read agent definitions: `Glob canonical/agents/*.md`
-2. Dispatch quality audit:
+2. Dispatch quality audit (capability = "code quality review, AI-slop detection, Five Criteria + Four Death Patterns audit"):
    ```
-   Agent(subagent_type: "meta-prism", description: "Agent quality audit",
-     prompt: "Audit these meta-agent definitions against Five Criteria and Four Death Patterns.
-     Read: Glob canonical/agents/*.md AND Read canonical/skills/meta-theory/references/meta-theory.md.
-     Output: evidence table per agent + quality rating + fix operations.")
+   Fetch-first: Search who declares "Own: code quality review" + "Own: quality forensics, AI-slop detection"
+   → Match best → Invoke
+   Task: Audit these meta-agent definitions against Five Criteria and Four Death Patterns.
+   Files: Glob canonical/agents/*.md + canonical/skills/meta-theory/references/meta-theory.md.
+   Output: evidence table per agent + quality rating + fix operations.
    ```
 
-### Exit Gate (Warden)
+### Exit Gate (capability = "coordination, arbitration, final synthesis")
 ```
-Agent(subagent_type: "meta-warden", description: "Synthesize audit results",
-  prompt: "Aggregate the following audit findings into an actionable report with ratings and next steps.
-  Findings: [paste meta-prism output here]")
+Fetch-first: Search who declares "Own: coordination and final synthesis"
+→ Match best → Invoke
+Task: Aggregate audit findings into an actionable report with ratings and next steps.
+Input: [paste quality audit output here]
+Output: final synthesis with S/A/B/C/D ratings and action items.
 ```
-Warden synthesizes audit results into final report with S/A/B/C/D ratings and action items.
+
 
 ## Type B: Agent Creation
 
-### Entry Gate (Warden)
-**Warden's entry role**: Confirm the capability gap is real (not already covered by existing agents); enumerate ≥2 creation approaches. Uses `superpowers/brainstorming` for solution enumeration.
+### Entry Gate (capability = "clarity gate, capability gap confirmation, solution enumeration")
+```
+Fetch-first: Search who declares "Own: coordination and clarity gate"
+→ Match best → Invoke
+Task: Confirm the capability gap is real. Enumerate ≥2 creation approaches.
+Input: [user's task description]
+Output: gap confirmation + ≥2 approaches.
+```
 
 ### Orchestration (Conductor)
-Conductor owns the dispatch board, card deck, worker task board, and handoff plan for the station pipeline. **`meta-genesis`** and **`meta-artisan`** are mandatory stations; **`meta-prism`** and **`meta-warden`** handle review and synthesis; **`meta-scout`**, **`meta-sentinel`**, and **`meta-librarian`** are optional factory stations by trigger.
+Conductor owns the dispatch board, card deck, worker task board, and handoff plan for the station pipeline. **Genesis (capability = "agent/persona SOUL design")** and **Artisan (capability = "skill/tool loadout matching")** are mandatory stations; **Prism (capability = "quality review")** and **Warden (capability = "coordination + synthesis")** handle review and synthesis; **Scout (capability = "external capability discovery")**, **Sentinel (capability = "security + permissions")**, and **Librarian (capability = "memory + continuity")** are optional factory stations by trigger.
 
 Read `canonical/skills/meta-theory/references/create-agent.md` for the full pipeline. Quick summary:
 1. Discovery → data collection → coupling grouping → user confirmation
 2. Pre-design → check if global agent already covers the need
 3. Design → Warden gap approval → Conductor task board → Genesis (identity) → Artisan (loadout) → optional Scout/Sentinel/Librarian → Prism review → Warden approval
-4. Review → meta-prism quality check
+4. Review → capability-matched quality reviewer (Fetch-first: "Own: code quality review")
 5. Integration → write `canonical/agents/{name}.md`
 
 **Factory artifacts (Type B execution-agent mode):**
@@ -259,22 +345,30 @@ Rule: a station only counts as complete when its deliverables are explicit enoug
 
 ## Type C: Development Governance
 
-### Entry Gate (Warden)
-**Warden's entry role**: Confirm scope, goal, and constraints are clear; enumerate ≥2 implementation approaches using `superpowers/brainstorming`. If ≥2 dimensions are ambiguous, Warden asks clarification questions before the spine begins.
+### Entry Gate (capability = "clarity gate, scope confirmation, solution enumeration")
+```
+Fetch-first: Search who declares "Own: coordination and clarity gate"
+→ Match best → Invoke
+Task: Confirm scope/goal/constraints. Enumerate ≥2 approaches.
+Input: [user's task description]
+Output: clarified scope + ≥2 approaches + complexity assessment.
+```
 
 ### Orchestration (Conductor)
 Conductor executes the 8-stage spine. Read `canonical/skills/meta-theory/references/dev-governance.md` for the complete spec. Core flow:
 
-| Stage | Name | YOUR action |
+| Stage | Name | Action |
 |---|---|---|
 | 1 | Critical | Clarify scope, ask if ambiguous |
-| 2 | Fetch | Search who can do this: `Glob canonical/agents/*.md` |
+| 2 | Fetch | **3-STEP CAPABILITY DISCOVERY** (keyword scan → search agents → search capability index) |
 | 3 | Thinking | Plan sub-tasks with owners and dependencies |
-| 4 | **Execution** | **Dispatch to agents via `Agent()` tool** |
-| 5 | Review | Inspect agent outputs; if governance violations found (Skip-Level, self-execution, circular evidence), directly edit the offending agent's SOUL.md to prevent recurrence |
+| 4 | **Execution** | **Dispatch to agents via `Agent()` tool, capability-matched** |
+| 5 | Review | Inspect agent outputs via capability-matched reviewer |
 | 6 | Meta-Review | Check review standards |
 | 7 | Verification | Confirm fixes closed findings |
-| 8 | Evolution | Directly evolve agent definitions: update `Own/Do Not Touch/CT/Decision Rules` in the specific agent file that revealed the gap; emit `evolutionWritebackPacket` with agent file as primary target |
+| 8 | Evolution | Evolve agent definitions directly |
+
+**Stage 2 is MANDATORY capability discovery** — do NOT skip to Stage 3 or Stage 4. The 3-step Fetch-first pattern above is the gate.
 
 **Stage 4 is THE key stage.** Conductor's task board drives execution agents from the capability index. For each sub-task:
 1. Conductor generates the dispatch board (which agents, which capabilities, which order)
@@ -305,64 +399,83 @@ Stage 4 rules:
 
 ## Type D: Review
 
-### Entry Gate (Warden)
-**Warden's entry role**: Confirm review scope and what verification is needed; enumerate ≥2 verification approaches using `superpowers/brainstorming`.
+### Entry Gate (capability = "clarity gate, review scope confirmation")
+```
+Fetch-first: Search who declares "Own: coordination and clarity gate"
+→ Match best → Invoke
+Task: Confirm review scope. Enumerate ≥2 verification approaches.
+Input: [user's task description]
+Output: review scope + ≥2 approaches.
+```
 
 ### Orchestration (Conductor)
-Conductor sequences the review work and manages the dispatch board.
+Conductor sequences the review work and manages the dispatch board via capability-matched agents.
 
 ### Execution
 1. Read the proposal/document
-2. Dispatch audit:
+2. Dispatch quality audit (capability = "code quality review, Five Criteria, Death Patterns, AI-Slop detection"):
    ```
-   Agent(subagent_type: "meta-prism", description: "Quality audit",
-     prompt: "Review this content for quality. Check: Five Criteria, Death Patterns, AI-Slop density, specificity.
-     Content: [paste here]. Output: evidence table + rating (S/A/B/C/D) + fix operations.")
+   Fetch-first: Search who declares "Own: code quality review"
+   → Match best → Invoke
+   Task: Review content for quality. Check: Five Criteria, Death Patterns, AI-Slop density, specificity.
+   Input: [paste content]
+   Output: evidence table + rating (S/A/B/C/D) + fix operations.
    ```
-3. If external claims need verification:
+3. If external claims need verification (capability = "external capability discovery, claim verification"):
    ```
-   Agent(subagent_type: "meta-scout", description: "Verify external claims",
-     prompt: "Verify these claims against external sources: [list claims]")
+   Fetch-first: Search who declares "Own: external capability discovery"
+   → Match best → Invoke
+   Task: Verify these claims against external sources.
+   Input: [list of claims to verify]
    ```
 
-### Exit Gate (Warden)
+### Exit Gate (capability = "coordination + final synthesis")
 ```
-Agent(subagent_type: "meta-warden", description: "Review synthesis",
-  prompt: "Aggregate these review findings: [paste all outputs]. Final rating + action items.")
+Fetch-first: Search who declares "Own: coordination and final synthesis"
+→ Match best → Invoke
+Task: Aggregate review findings. Output: final rating + action items.
 ```
-Warden synthesizes review findings into final rating with action items.
 
 ## Type E: Rhythm Orchestration
 
-### Entry Gate (Warden)
-**Warden's entry role**: Confirm the rhythm problem is real; enumerate ≥2 orchestration approaches using `superpowers/brainstorming`.
+### Entry Gate (capability = "clarity gate, rhythm problem confirmation")
+```
+Fetch-first: Search who declares "Own: coordination and clarity gate"
+→ Match best → Invoke
+Task: Confirm rhythm problem is real. Enumerate ≥2 orchestration approaches.
+Input: [user's task description]
+Output: rhythm diagnosis + ≥2 approaches.
+```
 
 ### Orchestration (Conductor)
-Conductor reads `canonical/skills/meta-theory/references/rhythm-orchestration.md` for attention cost model and card dealing rules, then designs the card deck:
+Conductor reads `canonical/skills/meta-theory/references/rhythm-orchestration.md` for attention cost model and card dealing rules, then designs the card deck via capability-matched agent:
 
 1. Diagnose rhythm issues
-2. Dispatch card deck design:
+2. Dispatch card deck design (capability = "workflow sequencing, rhythm control, card deck design"):
    ```
-   Agent(subagent_type: "meta-conductor", description: "Design card deck",
-     prompt: "Design Event Card Deck for this scenario: [details]. Cards need: id, type, priority, cost, skip_condition, interrupt_trigger.")
+   Fetch-first: Search who declares "Own: workflow sequencing and rhythm control"
+   → Match best → Invoke
+   Task: Design Event Card Deck. Cards need: id, type, priority, cost, skip_condition, interrupt_trigger.
+   Input: [scenario details]
    ```
 
-### Exit Gate (Warden)
+### Exit Gate (capability = "coordination + final synthesis")
 ```
-Agent(subagent_type: "meta-warden", description: "Orchestration plan",
-  prompt: "Synthesize this card deck into an actionable orchestration plan: [paste output]")
+Fetch-first: Search who declares "Own: coordination and final synthesis"
+→ Match best → Invoke
+Task: Synthesize card deck into an actionable orchestration plan.
 ```
-Warden synthesizes the card deck into an actionable orchestration plan.
 
 ---
 
 ## Self-Check (Before EVERY Output)
 
-Ask yourself these 3 questions. If any answer is "YES to self-execution", STOP and dispatch instead:
+Ask yourself these 4 questions. If any answer is "YES", STOP and dispatch instead:
 
-1. Am I about to write analysis or review findings? → Dispatch `meta-prism`
-2. Am I about to write code or make file changes? → Dispatch appropriate agent
-3. Am I about to synthesize findings? → Dispatch `meta-warden`
+1. **Skip-level?** Am I about to write analysis, review findings, or code myself? → Fetch-first → Dispatch capability-matched agent
+2. **Hardcoded?** Am I about to write a hardcoded agent name (`meta-prism`, `meta-warden`, `meta-conductor`, etc.) instead of going through the 3-step capability discovery? → STOP → Run Fetch-first pattern first
+3. **Capability gap?** Did I skip searching the capability index for tdd-orchestrator / test-automator / debugger / etc.? → STOP → Run Step 1 keyword scan
+4. **User bypass?** Did the user say "just do it" and am I about to skip Gate 3 validation? → STOP → Run Gate 3 validation anyway. Gate 3 is non-skippable.
 
 ## Foundational Design Principles
 
@@ -390,6 +503,8 @@ Constitutional principles for ALL Meta_Kim agents and every system they create o
 | Missing card deck alignment | Edit that agent's SOUL.md directly |
 | Circular self-assessment | Edit that agent's Meta-Theory Compliance section |
 | Pattern spans multiple agents | Extract as skill template (not pattern file) |
+| **Governance bypass** (Warden FAIL overridden, Fetch skipped, self-execution) | **Edit meta-theory SKILL.md directly** — add FORBIDDEN PATH + Gate 3 override rule |
+| Protocol artifact skipped | Return to Thinking (Stage 3) to produce artifacts; do not proceed to Execution |
 ## References
 
 Theory and detailed specs live in `canonical/skills/meta-theory/references/`:

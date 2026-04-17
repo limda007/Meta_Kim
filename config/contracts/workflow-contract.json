@@ -267,6 +267,15 @@
         "on_timeout",
         "on_user_request"
       ],
+      "cardTimingDescriptions": {
+        "immediate": "立即执行，不等待任何前置条件",
+        "next_stage": "等待下一个阶段开始后执行",
+        "after_dependency": "等待dependsOn中声明的所有依赖项满足后执行（channel/gate/event三种语义，见dependencyContract）",
+        "after_verify": "等待验证阶段完成后执行",
+        "on_risk": "风险信号触发时执行",
+        "on_timeout": "超时事件触发时执行",
+        "on_user_request": "用户明确请求时执行"
+      },
       "cardShellEnum": [
         "conversation",
         "file",
@@ -705,7 +714,8 @@
         "execution",
         "factory_build",
         "factory_upgrade"
-      ]
+      ],
+      "description": "Conductor编排板中的单个任务单元。dependsOn声明前置依赖，见dependencyContract定义。"
     },
     "capabilityGapPacket": {
       "requiredFields": [
@@ -812,7 +822,59 @@
         "dependsOn",
         "parallelGroup",
         "mergeOwner"
-      ]
+      ],
+      "description": "派发给worker agent的执行任务包。三大编排核心字段：dependsOn（前置依赖，见dependencyContract）/ parallelGroup（并行分组）/ mergeOwner（合并负责人）。",
+      "dependsOnField": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["taskRef"],
+          "properties": {
+            "taskRef": {
+              "type": "string",
+              "description": "依赖的任务ID（对应源workerTaskPacket.taskPacketId）"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["channel", "gate", "event"],
+              "description": "channel=点对点消息传递/gate=质量门放行/event=发布订阅"
+            },
+            "timeout_ms": {
+              "type": "integer",
+              "default": 300000,
+              "description": "等待依赖满足的超时时间（毫秒），默认5分钟"
+            },
+            "retry": {
+              "type": "object",
+              "description": "超时后重试策略",
+              "properties": {
+                "max": { "type": "integer", "default": 3, "description": "最大重试次数" },
+                "backoff_ms": { "type": "integer", "default": 5000, "description": "重试间隔（毫秒），支持指数退避" }
+              }
+            },
+            "onTimeout": {
+              "type": "string",
+              "enum": ["skip", "abort", "use_fallback"],
+              "description": "超时行为：skip=跳过依赖继续/abort=中止任务/use_fallback=使用兜底产物"
+            },
+            "fallback": {
+              "type": "object",
+              "description": "use_fallback时的兜底配置",
+              "properties": {
+                "artifact": { "type": "string", "description": "兜底产物路径或默认schema路径" }
+              }
+            }
+          }
+        }
+      },
+      "parallelGroupField": {
+        "type": "string",
+        "description": "并行分组标识。同组内所有任务可并行执行，必须声明mergeOwner接收合并结果"
+      },
+      "mergeOwnerField": {
+        "type": "string",
+        "description": "并行组的合并负责人，负责汇总同组所有worker的结果后再推进后续依赖链"
+      }
     },
     "workerResultPacket": {
       "requiredFields": [
@@ -929,6 +991,55 @@
         "scarIds",
         "syncRequired"
       ]
+    },
+    "dependencyContract": {
+      "description": "编排顺序依赖契约——定义agent间前后关系的标准格式。三种依赖语义覆盖所有前后端联调场景。",
+      "threeModes": {
+        "channel": {
+          "label": "通道式（点对点消息）",
+          "semantic": "producer生成消息，consumer从共享存储（artifact store）读取locator。消息体不经过dispatcher信道，避免payload膨胀。",
+          "useCase": "前后端artifact传递、文件产物交接、API响应回传",
+          "example": "frontend_agent产出build产物路径 → backend_agent读取build hash继续编译"
+        },
+        "gate": {
+          "label": "阶段门式（质量门）",
+          "semantic": "前置任务产出物必须通过schema验证才放行后续任务。不是简单的时间等待，是质量关卡。",
+          "useCase": "OpenAPI schema校验、代码规范检查、安全扫描通过后才推进",
+          "example": "frontend_agent输出api-contract.yaml → backend_agent必须验证schema含paths/components才生成代码"
+        },
+        "event": {
+          "label": "事件订阅式",
+          "semantic": "producer发布事件，consumer订阅并可选filter过滤。blocking=true则等待，false则旁听。",
+          "useCase": "部署完成事件、CI通过事件、监控告警事件触发后续任务",
+          "example": "deploy_agent发布deployment_started事件 → smoke_test_agent订阅并filter=env==staging才执行"
+        }
+      },
+      "timeoutStrategy": {
+        "default": 300000,
+        "unit": "milliseconds",
+        "retryBackoff": "exponential",
+        "maxRetries": 3,
+        "recommendation": "前端构建类依赖建议600000ms（10分钟），接口响应类建议300000ms（5分钟），CI任务建议60000ms（1分钟）"
+      },
+      "dagValidation": "dependsOn声明在Stage 3（Thinking）由Conductor构建DAG图。必须检测循环依赖，循环依赖的task不得进入Stage 4。",
+      "frontendBackendContract": {
+        "description": "前后端联调的标准依赖模板",
+        "frontendEmits": {
+          "type": "gate",
+          "outputSchema": "openapi_schema",
+          "requiredFields": ["openapi", "info", "paths"],
+          "minPaths": 3,
+          "qualityGate": true
+        },
+        "backendDepends": {
+          "type": "gate",
+          "from": "frontend_agent",
+          "timeout_ms": 600000,
+          "retry": { "max": 2, "backoff_ms": 30000 },
+          "onTimeout": "use_fallback",
+          "fallback": { "artifact": "schemas/fallback-api.yaml" }
+        }
+      }
     }
   },
   "departmentVisualPolicies": {
