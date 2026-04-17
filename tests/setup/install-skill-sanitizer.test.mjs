@@ -8,6 +8,7 @@ import {
   detectLegacySubdirInstall,
   sanitizeInstalledSkillTree,
   shouldSkipBundledRuntimePath,
+  shouldSkipDocsSkillDoc,
   shouldSkipHarnessPackageSkillDoc,
   validateSkillFrontmatter,
 } from "../../scripts/install-skill-sanitizer.mjs";
@@ -22,9 +23,9 @@ async function makeTempDir() {
 
 afterEach(async () => {
   await Promise.all(
-    tempDirs.splice(0, tempDirs.length).map((dir) =>
-      fs.rm(dir, { recursive: true, force: true }),
-    ),
+    tempDirs
+      .splice(0, tempDirs.length)
+      .map((dir) => fs.rm(dir, { recursive: true, force: true })),
   );
 });
 
@@ -83,10 +84,7 @@ describe("legacy subdir detection", () => {
     await fs.mkdir(path.join(targetDir, "skills"), { recursive: true });
     await fs.mkdir(path.join(targetDir, ".git"), { recursive: true });
 
-    assert.equal(
-      await detectLegacySubdirInstall(targetDir, "skills"),
-      true,
-    );
+    assert.equal(await detectLegacySubdirInstall(targetDir, "skills"), true);
   });
 
   test("does not flag nested subdir content without git metadata", async () => {
@@ -94,10 +92,7 @@ describe("legacy subdir detection", () => {
     const targetDir = path.join(root, "everything-claude-code");
     await fs.mkdir(path.join(targetDir, "skills"), { recursive: true });
 
-    assert.equal(
-      await detectLegacySubdirInstall(targetDir, "skills"),
-      false,
-    );
+    assert.equal(await detectLegacySubdirInstall(targetDir, "skills"), false);
   });
 
   test("does not flag a clean extracted subdir install", async () => {
@@ -107,10 +102,7 @@ describe("legacy subdir detection", () => {
       recursive: true,
     });
 
-    assert.equal(
-      await detectLegacySubdirInstall(targetDir, "skills"),
-      false,
-    );
+    assert.equal(await detectLegacySubdirInstall(targetDir, "skills"), false);
   });
 });
 
@@ -118,7 +110,10 @@ describe("bundled runtime path skip", () => {
   test("skips OpenClaw/Codex/Cursor subtrees case-insensitively", () => {
     assert.equal(shouldSkipBundledRuntimePath("openclaw"), true);
     assert.equal(shouldSkipBundledRuntimePath("OpenClaw/skills/foo"), true);
-    assert.equal(shouldSkipBundledRuntimePath("gstack/openclaw/skills/x"), true);
+    assert.equal(
+      shouldSkipBundledRuntimePath("gstack/openclaw/skills/x"),
+      true,
+    );
     assert.equal(shouldSkipBundledRuntimePath("pkg/Cursor/extra"), true);
     assert.equal(shouldSkipBundledRuntimePath("legit-skill"), false);
     assert.equal(shouldSkipBundledRuntimePath("openclawish"), false);
@@ -139,10 +134,77 @@ describe("harness package skill doc skip (CLI-Anything-style monorepos)", () => 
       ),
       true,
     );
-    assert.equal(shouldSkipHarnessPackageSkillDoc("exa/skills/SKILL.md"), false);
+    assert.equal(
+      shouldSkipHarnessPackageSkillDoc("exa/skills/SKILL.md"),
+      false,
+    );
     assert.equal(
       shouldSkipHarnessPackageSkillDoc("agent-harness/readme/SKILL.md"),
       false,
+    );
+  });
+});
+
+describe("docs skill doc skip (everything-claude-code-style bundled docs)", () => {
+  test("skips docs/{locale}/skills/SKILL.md case-insensitively", () => {
+    assert.equal(
+      shouldSkipDocsSkillDoc(
+        "docs/zh-TW/skills/project-guidelines-example/SKILL.md",
+      ),
+      true,
+    );
+    assert.equal(
+      shouldSkipDocsSkillDoc("docs/zh-TW/skills/verification-loop/SKILL.md"),
+      true,
+    );
+    assert.equal(shouldSkipDocsSkillDoc("docs/en/skills/foo/SKILL.md"), true);
+    assert.equal(shouldSkipDocsSkillDoc("docs/zh-CN/skills/SKILL.md"), true);
+    assert.equal(
+      shouldSkipDocsSkillDoc(
+        "everything-claude-code/docs/zh-TW/skills/demo/SKILL.md",
+      ),
+      true,
+    );
+    assert.equal(
+      shouldSkipDocsSkillDoc("docs/zh-TW/some-other/SKILL.md"),
+      false,
+    );
+    assert.equal(
+      shouldSkipDocsSkillDoc("docs/zh-TW/skills/SKILL.invalid.md"),
+      false,
+    );
+    assert.equal(
+      shouldSkipDocsSkillDoc("superpowers/docs/zh-TW/skills/x/SKILL.md"),
+      true,
+    );
+  });
+
+  test("does not quarantine bundled docs SKILL.md inside managed installs", async () => {
+    const root = await makeTempDir();
+    const pluginRoot = path.join(root, "everything-claude-code");
+    const docsSkillDir = path.join(
+      pluginRoot,
+      "docs",
+      "zh-TW",
+      "skills",
+      "project-guidelines-example",
+    );
+    await fs.mkdir(docsSkillDir, { recursive: true });
+    await fs.writeFile(
+      path.join(docsSkillDir, "SKILL.md"),
+      "# no yaml frontmatter\n",
+      "utf8",
+    );
+
+    const result = await sanitizeInstalledSkillTree(pluginRoot);
+    assert.equal(result.scanned, 1);
+    assert.equal(result.quarantined, 0);
+    assert.equal(
+      await fs
+        .access(path.join(docsSkillDir, "SKILL.md"))
+        .then(() => true)
+        .catch(() => false),
+      true,
     );
   });
 });

@@ -61,7 +61,7 @@ const STRINGS = {
     gitFailureExitLine: (code) => `git exit code: ${code}`,
     /** Shown when stderr mentions fetch progress — explains 100% vs full clone success. */
     gitFailureProgressNotFinalHint:
-      "Why progress looked \"done\": fetch can reach high % before checkout / delta resolution / TLS completes. The lines above are the authoritative error.",
+      'Why progress looked "done": fetch can reach high % before checkout / delta resolution / TLS completes. The lines above are the authoritative error.',
     gitFailureNoStderr:
       "(no stderr captured — try running the same git command in a terminal to see full output.)",
     proxyDetected: (url, source) =>
@@ -69,8 +69,7 @@ const STRINGS = {
     proxyStrippedHint:
       "Loopback proxy env stripped. Use --proxy <url> or set META_KIM_GIT_PROXY to configure proxy.",
     // sync-runtimes.mjs — incremental summary + --check
-    syncRuntimesSummaryTitle:
-      "── sync:runtimes (incremental write summary) ──",
+    syncRuntimesSummaryTitle: "── sync:runtimes (incremental write summary) ──",
     syncRuntimesSummaryIntro:
       "Listed counts are paths that changed this run; unchanged paths are omitted.",
     runtimeGroupClaude: "Claude Code",
@@ -99,8 +98,7 @@ const STRINGS = {
     okCloned: (path) => `[OK] cloned ${path}`,
     skipExists: (path) => `exists ${path}`,
     okBasename: (name, dest) => `[OK] ${name} -> ${dest}`,
-    skipNotApplicable: (name, runtime) =>
-      `${name} — not applicable to ${runtime}`,
+    allUpToDate: (label) => `All ${label} up to date`,
     // Plugins
     pluginsHeader: "--- Claude Code plugins (user scope) ---",
     warnClaNotFound:
@@ -109,6 +107,11 @@ const STRINGS = {
       `[WARN] plugin install failed: ${spec} (exit ${code})`,
     skipAlreadyInstalled: (name) => `${name} — already installed`,
     installingPlugin: (spec) => `Installing plugin: ${spec}`,
+    pluginUpdateVersionMismatch: (spec, installedVer, specVer) =>
+      `[UPDATE] ${spec} version mismatch: installed ${installedVer}, manifest ${specVer} — reinstalling`,
+    pluginUpdateUnknownVersion: (spec) =>
+      `[UPDATE] ${spec} has unknown installed version — reinstalling`,
+    pluginUpdated: (spec) => `Plugin updated: ${spec}`,
     // Python/graphify
     pythonToolsHeader: "--- Python Tools (optional) ---",
     pythonNotFound: "Python 3.10+ not found. Skipping graphify.",
@@ -189,7 +192,8 @@ const STRINGS = {
     failureHint_unknown:
       "Unknown error — see details above or retry with --update",
     failureSuggestions: "Suggestions:",
-    stagingHeaderParallel: "Phase 1: fetch skill repos into a temp cache (parallel)",
+    stagingHeaderParallel:
+      "Phase 1: fetch skill repos into a temp cache (parallel)",
     stagingExplainParallel: (cacheDir) =>
       `How this step works:\n• Cache folder (not your project repo): ${cacheDir}\n• Git clones run here first so each upstream repo is downloaded once.\n• Phase 2 copies into each selected runtime skills directory (~/.claude/skills, etc.).\n• The cache folder is deleted when finished.`,
     cloneStarting: (id) => `Fetching ${id}…`,
@@ -282,7 +286,8 @@ const STRINGS = {
     gitFailureExitLine: (code) => `git 退出码：${code}`,
     gitFailureProgressNotFinalHint:
       "为何进度像「下完了」：接收对象/解析增量显示很高百分比时，检出、TLS 或增量解析仍可能在后面失败；请以**上方 git 原文**为准。",
-    gitFailureNoStderr: "（未捕获到 stderr，可在终端手动执行相同 git 命令查看完整输出。）",
+    gitFailureNoStderr:
+      "（未捕获到 stderr，可在终端手动执行相同 git 命令查看完整输出。）",
     proxyDetected: (url, source) =>
       `为 git 配置代理：${url}（来源：${source}）`,
     proxyStrippedHint:
@@ -315,7 +320,7 @@ const STRINGS = {
     okCloned: (path) => `[OK] 已克隆 ${path}`,
     skipExists: (path) => `已存在 ${path}`,
     okBasename: (name, dest) => `[OK] ${name} -> ${dest}`,
-    skipNotApplicable: (name, runtime) => `${name} — 不适用 ${runtime}`,
+    allUpToDate: (label) => `全部就绪 — ${label}`,
     pluginsHeader: "--- Claude Code 插件（用户范围）---",
     warnClaNotFound:
       "未找到 claude CLI — 跳过插件安装。请先安装 Claude Code CLI，然后运行 --plugins-only。",
@@ -323,6 +328,11 @@ const STRINGS = {
     installingPlugin: (spec) => `正在安装插件：${spec}`,
     warnPluginFailed: (spec, code) =>
       `[WARN] 插件安装失败：${spec}（退出码 ${code}）`,
+    pluginUpdateVersionMismatch: (spec, installedVer, specVer) =>
+      `[更新] ${spec} 版本不匹配：已安装 ${installedVer}，清单 ${specVer} — 重新安装`,
+    pluginUpdateUnknownVersion: (spec) =>
+      `[更新] ${spec} 已安装版本未知 — 重新安装`,
+    pluginUpdated: (spec) => `插件已更新：${spec}`,
     pythonToolsHeader: "--- Python 工具（可选）---",
     pythonNotFound: "未找到 Python 3.10+，跳过 graphify。",
     pythonInstallHint:
@@ -510,8 +520,6 @@ const STRINGS = {
     okCloned: (path) => `[OK] クローン済み ${path}`,
     skipExists: (path) => `存在 ${path}`,
     okBasename: (name, dest) => `[OK] ${name} -> ${dest}`,
-    skipNotApplicable: (name, runtime) =>
-      `${name} — ${runtime} に適用外`,
     pluginsHeader: "--- Claude Code プラグイン（ユーザー範囲）---",
     warnClaNotFound:
       "claude CLI が見つかりません — プラグインインストールをスキップ。Claude Code CLI をインストール後、--plugins-only を再実行してください。",
@@ -519,6 +527,11 @@ const STRINGS = {
     installingPlugin: (spec) => `プラグインをインストール中：${spec}`,
     warnPluginFailed: (spec, code) =>
       `[WARN] プラグインインストール失敗：${spec}（終了 ${code}）`,
+    pluginUpdateVersionMismatch: (spec, installedVer, specVer) =>
+      `[更新] ${spec} バージョン不一致：インストール済み ${installedVer}、マニフェスト ${specVer} — 再インストール`,
+    pluginUpdateUnknownVersion: (spec) =>
+      `[更新] ${spec} インストール済みバージョンが不明 — 再インストール`,
+    pluginUpdated: (spec) => `プラグイン更新済み：${spec}`,
     pythonToolsHeader: "--- Python ツール（オプション）---",
     pythonNotFound: "Python 3.10+ が見つかりません — graphify をスキップ。",
     pythonInstallHint:
@@ -527,6 +540,7 @@ const STRINGS = {
     installingGraphify: "graphify をインストール中（コードナレッジグラフ）...",
     installingGraphifySkill: "graphify Claude スキルを登録中...",
     okGraphifyInstalled: "graphify インストール完了、Claude スキル登録済み",
+    allUpToDate: (label) => `${label} すべて最新です`,
     warnGraphifySkillFailed: "graphify Claude スキル登録失敗（非ブロッキング）",
     warnGraphifyPipFailed: "graphify pip インストール失敗（非ブロッキング）",
     skillsHeader: (label, root) => `--- ${label}: ${root} ---`,
@@ -593,7 +607,8 @@ const STRINGS = {
     failureHint_unknown:
       "不明なエラー — 上記の詳細を確認するか、--update で再試行してください",
     failureSuggestions: "提案：",
-    stagingHeaderParallel: "フェーズ1：一時キャッシュにスキルリポジトリを並列取得",
+    stagingHeaderParallel:
+      "フェーズ1：一時キャッシュにスキルリポジトリを並列取得",
     stagingExplainParallel: (cacheDir) =>
       `このステップの流れ:\n• キャッシュフォルダ（プロジェクト本体ではありません）: ${cacheDir}\n• 先に各リポジトリをここへ clone（複数ランタイムでも 1 回だけ）。\n• フェーズ2 で各ランタイムの skills ディレクトリへコピー（例: ~/.claude/skills）。\n• 完了後、この一時フォルダは削除されます。`,
     cloneStarting: (id) => `${id} を取得中…`,
@@ -704,8 +719,7 @@ const STRINGS = {
     syncDetailWorkspaces: (count, teamSize) =>
       `${count}/${teamSize}개 워크스페이스 디렉터리에 변경 있음`,
     syncDetailFiles: (count) => `${count}개 파일 업데이트됨`,
-    syncScopeLine: (scope, targets) =>
-      `범위: ${scope}  ·  대상: ${targets}`,
+    syncScopeLine: (scope, targets) => `범위: ${scope}  ·  대상: ${targets}`,
     syncRuntimesCheckStale: "생성된 런타임 자산이 오래되었습니다:",
     syncRuntimesCheckStaleLine: (file) => `- ${file}`,
     syncRuntimesCheckOk: "런타임 자산이 최신입니다.",
@@ -721,8 +735,6 @@ const STRINGS = {
     okCloned: (path) => `[OK] 클론됨 ${path}`,
     skipExists: (path) => `존재함 ${path}`,
     okBasename: (name, dest) => `[OK] ${name} -> ${dest}`,
-    skipNotApplicable: (name, runtime) =>
-      `${name} — ${runtime}에 적용 불가`,
     pluginsHeader: "--- Claude Code 플러그인 (사용자 범위) ---",
     warnClaNotFound:
       "claude CLI를 찾을 수 없음 — 플러그인 설치 건너뜀. Claude Code CLI를 설치한 후 --plugins-only를 다시 실행하세요.",
@@ -730,6 +742,11 @@ const STRINGS = {
     installingPlugin: (spec) => `플러그인 설치 중：${spec}`,
     warnPluginFailed: (spec, code) =>
       `[WARN] 플러그인 설치 실패：${spec}（종료 코드 ${code}）`,
+    pluginUpdateVersionMismatch: (spec, installedVer, specVer) =>
+      `[업데이트] ${spec} 버전 불일치: 설치됨 ${installedVer}, 매니페스트 ${specVer} — 재설치`,
+    pluginUpdateUnknownVersion: (spec) =>
+      `[업데이트] ${spec} 설치 버전 알 수 없음 — 재설치`,
+    pluginUpdated: (spec) => `플러그인 업데이트됨：${spec}`,
     pythonToolsHeader: "--- Python 도구 (선택) ---",
     pythonNotFound: "Python 3.10+ 없음 — graphify 건너뜀.",
     pythonInstallHint:
@@ -738,6 +755,7 @@ const STRINGS = {
     installingGraphify: "graphify 설치 중 (코드 지식 그래프)...",
     installingGraphifySkill: "graphify Claude 스킬 등록 중...",
     okGraphifyInstalled: "graphify 설치 완료, Claude 스킬 등록됨",
+    allUpToDate: (label) => `${label} 모두 최신 상태입니다`,
     warnGraphifySkillFailed: "graphify Claude 스킬 등록 실패 (비차단)",
     warnGraphifyPipFailed: "graphify pip 설치 실패 (비차단)",
     skillsHeader: (label, root) => `--- ${label}: ${root} ---`,

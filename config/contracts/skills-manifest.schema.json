@@ -66,12 +66,17 @@
             "type": "boolean",
             "description": "If false, setup does not pre-select this repo in the dependency multi-select (default: true)"
           },
+          "installMethod": {
+            "type": "string",
+            "enum": ["pluginMarketplace", "gitClone", "gitCloneInstallScript", "subdirExtraction", "manual"],
+            "description": "How this skill is installed on target platforms. pluginMarketplace=Claude Code plugin marketplace; gitClone=plain git clone; gitCloneInstallScript=git clone then run setup script; subdirExtraction=git clone with subdir extraction; manual=copy files manually per README"
+          },
           "targets": {
             "type": "array",
             "description": "Which runtimes this skill applies to. If omitted, applies to all runtimes.",
             "items": {
               "type": "string",
-              "enum": ["claude", "codex", "openclaw", "cursor"]
+              "enum": ["claude", "codex", "openclaw", "cursor", "opencode"]
             }
           }
         }

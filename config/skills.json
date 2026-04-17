@@ -6,6 +6,7 @@
     {
       "id": "agent-teams-playbook",
       "repo": "${skillOwner}/agent-teams-playbook",
+      "installMethod": "gitCloneInstallScript",
       "targets": [
         "claude",
         "codex",
@@ -16,6 +17,7 @@
     {
       "id": "findskill",
       "repo": "${skillOwner}/findskill",
+      "installMethod": "subdirExtraction",
       "subdirTemplate": "{platform}",
       "subdirMapping": {
         "win32": "windows",
@@ -31,6 +33,7 @@
     {
       "id": "hookprompt",
       "repo": "${skillOwner}/HookPrompt",
+      "installMethod": "manual",
       "targets": [
         "claude"
       ]
@@ -38,28 +41,33 @@
     {
       "id": "superpowers",
       "repo": "obra/superpowers",
-      "claudePlugin": "superpowers@claude-plugins-official",
+      "claudePlugin": "superpowers@superpowers-marketplace",
+      "installMethod": "pluginMarketplace",
       "targets": [
         "claude",
         "codex",
         "openclaw",
-        "cursor"
+        "cursor",
+        "opencode"
       ]
     },
     {
       "id": "everything-claude-code",
       "repo": "affaan-m/everything-claude-code",
-      "subdir": "skills",
+      "claudePlugin": "everything-claude-code@everything-claude-code",
+      "installMethod": "pluginMarketplace",
       "targets": [
         "claude",
         "codex",
         "openclaw",
-        "cursor"
+        "cursor",
+        "opencode"
       ]
     },
     {
       "id": "planning-with-files",
       "repo": "OthmanAdi/planning-with-files",
+      "installMethod": "subdirExtraction",
       "subdir": "skills/planning-with-files",
       "pluginHookCompat": true,
       "targets": [
@@ -72,6 +80,7 @@
     {
       "id": "cli-anything",
       "repo": "HKUDS/CLI-Anything",
+      "installMethod": "pluginMarketplace",
       "defaultSelected": false,
       "targets": [
         "claude",
@@ -83,6 +92,7 @@
     {
       "id": "gstack",
       "repo": "garrytan/gstack",
+      "installMethod": "gitCloneInstallScript",
       "targets": [
         "claude",
         "codex",
@@ -93,6 +103,7 @@
     {
       "id": "skill-creator",
       "repo": "anthropics/skills",
+      "installMethod": "subdirExtraction",
       "subdir": "skills/skill-creator",
       "targets": [
         "claude",

@@ -191,15 +191,17 @@ export function parseSkillsArg(argv = process.argv.slice(2)) {
     }
   }
 
-  if (joined.length === 0) {
-    return null;
-  }
-
-  return joined
+  const result = joined
     .join(",")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  return result;
 }
 
 export function normalizeTargets(rawTargets) {

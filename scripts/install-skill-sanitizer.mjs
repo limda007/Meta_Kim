@@ -138,6 +138,18 @@ export function shouldSkipHarnessPackageSkillDoc(relPath) {
   return /\/agent-harness\/.+\/skills\/SKILL\.md$/i.test(n);
 }
 
+/**
+ * Third-party plugins (everything-claude-code, superpowers, etc.) ship bundled
+ * documentation SKILL.md files under `docs/{locale}/skills/` subtrees.
+ * These are reference docs bundled inside the plugin repo — not installable skills —
+ * and often lack valid YAML frontmatter. Skip quarantine so they stay in place.
+ */
+export function shouldSkipDocsSkillDoc(relPath) {
+  const n = relPath.replace(/\\/g, "/");
+  // docs/{locale}/skills/SKILL.md  OR  docs/{locale}/skills/{subdir}/SKILL.md
+  return /docs\/[^/]+\/skills\/(.+\/)?SKILL\.md$/i.test(n);
+}
+
 export async function listSkillFiles(rootDir) {
   const results = [];
 
@@ -221,7 +233,8 @@ export async function sanitizeInstalledSkillTree(
 
   for (const filePath of files) {
     const relToTarget = path.relative(targetDir, filePath).replace(/\\/g, "/");
-    const skipHarnessInvalidOnly = shouldSkipHarnessPackageSkillDoc(relToTarget);
+    const skipHarnessInvalidOnly =
+      shouldSkipHarnessPackageSkillDoc(relToTarget);
 
     const raw = await fs.readFile(filePath, "utf8");
     const validation = validateSkillFrontmatter(raw);
@@ -240,7 +253,7 @@ export async function sanitizeInstalledSkillTree(
       continue;
     }
 
-    if (skipHarnessInvalidOnly) {
+    if (skipHarnessInvalidOnly || shouldSkipDocsSkillDoc(relToTarget)) {
       continue;
     }
 

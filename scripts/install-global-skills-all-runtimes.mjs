@@ -8,7 +8,7 @@
  * marketplace plugin bundles.
  *
  * Flags:
- *   --update          git pull / re-clone skill dirs
+ *   --update          git pull / re-clone / re-run setup script for all skills
  *   --dry-run         print actions only
  *   --plugins-only    only run `claude plugin install` (no git clones)
  *   --skip-plugins    skip `claude plugin install` even if defaults apply
@@ -290,7 +290,7 @@ function applySkillsIdFilter(skillRepos, filterIds) {
 const manifestLoad = loadSkillsManifest();
 let SKILL_REPOS = manifestLoad.skillRepos;
 const skillsArg = parseSkillsArg(cliArgs);
-if (skillsArg !== null) {
+if (skillsArg !== null && skillsArg.length > 0) {
   const { repos, unknownIds } = applySkillsIdFilter(SKILL_REPOS, skillsArg);
   for (const id of unknownIds) {
     console.warn(`${C.yellow}⚠${C.reset} ${t.skillsFilterUnknown(id)}`);
@@ -1394,22 +1394,26 @@ async function installSkillCreator(targetBaseSkills) {
 
 async function installAllSkillsForRuntime(label, runtimeHome, runtimeId) {
   const skillsRoot = path.join(runtimeHome, "skills");
-  console.log(
-    `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
-  );
   assertUnderHome(runtimeHome);
   if (!dryRun) {
     await fs.mkdir(skillsRoot, { recursive: true });
     await fs.mkdir(path.join(runtimeHome, "plugins"), { recursive: true });
   }
 
+  let hasOutput = false;
+  const emitHeader = () => {
+    if (hasOutput) return;
+    hasOutput = true;
+    console.log(
+      `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
+    );
+  };
+
   for (const spec of SKILL_REPOS) {
     if (spec.targets && !spec.targets.includes(runtimeId)) {
-      console.log(
-        `${C.yellow}⊘${C.reset} ${C.dim}${t.skipNotApplicable(spec.id, runtimeId)}${C.reset}`,
-      );
       continue;
     }
+    emitHeader();
     const targetDir = resolveSkillTargetDir(runtimeHome, spec);
     if (spec.subdir) {
       await installGitSkillFromSubdir(
@@ -1428,7 +1432,14 @@ async function installAllSkillsForRuntime(label, runtimeHome, runtimeId) {
     (spec) => spec.id === "skill-creator",
   );
   if (!hasManifestSkillCreator) {
+    emitHeader();
     await installSkillCreator(skillsRoot);
+  }
+
+  if (!hasOutput) {
+    console.log(
+      `\n${C.green}✓${C.reset} ${C.dim}${t.allUpToDate(label)}${C.reset}`,
+    );
   }
 }
 
@@ -1472,7 +1483,22 @@ function installClaudePlugins() {
     return;
   }
 
-  // Detect already-installed plugins so we skip re-installing them.
+  // Load installed plugin versions from installed_plugins.json
+  // Format: { "<bareName>": "<installedVersion>" }
+  let installedPlugins = {};
+  const configHome =
+    process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), ".claude");
+  const installedPluginsPath = path.join(configHome, "installed_plugins.json");
+  try {
+    if (existsSync(installedPluginsPath)) {
+      const raw = readFileSync(installedPluginsPath, "utf8");
+      installedPlugins = JSON.parse(raw);
+    }
+  } catch {
+    // If file missing or corrupt, fall through with empty map
+  }
+
+  // Probe currently-active plugins via CLI (for bare-name dedup in non-update mode)
   const listOut = spawnSync("claude", ["plugins", "list", "--json"], {
     encoding: "utf8",
     shell: claudeShellOpt,
@@ -1494,12 +1520,35 @@ function installClaudePlugins() {
 
   for (const spec of CLAUDE_PLUGIN_SPECS) {
     const bareName = spec.split("@")[0];
-    if (installedNames.has(bareName)) {
-      console.log(
-        `${C.yellow}⊘${C.reset} ${C.dim}${t.skipAlreadyInstalled(bareName)}${C.reset}`,
-      );
-      continue;
+    const installedVersion = installedPlugins[bareName];
+
+    if (!updateMode) {
+      // Non-update mode: skip if bare name is already installed (original behavior)
+      if (installedNames.has(bareName)) {
+        console.log(
+          `${C.yellow}⊘${C.reset} ${C.dim}${t.skipAlreadyInstalled(bareName)}${C.reset}`,
+        );
+        continue;
+      }
+    } else {
+      // Update mode: check version; reinstall if mismatch or unknown
+      if (installedVersion !== undefined && installedVersion !== "unknown") {
+        if (installedVersion === spec) {
+          console.log(
+            `${C.yellow}⊘${C.reset} ${C.dim}${t.skipAlreadyInstalled(bareName)}${C.reset}`,
+          );
+          continue;
+        }
+        console.log(
+          `${C.cyan}↺${C.reset} ${t.pluginUpdateVersionMismatch(spec, installedVersion, spec)}`,
+        );
+      } else {
+        console.log(
+          `${C.cyan}↺${C.reset} ${t.pluginUpdateUnknownVersion(spec)}`,
+        );
+      }
     }
+
     if (dryRun) {
       console.log(t.dryRun(`claude plugin install ${spec}`));
       continue;
@@ -1513,6 +1562,23 @@ function installClaudePlugins() {
       console.warn(
         `${C.yellow}⚠${C.reset} ${t.warnPluginFailed(spec, p.status)}`,
       );
+    } else if (updateMode) {
+      console.log(`${C.green}✓${C.reset} ${t.pluginUpdated(spec)}`);
+    }
+
+    // Record installed version so --update mode can detect future mismatches.
+    // Both update-mode reinstalls and first-time installs write here.
+    if (p.status === 0) {
+      installedPlugins[bareName] = spec;
+      try {
+        fs.writeFileSync(
+          installedPluginsPath,
+          JSON.stringify(installedPlugins, null, 2),
+          "utf8",
+        );
+      } catch {
+        // Write failure is non-fatal; the version will be re-detected next run.
+      }
     }
   }
 }
@@ -1679,14 +1745,38 @@ async function cleanupStaleStagingDirs(homes) {
  * Stage a skill repo to a temporary staging directory (full clone).
  * Returns true if staging succeeded.
  */
-async function stageSkillClone(skillId, stagedPath, repoUrl) {
+/**
+ * Clone a skill repo to the staging directory, skipping download if the skill
+ * already exists at preExistingPath (first target runtime's install location).
+ * This avoids redundant git clones in multi-runtime mode when skills are
+ * already deployed to at least one runtime.
+ * @param {boolean} skipIfExisting - when true, skip clone if preExistingPath is populated (non-update mode).
+ *   When false (update mode), always clone even if skill already exists at a runtime.
+ */
+async function stageSkillClone(
+  skillId,
+  stagedPath,
+  repoUrl,
+  preExistingPath,
+  skipIfExisting,
+) {
+  // Skip download if the skill already exists at a target runtime (non-update mode).
+  // In update mode, skipIfExisting is false so this block is bypassed and we always re-clone.
+  if (
+    skipIfExisting &&
+    preExistingPath &&
+    (await pathExists(preExistingPath)) &&
+    !(await isEmptyDir(preExistingPath))
+  ) {
+    return true;
+  }
+
   if ((await pathExists(stagedPath)) && !(await isEmptyDir(stagedPath))) {
     return true;
   }
 
   await fs.mkdir(path.dirname(stagedPath), { recursive: true });
   try {
-    console.log(`${C.dim}${t.cloneStarting(skillId)}${C.reset}`);
     await runGitAsync(
       ["clone", "--progress", "--depth", "1", repoUrl, stagedPath],
       {
@@ -1694,7 +1784,6 @@ async function stageSkillClone(skillId, stagedPath, repoUrl) {
         cloneProgress: { skillId, rootPath: stagedPath },
       },
     );
-    console.log(`${C.green}✓${C.reset} ${t.okStaged(skillId)}`);
     return true;
   } catch (error) {
     await handleGitFailure({ skillId, targetDir: stagedPath, repoUrl, error });
@@ -1704,16 +1793,36 @@ async function stageSkillClone(skillId, stagedPath, repoUrl) {
 
 /**
  * Stage a skill from a repo subdir (sparse checkout) to staging.
+ * Skips download if preExistingPath already contains the skill.
  * Returns true if staging succeeded.
+ * @param {boolean} skipIfExisting - when true, skip clone if preExistingPath is populated (non-update mode).
+ *   When false (update mode), always clone even if skill already exists at a runtime.
  */
-async function stageSkillFromSubdir(skillId, stagedPath, repoUrl, subdirPath) {
+async function stageSkillFromSubdir(
+  skillId,
+  stagedPath,
+  repoUrl,
+  subdirPath,
+  preExistingPath,
+  skipIfExisting,
+) {
+  // Skip download if the skill already exists at a target runtime (non-update mode).
+  // In update mode, skipIfExisting is false so this block is bypassed and we always re-clone.
+  if (
+    skipIfExisting &&
+    preExistingPath &&
+    (await pathExists(preExistingPath)) &&
+    !(await isEmptyDir(preExistingPath))
+  ) {
+    return true;
+  }
+
   if ((await pathExists(stagedPath)) && !(await isEmptyDir(stagedPath))) {
     return true;
   }
 
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "meta-kim-skill-"));
   try {
-    console.log(`${C.dim}${t.cloneStarting(skillId)}${C.reset}`);
     await runGitAsync(
       [
         "clone",
@@ -1740,9 +1849,6 @@ async function stageSkillFromSubdir(skillId, stagedPath, repoUrl, subdirPath) {
     }
     await fs.mkdir(path.dirname(stagedPath), { recursive: true });
     await fs.cp(src, stagedPath, { recursive: true, force: true });
-    console.log(
-      `${C.green}✓${C.reset} ${t.okStagedSubdir(skillId, subdirPath)}`,
-    );
     return true;
   } catch (error) {
     let recovered = false;
@@ -1759,9 +1865,6 @@ async function stageSkillFromSubdir(skillId, stagedPath, repoUrl, subdirPath) {
         if (await pathExists(srcRecover)) {
           await fs.mkdir(path.dirname(stagedPath), { recursive: true });
           await fs.cp(srcRecover, stagedPath, { recursive: true, force: true });
-          console.log(
-            `${C.green}✓${C.reset} ${t.okStagedSubdir(skillId, subdirPath)}`,
-          );
           recovered = true;
         }
       } catch {
@@ -1846,11 +1949,24 @@ async function installSkillsToMultipleRuntimes(
   );
 
   try {
-    // Phase 1: Stage each unique skill repo in parallel
-    console.log(`\n${C.bold}${AMBER}${t.stagingHeaderParallel}${C.reset}`);
-    console.log(`${C.dim}${t.stagingExplainParallel(stagingRoot)}${C.reset}\n`);
+    // Phase 0: Find pre-existing installs to avoid redundant downloads.
+    // If a skill already exists at the first target runtime, the staging
+    // functions can skip cloning and Phase 2 can copy from that location.
+    const alreadyExists = new Map();
+    for (const spec of SKILL_REPOS) {
+      const applicableRuntimes = targetRuntimeIds.filter(
+        (id) => !spec.targets || spec.targets.includes(id),
+      );
+      if (applicableRuntimes.length === 0) continue;
+      // Check the first runtime as the canonical "already installed" source.
+      const firstRuntimeHome = homes[applicableRuntimes[0]];
+      const candidate = resolveSkillTargetDir(firstRuntimeHome, spec);
+      if ((await pathExists(candidate)) && !(await isEmptyDir(candidate))) {
+        alreadyExists.set(spec.id, candidate);
+      }
+    }
 
-    const stagedSkills = new Map();
+    // Phase 1: Stage each unique skill repo in parallel (silent unless actual cloning happens)
 
     const limitClone = createConcurrencyLimiter(MAX_CONCURRENT_CLONES);
 
@@ -1862,18 +1978,28 @@ async function installSkillsToMultipleRuntimes(
     }).map((spec) =>
       limitClone(async () => {
         const stagedPath = path.join(stagingRoot, spec.id);
+        const preExistingPath = alreadyExists.get(spec.id);
         const success = spec.subdir
           ? await stageSkillFromSubdir(
               spec.id,
               stagedPath,
               spec.repo,
               spec.subdir,
+              preExistingPath,
+              !updateMode,
             )
-          : await stageSkillClone(spec.id, stagedPath, spec.repo);
+          : await stageSkillClone(
+              spec.id,
+              stagedPath,
+              spec.repo,
+              preExistingPath,
+              !updateMode,
+            );
         return { id: spec.id, success, stagedPath };
       }),
     );
 
+    const stagedSkills = new Map();
     const stageResults = await Promise.allSettled(stagePromises);
     for (const result of stageResults) {
       if (result.status === "fulfilled") {
@@ -1900,18 +2026,21 @@ async function installSkillsToMultipleRuntimes(
       const runtimeHome = homes[runtimeId];
       const skillsRoot = path.join(runtimeHome, "skills");
       const label = runtimeLabels[runtimeId] || `${runtimeId} skills`;
-      console.log(
-        `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
-      );
       assertUnderHome(skillsRoot);
       await fs.mkdir(skillsRoot, { recursive: true });
       await fs.mkdir(path.join(runtimeHome, "plugins"), { recursive: true });
 
+      let hasOutput = false;
+      const emitHeader = () => {
+        if (hasOutput) return;
+        hasOutput = true;
+        console.log(
+          `\n${C.bold}${AMBER}${t.skillsHeader(label, runtimeHome)}${C.reset}`,
+        );
+      };
+
       for (const spec of SKILL_REPOS) {
         if (spec.targets && !spec.targets.includes(runtimeId)) {
-          console.log(
-            `${C.yellow}⊘${C.reset} ${C.dim}${t.skipNotApplicable(spec.id, runtimeId)}${C.reset}`,
-          );
           continue;
         }
 
@@ -1919,6 +2048,7 @@ async function installSkillsToMultipleRuntimes(
         const targetDir = resolveSkillTargetDir(runtimeHome, spec);
 
         if (staged?.success) {
+          emitHeader();
           await deployStagedSkill(
             staged.stagedPath,
             targetDir,
@@ -1927,6 +2057,7 @@ async function installSkillsToMultipleRuntimes(
           );
         } else {
           // Staging failed: fall back to direct per-runtime install
+          emitHeader();
           if (spec.subdir) {
             await installGitSkillFromSubdir(
               spec.id,
@@ -1948,7 +2079,14 @@ async function installSkillsToMultipleRuntimes(
         (s) => s.id === "skill-creator",
       );
       if (!hasManifestSkillCreator) {
+        emitHeader();
         await installSkillCreator(skillsRoot);
+      }
+
+      if (!hasOutput) {
+        console.log(
+          `\n${C.green}✓${C.reset} ${C.dim}${t.allUpToDate(label)}${C.reset}`,
+        );
       }
     }
   } finally {

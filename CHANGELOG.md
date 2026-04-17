@@ -6,6 +6,22 @@ When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the
 
 ## [2.0.8] - 2026-04-17
 
+### Fixed
+
+- **skills.json: superpowers plugin version**: Fixed `superpowers` from `superpowers@claude-plugins-official` (wrong, lacks per-skill discovery) to `superpowers@superpowers-marketplace` (correct, 14 skills discoverable). Resolves [Issue #4](https://github.com/KimYx0207/Meta_Kim/issues/4).
+
+- **skills.json: everything-claude-code install method**: Fixed `everything-claude-code` from `subdir: "skills"` (wrong, not a subdir of its repo) to `claudePlugin: "everything-claude-code@everything-claude-code"` (plugin marketplace, correct).
+
+- **schema: installMethod field**: Added `installMethod` enum to `skills-manifest.schema.json`: `pluginMarketplace`, `gitClone`, `gitCloneInstallScript`, `subdirExtraction`, `manual`. Documents how each of the 9 dependency skills is installed across platforms.
+
+- **schema: opencode target**: Added `opencode` to targets enum — `superpowers` and `everything-claude-code` now declare full cross-platform support (claude, codex, openclaw, cursor, opencode).
+
+- **skills.json: installMethod coverage**: All 9 skills now carry explicit `installMethod`: superpowers/ecc/cli-anything → `pluginMarketplace`; agent-teams-playbook/gstack → `gitCloneInstallScript`; findskill/planning-with-files/skill-creator → `subdirExtraction`; hookprompt → `manual`.
+
+- **setup.mjs multi-runtime redundant download fix**: Added Phase 0 pre-check in `installSkillsToMultipleRuntimes` to detect skills already deployed at target runtimes. Updated `stageSkillClone` and `stageSkillFromSubdir` to accept optional `preExistingPath` and skip git clone when skill already exists. Eliminates wasteful downloads on every `setup.mjs` run (without `--update`) for already-installed skills. Backward compatible: `--update` mode, single-runtime path, and CLI interface unchanged.
+
+- **sanitizer: skip quarantine for third-party plugin docs**: Added `shouldSkipDocsSkillDoc()` to `install-skill-sanitizer.mjs` — skips quarantine for `docs/{locale}/skills/*.md` files in third-party plugin repos (e.g. ecc's example skills under `docs/zh-CN/skills/`). Suppresses the noisy "隔离托管安装中的无效 SKILL.md" warnings that appear on every `setup.mjs` run. Only quarantines files that would actually be discovered as skills.
+
 ### Added
 
 - **meta-conductor Stage 4 agent-team-playbook integration**: Pipeline Mode integration with `agent-teams-playbook` v4.5. Conductor now invokes the playbook at Stage 4 (Execution) to obtain orchestration decisions (scenario selection, team blueprint, collaboration mode), parses the natural language output, and converts `teamBlueprint` to `workerTaskPackets` for dispatch board execution. Strict mode: parsing failures throw `ParseError` immediately (no silent defaults). Error codes: `SCENARIO_MISSING`, `BLUEPRINT_EMPTY`, `BLUEPRINT_COLUMN_MISMATCH`, `DISPATCH_BOARD_MISSING`.
