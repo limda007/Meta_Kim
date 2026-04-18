@@ -19,6 +19,19 @@ import {
   resolveTargetContext,
   resolveRuntimeHomeInfo,
 } from "./meta-kim-sync-config.mjs";
+import { CATEGORIES, openRecorder } from "./install-manifest.mjs";
+
+// Recorder is lazily opened in runSync(); helpers record through this holder
+// so we do not have to thread recorder arg through every sync function.
+let manifestRecorder = null;
+function recordSafe(fn) {
+  if (!manifestRecorder) return;
+  try {
+    fn(manifestRecorder);
+  } catch {
+    /* recorder never breaks sync */
+  }
+}
 
 // ANSI colors matching setup.mjs
 const C = {
@@ -139,11 +152,18 @@ async function fingerprintDir(rootDir) {
   };
 }
 
-async function copyCanonicalSkill(targetDir) {
+async function copyCanonicalSkill(targetDir, targetId) {
   assertHomeBound(targetDir);
   await fs.mkdir(path.dirname(targetDir), { recursive: true });
   await fs.rm(targetDir, { recursive: true, force: true });
   await fs.cp(sourceDir, targetDir, { recursive: true, force: true });
+  recordSafe((rec) =>
+    rec.recordDir(targetDir, {
+      source: "sync-global-meta-theory",
+      purpose: `${targetId ?? "runtime"}-global-skill`,
+      category: CATEGORIES.A,
+    }),
+  );
 }
 
 async function removeIfExists(targetPath) {
@@ -168,6 +188,28 @@ async function copyCanonicalHooksToGlobal() {
   await fs.mkdir(path.dirname(dest), { recursive: true });
   await fs.rm(dest, { recursive: true, force: true });
   await fs.cp(repoHooksDir, dest, { recursive: true, force: true });
+  recordSafe((rec) =>
+    rec.recordDir(dest, {
+      source: "sync-global-meta-theory",
+      purpose: "claude-global-hooks-dir",
+      category: CATEGORIES.B,
+    }),
+  );
+  try {
+    const entries = await fs.readdir(dest, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      recordSafe((rec) =>
+        rec.recordFile(path.join(dest, entry.name), {
+          source: "sync-global-meta-theory",
+          purpose: "claude-global-hook",
+          category: CATEGORIES.B,
+        }),
+      );
+    }
+  } catch {
+    /* directory iteration best-effort */
+  }
 }
 
 async function syncClaudeGlobalSettingsHooks() {
@@ -216,6 +258,21 @@ async function syncClaudeGlobalSettingsHooks() {
 
   await fs.writeFile(settingsPath, out, "utf8");
   console.log(`Merged Meta_Kim hooks into ${settingsPath}`);
+  recordSafe((rec) => {
+    const managedCommands = [];
+    for (const blocks of Object.values(template)) {
+      for (const block of blocks ?? []) {
+        for (const h of block.hooks ?? []) {
+          if (h?.command) managedCommands.push(h.command);
+        }
+      }
+    }
+    rec.recordSettingsMerge(settingsPath, managedCommands, {
+      source: "sync-global-meta-theory",
+      purpose: "claude-global-settings-merge",
+      category: CATEGORIES.C,
+    });
+  });
 }
 
 async function runCheck() {
@@ -273,6 +330,10 @@ async function runSync() {
   if (!(await pathExists(sourceSkillFile))) {
     throw new Error(`Missing canonical skill source: ${sourceSkillFile}`);
   }
+  manifestRecorder = openRecorder({
+    scope: "global",
+    metaKimVersion: process.env.META_KIM_VERSION ?? null,
+  });
 
   for (const target of cleanupTargets) {
     const removed = await removeIfExists(target.dir);
@@ -284,7 +345,7 @@ async function runSync() {
   }
 
   for (const target of activeTargets) {
-    await copyCanonicalSkill(target.dir);
+    await copyCanonicalSkill(target.dir, target.targetId);
     console.log(
       `${C.green}✓${C.reset} ${C.dim}Synced ${target.label}: ${target.dir}${C.reset}`,
     );
@@ -300,6 +361,15 @@ async function runSync() {
     console.log(
       `${C.yellow}⊘${C.reset} ${C.dim}Skipped Claude Code global hooks.${C.reset}`,
     );
+  }
+
+  if (manifestRecorder) {
+    const result = await manifestRecorder.flush();
+    if (result.ok) {
+      console.log(
+        `${C.green}✓${C.reset} ${C.dim}Install manifest: ${result.path} (${result.entries} entries)${C.reset}`,
+      );
+    }
   }
 }
 
