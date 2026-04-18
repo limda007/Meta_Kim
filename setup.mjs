@@ -494,6 +494,10 @@ Possible causes:
     progressValidate: "Validate installation",
     // Confirm strings
     confirmStartInstall: "Start installation?",
+    footprintTitle: "Installation footprint (from previous run)",
+    footprintFirstInstall:
+      "First install on this machine — no previous footprint recorded.",
+    footprintRefreshNote: "Running install will refresh these entries.",
     installCancelled: "Installation cancelled",
     installComplete: "Installation complete!",
     // Warning messages
@@ -880,6 +884,9 @@ ${r ? `原始错误：${r}` : ""}
     progressValidate: "验证安装",
     // 确认字符串
     confirmStartInstall: "开始安装？",
+    footprintTitle: "安装足迹（上次安装记录）",
+    footprintFirstInstall: "首次安装 — 无历史足迹可显示。",
+    footprintRefreshNote: "本次安装将刷新上述条目。",
     installCancelled: "安装已取消",
     installComplete: "安装完成！",
     // Warning messages
@@ -1293,6 +1300,10 @@ ${r ? `生エラー：${r}` : ""}
     progressValidate: "インストールを検証",
     // 確認文字列
     confirmStartInstall: "インストールを開始しますか？",
+    footprintTitle: "インストール足跡（前回の記録）",
+    footprintFirstInstall:
+      "このマシンでの初回インストール — 前回の足跡はありません。",
+    footprintRefreshNote: "インストール実行時に上記エントリは更新されます。",
     installCancelled: "インストールがキャンセルされました",
     installComplete: "インストール完了！",
     // 警告メッセージ
@@ -1692,6 +1703,9 @@ ${r ? `원본 오류：${r}` : ""}
     progressValidate: "설치 검증",
     // 확인 문자열
     confirmStartInstall: "설치를 시작할까요?",
+    footprintTitle: "설치 발자국 (이전 설치 기록)",
+    footprintFirstInstall: "이 머신에서 첫 설치 — 이전 발자국이 없습니다.",
+    footprintRefreshNote: "설치 실행 시 위 항목들이 갱신됩니다.",
     installCancelled: "설치가 취소되었습니다",
     installComplete: "설치 완료!",
     // 경고 메시지
@@ -2264,6 +2278,56 @@ ${C.dim}${t.installOverviewTargets}${C.reset}${activeTargets.join(", ")}
 ${C.dim}${t.installOverviewScope}${C.reset}${scopeLabel}${skillLine}
 ${C.dim}${t.installOverviewEstimated}${C.reset}${t.installOverviewTime}
 `);
+}
+
+/**
+ * Print a summary of Meta_Kim's existing install footprint (from manifests
+ * written by prior sync runs) so the user can see what this install is about
+ * to refresh. Pure read-only; safe to call even when no manifest exists.
+ */
+async function showExistingFootprint(installScope) {
+  const { readManifest, manifestPathFor, listByCategory, CATEGORY_LABELS } =
+    await import("./scripts/install-manifest.mjs");
+
+  const sources = [];
+  if (installScope === "global" || installScope === "both") {
+    try {
+      const m = readManifest(manifestPathFor("global"));
+      if (m && m.entries?.length > 0)
+        sources.push({ label: "Global", manifest: m });
+    } catch {
+      /* manifest read is best-effort */
+    }
+  }
+  if (installScope === "project" || installScope === "both") {
+    try {
+      const m = readManifest(manifestPathFor("project", PROJECT_DIR));
+      if (m && m.entries?.length > 0)
+        sources.push({ label: "Project", manifest: m });
+    } catch {
+      /* manifest read is best-effort */
+    }
+  }
+
+  console.log(`\n${C.bold}${t.footprintTitle}${C.reset}`);
+  if (sources.length === 0) {
+    console.log(`${C.dim}${t.footprintFirstInstall}${C.reset}\n`);
+    return;
+  }
+
+  for (const { label, manifest } of sources) {
+    const grouped = listByCategory(manifest);
+    console.log(
+      `  ${C.cyan}${label}${C.reset}: ${manifest.entries.length} entries`,
+    );
+    for (const [cat, items] of Object.entries(grouped)) {
+      if (items.length === 0) continue;
+      console.log(
+        `    ${cat}. ${CATEGORY_LABELS[cat]}: ${C.bold}${items.length}${C.reset}`,
+      );
+    }
+  }
+  console.log(`${C.dim}${t.footprintRefreshNote}${C.reset}\n`);
 }
 
 /** Execute with progress indicator */
@@ -3620,6 +3684,7 @@ async function runInstall() {
 
   // Show installation overview
   showInstallOverview(activeTargets, installScope, selectedSkillIds);
+  await showExistingFootprint(installScope);
 
   const confirm = await askYesNo(t.confirmStartInstall, true);
   if (!confirm) {
