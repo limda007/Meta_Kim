@@ -398,6 +398,8 @@ ${r ? `Raw error: ${r}` : ""}
     pythonInstallNotSupported: (platform) =>
       `Auto-install not supported on ${platform}. Please install Python 3.10+ manually from https://www.python.org/downloads/`,
     pythonInstallWinget: "Installing Python via winget...",
+    pythonInstallWingetHint:
+      "winget is downloading and installing Python — this may take a few minutes, please wait...",
     pythonInstallScoop: "Installing Python via scoop...",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "Installing graphify (code knowledge graph)...",
@@ -789,6 +791,8 @@ ${r ? `原始错误：${r}` : ""}
     pythonInstallNotSupported: (platform) =>
       `${platform} 平台暂不支持自动安装，请从 https://www.python.org/downloads/ 手动下载 Python 3.10+`,
     pythonInstallWinget: "正在通过 winget 安装 Python...",
+    pythonInstallWingetHint:
+      "winget 正在下载安装 Python — 可能需要几分钟，请耐心等待...",
     pythonInstallScoop: "正在通过 scoop 安装 Python...",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "正在安装 graphify（代码知识图谱）...",
@@ -1185,6 +1189,8 @@ ${r ? `生エラー：${r}` : ""}
     pythonInstallNotSupported: (platform) =>
       `${platform} では自動インストールがサポートされていません。https://www.python.org/downloads/ から手動でインストールしてください`,
     pythonInstallWinget: "winget で Python をインストール中...",
+    pythonInstallWingetHint:
+      "winget で Python をダウンロード・インストール中 — 数分かかる場合があります、お待ちください...",
     pythonInstallScoop: "scoop で Python をインストール中...",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "graphify をインストール中（コードナレッジグラフ）...",
@@ -1592,6 +1598,8 @@ ${r ? `원본 오류：${r}` : ""}
     pythonInstallNotSupported: (platform) =>
       `${platform}은(는) 자동 설치를 지원하지 않습니다. https://www.python.org/downloads/ 에서 수동 설치하세요`,
     pythonInstallWinget: "winget으로 Python 설치 중...",
+    pythonInstallWingetHint:
+      "winget이 Python을 다운로드 및 설치 중입니다 — 몇 분 정도 걸릴 수 있습니다, 잠시만 기다려 주세요...",
     pythonInstallScoop: "scoop으로 Python 설치 중...",
     graphifyCheck: (v) => `graphify ${v}`,
     graphifyInstalling: "graphify 설치 중 (코드 지식 그래프)...",
@@ -2937,9 +2945,7 @@ async function downloadAndInstallPython() {
     });
     if (wingetCheck.status === 0) {
       info(t.pythonInstallWinget);
-      console.log(
-        `${C.dim}  winget is downloading and installing Python — this may take a few minutes, please wait...${C.reset}`,
-      );
+      console.log(`${C.dim}  ${t.pythonInstallWingetHint}${C.reset}`);
       const result = spawnSync(
         "winget",
         [
