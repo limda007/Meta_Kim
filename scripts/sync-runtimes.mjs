@@ -5,7 +5,6 @@ import {
   buildMetaKimHooksTemplate,
   mergeGlobalMetaKimHooksIntoSettings,
   mergeRepoClaudeSettings,
-  rewriteRepoHookCommandsToAbsolute,
 } from "./claude-settings-merge.mjs";
 import {
   canonicalAgentsDir,
@@ -762,7 +761,7 @@ async function syncClaudeProjection(
       }
     }
     const canonCopy = structuredClone(canonicalParsed);
-    rewriteRepoHookCommandsToAbsolute(canonCopy, repoRoot);
+    // Keep relative paths — do NOT rewrite to absolute (breaks cross-machine portability)
     const merged = mergeRepoClaudeSettings(base, canonCopy);
     finalSettingsContent = `${JSON.stringify(merged, null, 2)}\n`;
   } else {
@@ -775,7 +774,7 @@ async function syncClaudeProjection(
         throw error;
       }
     }
-    const template = buildMetaKimHooksTemplate(claudeHooksProjectionDir);
+    const template = buildMetaKimHooksTemplate(".claude/hooks");
     const merged = mergeGlobalMetaKimHooksIntoSettings(base, template);
     finalSettingsContent = `${JSON.stringify(merged, null, 2)}\n`;
   }
