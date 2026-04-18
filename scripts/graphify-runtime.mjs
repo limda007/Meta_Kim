@@ -1,4 +1,6 @@
 import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 export function readProcessText(result) {
   const stdout =
@@ -39,6 +41,57 @@ export function pythonCandidates(platform = process.platform) {
   ];
 }
 
+// Scan common Windows install locations for a python.exe that PATH may miss.
+// Covers: per-user (winget default), system-wide (Python.org installer),
+// C:\PythonXY (legacy), and Program Files (both 64/32-bit trees).
+// Returns [{ major, minor, path }] sorted by version descending.
+export function discoverWindowsPythonPaths(env = process.env) {
+  const roots = new Set();
+  const addRoot = (value) => {
+    if (value && typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed) roots.add(trimmed);
+    }
+  };
+
+  if (env.LOCALAPPDATA) addRoot(join(env.LOCALAPPDATA, "Programs", "Python"));
+  if (env.ProgramFiles) addRoot(env.ProgramFiles);
+  if (env["ProgramFiles(x86)"]) addRoot(env["ProgramFiles(x86)"]);
+  addRoot("C:\\");
+
+  const pythonDirRe = /^Python(\d)(\d+)(?:-32)?$/i;
+  const found = [];
+
+  for (const root of roots) {
+    let entries;
+    try {
+      if (!existsSync(root)) continue;
+      entries = readdirSync(root);
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const match = pythonDirRe.exec(entry);
+      if (!match) continue;
+      const major = Number.parseInt(match[1], 10);
+      const minor = Number.parseInt(match[2], 10);
+      const exe = join(root, entry, "python.exe");
+      try {
+        if (!existsSync(exe) || !statSync(exe).isFile()) continue;
+      } catch {
+        continue;
+      }
+      found.push({ major, minor, path: exe });
+    }
+  }
+
+  found.sort((a, b) =>
+    a.major !== b.major ? b.major - a.major : b.minor - a.minor,
+  );
+  return found;
+}
+
 export function formatPythonLauncher(python) {
   return [python.command, ...python.args].join(" ");
 }
@@ -46,8 +99,9 @@ export function formatPythonLauncher(python) {
 export function detectPython310(
   spawnFn = spawnSync,
   platform = process.platform,
+  options = {},
 ) {
-  for (const candidate of pythonCandidates(platform)) {
+  const tryCandidate = (candidate) => {
     let result;
     try {
       result = spawnFn(candidate.command, [...candidate.args, "--version"], {
@@ -55,11 +109,11 @@ export function detectPython310(
         shell: false,
       });
     } catch {
-      continue;
+      return null;
     }
 
     if (result?.error || result?.status !== 0) {
-      continue;
+      return null;
     }
 
     const versionText = readProcessText(result);
@@ -73,6 +127,24 @@ export function detectPython310(
         version: parsed,
         versionText,
       };
+    }
+    return null;
+  };
+
+  for (const candidate of pythonCandidates(platform)) {
+    const hit = tryCandidate(candidate);
+    if (hit) return hit;
+  }
+
+  // Windows fallback: PATH may miss python.exe installed by winget or the
+  // Python.org installer. Scan common install roots and try absolute paths.
+  if (platform === "win32") {
+    const env = options.env ?? process.env;
+    const discovered = discoverWindowsPythonPaths(env);
+    for (const { major, minor, path: exePath } of discovered) {
+      if (major < 3 || (major === 3 && minor < 10)) continue;
+      const hit = tryCandidate({ command: exePath, args: [] });
+      if (hit) return { ...hit, absolutePath: true };
     }
   }
 
