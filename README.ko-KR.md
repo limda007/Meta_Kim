@@ -49,6 +49,8 @@ npm install
 node setup.mjs
 ```
 
+> 💡 **설치 후**: `setup.mjs`가 산출물 위치를 출력합니다. 언제든 다시 확인(또는 이전 설치와 비교)하려면 설치한 디렉터리에서 `npm run meta:status`를 실행하세요.
+
 저장소를 유지보수할 계획이라면, 먼저 `canonical/`과 `config/contracts/workflow-contract.json`을 수정한 뒤 다음을 실행하세요:
 
 ```bash
@@ -745,6 +747,16 @@ flowchart TB
 ---
 
 ## FAQ
+
+### `npx`로 설치했는데, 파일이 어디에 있나요?
+
+Meta_Kim은 3 곳에 기록합니다:
+
+1. **현재 디렉터리** — `.claude/`, `.codex/`, `.cursor/`, `openclaw/` 이 프로젝트의 런타임 투영
+2. **홈 디렉터리** — `~/.claude/skills/meta-theory/` (및 `.codex / .cursor / .openclaw`) 프로젝트 간 공유되는 전역 스킬
+3. **매니페스트** — `~/.meta-kim/install-manifest.json`이 모든 변경사항을 추적하여 안전한 롤백을 지원
+
+`npx`를 실행한 디렉터리에서 `npm run meta:status` (또는 `node setup.mjs --check`)를 실행하여 전체 풋프린트를 확인하세요. 롤백하려면 `npm run meta:uninstall`을 실행하세요.
 
 ### Meta_Kim은 일반 AI 코딩 보조와 뭐가 다르나요?
 

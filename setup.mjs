@@ -313,6 +313,14 @@ ${r ? `Raw error: ${r}` : ""}
     layer3Label: "Layer 3 (SQL / MCP Memory Service)",
     layer3Note:
       "requires server startup: python -m mcp_memory_service (then http://localhost:8000)",
+    installLocationsHeading: "Installation locations:",
+    installLocationsProject: "Project-level (this directory)",
+    installLocationsGlobal: "Global-level (shared across projects)",
+    installLocationsManifest: "Install manifest (for safe rollback)",
+    usefulCommandsHeading: "Next useful commands:",
+    cmdWhereStatus: "view all artifact locations",
+    cmdWhereStatusDiff: "diff against previous install",
+    cmdWhereUninstall: "safe uninstall",
     postInstallNotesReminder: "Reminder:",
     postInstallNotesReminderText:
       "Run node setup.mjs --check to verify your installation at any time.",
@@ -728,6 +736,14 @@ ${r ? `原始错误：${r}` : ""}
     layer3Label: "第三层（SQL / MCP Memory Service）",
     layer3Note:
       "需手动启动服务器：python -m mcp_memory_service（然后访问 http://localhost:8000）",
+    installLocationsHeading: "安装位置：",
+    installLocationsProject: "项目级（当前目录）",
+    installLocationsGlobal: "全局级（跨项目共享）",
+    installLocationsManifest: "安装清单（可安全卸载）",
+    usefulCommandsHeading: "常用后续命令：",
+    cmdWhereStatus: "查看所有产物位置",
+    cmdWhereStatusDiff: "对比上次安装",
+    cmdWhereUninstall: "安全卸载",
     postInstallNotesReminder: "提醒：",
     postInstallNotesReminderText:
       "随时可运行 node setup.mjs --check 验证安装状态。",
@@ -1132,6 +1148,15 @@ ${r ? `生エラー：${r}` : ""}
     layer3Label: "第3層（SQL / MCP Memory Service）",
     layer3Note:
       "サーバー手動起動が必要：python -m mcp_memory_service（次に http://localhost:8000 にアクセス）",
+    installLocationsHeading: "インストール先：",
+    installLocationsProject: "プロジェクトレベル（このディレクトリ）",
+    installLocationsGlobal: "グローバルレベル（プロジェクト間で共有）",
+    installLocationsManifest:
+      "インストールマニフェスト（安全にアンインストール可能）",
+    usefulCommandsHeading: "次によく使うコマンド：",
+    cmdWhereStatus: "すべての成果物の場所を表示",
+    cmdWhereStatusDiff: "前回のインストールとの差分",
+    cmdWhereUninstall: "安全にアンインストール",
     postInstallNotesReminder: "補足：",
     postInstallNotesReminderText:
       "node setup.mjs --check でいつでも導入状態を確認できます。",
@@ -1561,6 +1586,14 @@ ${r ? `원본 오류：${r}` : ""}
     layer3Label: "제3층 (SQL / MCP Memory Service)",
     layer3Note:
       "서버 수동 시작 필요: python -m mcp_memory_service (그러면 http://localhost:8000 에 접속)",
+    installLocationsHeading: "설치 위치:",
+    installLocationsProject: "프로젝트 레벨 (현재 디렉터리)",
+    installLocationsGlobal: "전역 레벨 (프로젝트 간 공유)",
+    installLocationsManifest: "설치 매니페스트 (안전하게 제거 가능)",
+    usefulCommandsHeading: "다음에 자주 사용하는 명령:",
+    cmdWhereStatus: "모든 산출물 위치 확인",
+    cmdWhereStatusDiff: "이전 설치와 비교",
+    cmdWhereUninstall: "안전하게 제거",
     postInstallNotesReminder: "참고:",
     postInstallNotesReminderText:
       "node setup.mjs --check로 언제든지 설치 상태를 확인할 수 있습니다.",
@@ -3851,6 +3884,28 @@ function showNextSteps(runtimes) {
   console.log(`${C.dim}${t.layer1Label} — ${t.layer1Note}${C.reset}`);
   console.log(`${C.dim}${t.layer2Label} — ${t.layer2Note}${C.reset}`);
   console.log(`${C.dim}${t.layer3Label} — ${t.layer3Note}${C.reset}`);
+  console.log("");
+  console.log(`${C.bold}${C.cyan}● ${t.installLocationsHeading}${C.reset}`);
+  console.log(
+    `${C.dim}• ${t.installLocationsProject}: .claude/  .codex/  .cursor/  openclaw/${C.reset}`,
+  );
+  console.log(
+    `${C.dim}• ${t.installLocationsGlobal}: ~/.claude/skills/  ~/.codex/skills/  ~/.cursor/skills/  ~/.openclaw/skills/${C.reset}`,
+  );
+  console.log(
+    `${C.dim}• ${t.installLocationsManifest}: ~/.meta-kim/install-manifest.json${C.reset}`,
+  );
+  console.log("");
+  console.log(`${C.bold}${C.cyan}● ${t.usefulCommandsHeading}${C.reset}`);
+  console.log(
+    `${C.dim}  npm run meta:status        # ${t.cmdWhereStatus}${C.reset}`,
+  );
+  console.log(
+    `${C.dim}  npm run meta:status:diff   # ${t.cmdWhereStatusDiff}${C.reset}`,
+  );
+  console.log(
+    `${C.dim}  npm run meta:uninstall     # ${t.cmdWhereUninstall}${C.reset}`,
+  );
   console.log("");
   console.log(
     `${C.dim}${C.yellow}★ ${t.postInstallNotesReminder} ${t.postInstallNotesReminderText}${C.reset}`,

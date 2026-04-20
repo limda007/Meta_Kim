@@ -49,6 +49,8 @@ npm install
 node setup.mjs
 ```
 
+> 💡 **安装之后**：`setup.mjs` 结尾会打印产物位置。任何时候想再看一眼（或对比上次安装），在安装目录里跑 `npm run meta:status` 即可。
+
 如果你准备维护仓库，优先改 `canonical/` 和 `config/contracts/workflow-contract.json`，然后执行：
 
 ```bash
@@ -745,6 +747,16 @@ flowchart TB
 ---
 
 ## FAQ
+
+### Q：我用 `npx` 装的，文件在哪？
+
+Meta_Kim 把产物写到 3 个地方：
+
+1. **当前目录** — `.claude/`、`.codex/`、`.cursor/`、`openclaw/` 本项目的 runtime 投影
+2. **用户 home** — `~/.claude/skills/meta-theory/`（以及 `.codex / .cursor / .openclaw`）跨项目共享的全局 skill
+3. **清单** — `~/.meta-kim/install-manifest.json` 记录所有改动，支持安全卸载
+
+在你跑 `npx` 的那个目录下运行 `npm run meta:status`（或 `node setup.mjs --check`）查看完整足迹。想回滚就跑 `npm run meta:uninstall`。
 
 ### Q：Meta_Kim 和普通的 AI 编码助手有什么区别？
 

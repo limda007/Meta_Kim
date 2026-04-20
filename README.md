@@ -49,6 +49,8 @@ npm install
 node setup.mjs
 ```
 
+> 💡 **After install**: `setup.mjs` prints where every artifact lives. To revisit that summary anytime (or diff vs. the previous install), run `npm run meta:status` in the directory where you installed.
+
 If you plan to maintain the repository, edit `canonical/` and `config/contracts/workflow-contract.json` first, then run:
 
 ```bash
@@ -746,6 +748,16 @@ The extracted tree lands in `~/.<runtime>/skills/<id>/`. Run `npm run meta:deps:
 ---
 
 ## FAQ
+
+### Q: I installed via `npx`, where are my files?
+
+Meta_Kim writes to 3 places:
+
+1. **Current directory** — `.claude/`, `.codex/`, `.cursor/`, `openclaw/` runtime projections for THIS project
+2. **Your home** — `~/.claude/skills/meta-theory/` (plus `.codex / .cursor / .openclaw`) for global skills shared across all projects
+3. **Manifest** — `~/.meta-kim/install-manifest.json` tracks everything for safe rollback
+
+Run `npm run meta:status` (or `node setup.mjs --check`) in the directory where you ran `npx` to see the full footprint. Use `npm run meta:uninstall` for a safe rollback.
 
 ### Q: What is different about Meta_Kim compared with a normal AI coding assistant?
 
