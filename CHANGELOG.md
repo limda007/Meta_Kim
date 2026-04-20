@@ -4,6 +4,24 @@ All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
+## [2.0.14] - 2026-04-20
+
+### Added
+
+- **MCP Memory SessionEnd auto-save + Layered injection (L1/L2/L3)**: Two complementary progress-tracking mechanisms for cross-session continuity.
+  - **`scripts/install-mcp-memory-hooks.mjs`** — Extended to handle Stop hook (`stop-save-progress.mjs`) and commands directory (`save-progress/`). Now registers both SessionStart and Stop hooks in `settings.json`. Stop hook auto-extracts completed/remaining tasks from session transcript via regex patterns and persists to `.claude/project-task-state.json`.
+  - **`canonical/runtime-assets/claude/hooks/stop-save-progress.mjs`** — Node.js Stop hook that reads session transcript, extracts task keywords (完成/搞定/新增/修复 etc.), and calls `mcp_memory_global.py --mode save`. Runs after every Claude Code session, exits 0 always.
+  - **`canonical/runtime-assets/claude/memory-hooks/mcp_memory_global.py`** — Upgraded with layered injection:
+    - L1 compact: task state only (~120 chars) — always shown
+    - L2 filtered: project memories with relevance > 0.55 (~400 chars) — context-triggered
+    - L3 full: recent memories (~800 chars) — on demand via `--mode query-memories`
+  - **`canonical/runtime-assets/claude/commands/save-progress/SKILL.md`** — Manual save command (`/save-progress`). Allows explicit task state persistence when user wants precise control.
+  - **Chinese-friendly limits**: `MIN_RELEVANCE=0.55` (lowered for Chinese embedding models), `MAX_LEN_COMPACT=120`, `MAX_LEN_L2=400`, `MAX_LEN_L3=800`.
+
+### Fixed
+
+- **`scripts/install-mcp-memory-hooks.mjs` async + `fs` import bug** — `copyCommandsDir()` used `fs.readdir()` but imported sync `fs` module, causing "fs is not defined" error. Fixed by importing `readdir` from `node:fs/promises`. Also fixed `registered is not defined` error by properly capturing return values from `registerSessionStartHook()` and `registerStopHook()`.
+
 ## [2.0.13] - 2026-04-20
 
 ### Added
