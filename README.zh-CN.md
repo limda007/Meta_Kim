@@ -45,6 +45,7 @@ npx --yes github:KimYx0207/Meta_Kim meta-kim
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
+npm install
 node setup.mjs
 ```
 
@@ -787,6 +788,7 @@ npx --yes github:KimYx0207/Meta_Kim meta-kim
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
+npm install
 node setup.mjs
 ```
 

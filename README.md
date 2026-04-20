@@ -45,6 +45,7 @@ Or install it the traditional way:
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
+npm install
 node setup.mjs
 ```
 
@@ -789,6 +790,7 @@ Or clone the repository and run:
 ```bash
 git clone https://github.com/KimYx0207/Meta_Kim.git
 cd Meta_Kim
+npm install
 node setup.mjs
 ```
 
