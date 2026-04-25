@@ -379,11 +379,11 @@ ${r ? `Raw error: ${r}` : ""}
     syncClaudeSettings: "Claude Code .claude/settings.json",
     syncClaudeMcp: "Claude Code .mcp.json",
     syncCodexAgents: (n) => `Codex agents: ${n}/8 .toml files`,
-    syncCodexSkills: "Codex skills/meta-theory.md",
+    syncCodexSkills: "Codex skills/meta-theory/SKILL.md",
     syncOpenclawWorkspaces: (n) =>
       `OpenClaw workspaces: ${n}/8 agents — each folder has the 9 required .md files (BOOT, SOUL, …)`,
     syncOpenclawSkill: "OpenClaw shared meta-theory",
-    syncSharedSkills: "Shared skills/meta-theory.md",
+    syncSharedSkills: "Shared skills/meta-theory/SKILL.md",
     syncCursorAgents: (n) => `Cursor agents: ${n}/8 .md files`,
     syncCursorSkills: "Cursor skills/meta-theory/SKILL.md",
     syncCursorMcp: "Cursor .cursor/mcp.json",
@@ -504,6 +504,7 @@ Possible causes:
     progressPrepareDir: "Prepare global skills directory",
     progressNpmInstall: "Install npm dependencies",
     progressSyncConfig: "Sync tool configurations",
+    progressCleanupLegacy: "Clean up legacy skill files",
     progressInstallSkills: "Install global skills (may take several minutes)",
     progressSyncMeta: "Sync meta-theory",
     progressValidate: "Validate installation",
@@ -825,11 +826,11 @@ ${r ? `原始错误：${r}` : ""}
     syncClaudeSettings: "Claude Code .claude/settings.json",
     syncClaudeMcp: "Claude Code .mcp.json",
     syncCodexAgents: (n) => `Codex 智能体: ${n}/8 .toml 文件`,
-    syncCodexSkills: "Codex 技能/meta-theory.md",
+    syncCodexSkills: "Codex 技能/meta-theory/SKILL.md",
     syncOpenclawWorkspaces: (n) =>
       `OpenClaw 工作区：${n}/8 个智能体，各目录 9 个必备 Markdown 已齐（含 BOOT、SOUL 等；不含子文件夹里的额外文件）`,
     syncOpenclawSkill: "OpenClaw 共享 meta-theory",
-    syncSharedSkills: "共享技能/meta-theory.md",
+    syncSharedSkills: "共享技能/meta-theory/SKILL.md",
     syncCursorAgents: (n) => `Cursor 智能体: ${n}/8 .md 文件`,
     syncCursorSkills: "Cursor 技能/meta-theory/SKILL.md",
     syncCursorMcp: "Cursor .cursor/mcp.json",
@@ -942,6 +943,7 @@ ${r ? `原始错误：${r}` : ""}
     progressPrepareDir: "准备全局技能目录",
     progressNpmInstall: "安装 npm 依赖",
     progressSyncConfig: "同步配置文件",
+    progressCleanupLegacy: "清理旧版技能文件",
     progressInstallSkills: "安装全局技能（可能需要几分钟）",
     progressSyncMeta: "同步 meta-theory",
     progressValidate: "验证安装",
@@ -1273,11 +1275,11 @@ ${r ? `生エラー：${r}` : ""}
     syncClaudeSettings: "Claude Code .claude/settings.json",
     syncClaudeMcp: "Claude Code .mcp.json",
     syncCodexAgents: (n) => `Codex エージェント: ${n}/8 .toml ファイル`,
-    syncCodexSkills: "Codex スキル/meta-theory.md",
+    syncCodexSkills: "Codex スキル/meta-theory/SKILL.md",
     syncOpenclawWorkspaces: (n) =>
       `OpenClaw ワークスペース: ${n}/8 エージェント — 各フォルダに必須の .md 9 件（BOOT、SOUL など）`,
     syncOpenclawSkill: "OpenClaw 共有 meta-theory",
-    syncSharedSkills: "共有スキル/meta-theory.md",
+    syncSharedSkills: "共有スキル/meta-theory/SKILL.md",
     syncCursorAgents: (n) => `Cursor エージェント: ${n}/8 .md ファイル`,
     syncCursorSkills: "Cursor スキル/meta-theory/SKILL.md",
     syncCursorMcp: "Cursor .cursor/mcp.json",
@@ -1407,6 +1409,7 @@ ${r ? `生エラー：${r}` : ""}
     progressPrepareDir: "グローバルスキルディレクトリを準備",
     progressNpmInstall: "npm依存関係をインストール",
     progressSyncConfig: "設定を同期",
+    progressCleanupLegacy: "レガシースキルファイルをクリーンアップ",
     progressInstallSkills:
       "グローバルスキルをインストール（数分かかる場合があります）",
     progressSyncMeta: "meta-theory を同期",
@@ -1737,11 +1740,11 @@ ${r ? `원본 오류：${r}` : ""}
     syncClaudeSettings: "Claude Code .claude/settings.json",
     syncClaudeMcp: "Claude Code .mcp.json",
     syncCodexAgents: (n) => `Codex 에이전트: ${n}/8 .toml 파일`,
-    syncCodexSkills: "Codex 스킬/meta-theory.md",
+    syncCodexSkills: "Codex 스킬/meta-theory/SKILL.md",
     syncOpenclawWorkspaces: (n) =>
       `OpenClaw 워크스페이스: ${n}/8 에이전트 — 각 폴더에 필수 .md 9개(BOOT, SOUL 등)`,
     syncOpenclawSkill: "OpenClaw 공유 meta-theory",
-    syncSharedSkills: "공유 스킬/meta-theory.md",
+    syncSharedSkills: "공유 스킬/meta-theory/SKILL.md",
     syncCursorAgents: (n) => `Cursor 에이전트: ${n}/8 .md 파일`,
     syncCursorSkills: "Cursor 스킬/meta-theory/SKILL.md",
     syncCursorMcp: "Cursor .cursor/mcp.json",
@@ -1861,6 +1864,7 @@ ${r ? `원본 오류：${r}` : ""}
     progressPrepareDir: "전역 스킬 디렉토리 준비",
     progressNpmInstall: "npm 의존성 설치",
     progressSyncConfig: "설정 동기화",
+    progressCleanupLegacy: "레거시 스킬 파일 정리",
     progressInstallSkills: "전역 스킬 설치(몇 분 소요될 수 있음)",
     progressSyncMeta: "meta-theory 동기화",
     progressValidate: "설치 검증",
@@ -2706,6 +2710,13 @@ async function runQuickDeploy() {
     return result.status === 0;
   });
 
+  // Clean up legacy skill files before sync
+  await withProgress(t.progressCleanupLegacy, () => {
+    const n = cleanupLegacySkills("both");
+    if (n > 0) ok(`Cleaned ${n} legacy file(s)`);
+    return true;
+  });
+
   // Sync runtimes to PROJECT_DIR
   await withProgress(t.progressSyncConfig, async () => {
     const configResult = await autoConfigure("project");
@@ -2981,7 +2992,7 @@ function checkSync(
 
     const codexSkillPath = join(
       PROJECT_DIR,
-      ".agents",
+      ".codex",
       "skills",
       "meta-theory",
       "SKILL.md",
@@ -3251,6 +3262,72 @@ function runNodeScript(scriptRelative, extraArgs = [], envOverrides = {}) {
     },
   };
   return spawnSync(spawnConfig.command, spawnConfig.args, mergedOptions);
+}
+
+// ── Legacy skill file cleanup ────────────────────────────
+// Precise removal of old single-file skill format that was replaced
+// by directory format (meta-theory.md → meta-theory/SKILL.md).
+
+const LEGACY_PROJECT_PATHS = [
+  join(PROJECT_DIR, ".claude", "skills", "meta-theory.md"),
+  join(PROJECT_DIR, ".codex", "skills", "meta-theory.md"),
+  join(PROJECT_DIR, ".codex", "skills", "references"),
+  join(PROJECT_DIR, "openclaw", "skills", "meta-theory.md"),
+  join(PROJECT_DIR, "openclaw", "skills", "references"),
+  join(PROJECT_DIR, ".cursor", "skills", "meta-theory.md"),
+];
+
+const LEGACY_GLOBAL_PATHS = [
+  {
+    id: "claude",
+    file: join(homedir(), ".claude", "skills", "meta-theory.md"),
+  },
+  {
+    id: "codex",
+    file: join(homedir(), ".codex", "skills", "meta-theory.md"),
+    dir: join(homedir(), ".codex", "skills", "references"),
+  },
+  {
+    id: "openclaw",
+    file: join(homedir(), ".openclaw", "skills", "meta-theory.md"),
+    dir: join(homedir(), ".openclaw", "skills", "references"),
+  },
+  {
+    id: "cursor",
+    file: join(homedir(), ".cursor", "skills", "meta-theory.md"),
+  },
+];
+
+function cleanupLegacySkills(scope = "project") {
+  let cleaned = 0;
+
+  if (scope === "project" || scope === "both") {
+    for (const p of LEGACY_PROJECT_PATHS) {
+      if (!existsSync(p)) continue;
+      try {
+        rmSync(p, { recursive: true, force: true });
+        cleaned++;
+      } catch {
+        // Best-effort: locked or permission-denied is non-fatal
+      }
+    }
+  }
+
+  if (scope === "global" || scope === "both") {
+    for (const { file, dir } of LEGACY_GLOBAL_PATHS) {
+      for (const p of [file, dir]) {
+        if (!existsSync(p)) continue;
+        try {
+          rmSync(p, { recursive: true, force: true });
+          cleaned++;
+        } catch {
+          // Best-effort
+        }
+      }
+    }
+  }
+
+  return cleaned;
 }
 
 // ── Step 3: Auto-configure project files ────────────────
@@ -4574,6 +4651,13 @@ async function runInstall() {
     });
 
     stepNum++;
+    await withProgress(t.stepLabel(stepNum, t.progressCleanupLegacy), () => {
+      const n = cleanupLegacySkills(installScope);
+      if (n > 0) ok(`Cleaned ${n} legacy file(s)`);
+      return true;
+    });
+
+    stepNum++;
     await withProgress(t.stepLabel(stepNum, t.progressSyncConfig), async () => {
       const configResult = await autoConfigure(installScope);
       if (!configResult) {
@@ -4724,6 +4808,10 @@ async function runUpdate() {
   // ── 2.5 [Optional] MCP Memory Service (Layer 3) ─────────────────
   console.log("");
   await installMcpMemoryServiceStep(true);
+
+  // ── 2.8. Clean up legacy skill files ───────────────────────────────
+  const legacyCount = cleanupLegacySkills(updateScope);
+  if (legacyCount > 0) ok(`Cleaned ${legacyCount} legacy file(s)`);
 
   // ── 3. sync-runtimes (scope from user selection) ──────────────────
   if (updateScope === "global") {
