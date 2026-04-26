@@ -322,6 +322,20 @@ function loadSkillsManifest() {
         ...(skill.installRoot ? { installRoot: skill.installRoot } : {}),
         ...(skill.pluginHookCompat ? { pluginHookCompat: true } : {}),
         ...(skill.installMethod ? { installMethod: skill.installMethod } : {}),
+        ...(skill.legacyNames ? { legacyNames: skill.legacyNames } : {}),
+        ...(skill.hookSubdirs ? { hookSubdirs: skill.hookSubdirs } : {}),
+        ...(skill.hookConfigFiles
+          ? { hookConfigFiles: skill.hookConfigFiles }
+          : {}),
+        ...(skill.fallbackContentDir
+          ? { fallbackContentDir: skill.fallbackContentDir }
+          : {}),
+        ...(skill.hookExtraFiles
+          ? { hookExtraFiles: skill.hookExtraFiles }
+          : {}),
+        ...(skill.hookSettingsMerge
+          ? { hookSettingsMerge: skill.hookSettingsMerge }
+          : {}),
       });
     }
 
@@ -1481,6 +1495,7 @@ async function installAllSkillsForRuntime(label, runtimeHome, runtimeId) {
     }
     emitHeader();
     const targetDir = resolveSkillTargetDir(runtimeHome, spec);
+    await cleanupLegacySkillNames(runtimeHome, spec);
     if (spec.subdir) {
       await installGitSkillFromSubdir(
         spec.id,
@@ -1494,8 +1509,11 @@ async function installAllSkillsForRuntime(label, runtimeHome, runtimeId) {
     await sanitizeCompatibilityRoots(runtimeId, skillsRoot, spec);
     await ensureHookLayoutAliases(runtimeHome, spec);
     // Hook co-deployment for subdirExtraction installs (e.g. planning-with-files)
-    await deployHookSubdirs(spec, targetDir, runtimeId);
-    await deployHookConfigFiles(spec, targetDir, runtimeId);
+    await deployHookSubdirs(spec, runtimeHome, runtimeId);
+    await deployHookConfigFiles(spec, runtimeHome, runtimeId);
+    await deployHookExtraFiles(spec, runtimeHome, runtimeId);
+    await mergeHookSettings(spec, runtimeHome, runtimeId);
+    await cleanupDisabledSkillResidue(runtimeHome, spec.id);
   }
   const hasManifestSkillCreator = SKILL_REPOS.some(
     (spec) => spec.id === "skill-creator",
@@ -1706,8 +1724,10 @@ async function installPluginBundlesForNonClaudeRuntimes(
       }
 
       // Hook co-deployment for plugin bundles
-      await deployHookSubdirs(spec, targetDir, runtimeId);
-      await deployHookConfigFiles(spec, targetDir, runtimeId);
+      await deployHookSubdirs(spec, runtimeHome, runtimeId);
+      await deployHookConfigFiles(spec, runtimeHome, runtimeId);
+      await deployHookExtraFiles(spec, runtimeHome, runtimeId);
+      await mergeHookSettings(spec, runtimeHome, runtimeId);
     }
   }
 }
@@ -2193,9 +2213,168 @@ async function cleanupStaleStagingDirs(homes) {
 // ── Two-phase install helpers ─────────────────────────────────
 
 /**
- * Stage a skill repo to a temporary staging directory (full clone).
- * Returns true if staging succeeded.
+ * Remove legacy-named skill directories/symlinks before installing the current skill.
+ * For example, when "find-skills" was renamed to "findskill", this removes the old
+ * "find-skills" directory or symlink so both do not coexist.
+ *
+ * @param {string} runtimeHome - The runtime home directory (e.g. ~/.claude)
+ * @param {object} spec - The skill spec from the manifest (must have .id, may have .legacyNames)
  */
+async function cleanupLegacySkillNames(runtimeHome, spec) {
+  const legacyNames = spec.legacyNames;
+  if (!legacyNames || legacyNames.length === 0) {
+    return;
+  }
+
+  const installSegment = skillInstallRootSegment(spec);
+
+  for (const legacyName of legacyNames) {
+    const legacyDir = path.join(runtimeHome, installSegment, legacyName);
+    if (!(await pathExists(legacyDir))) {
+      continue;
+    }
+
+    if (dryRun) {
+      console.log(t.dryRun(`remove legacy skill dir: ${legacyDir}`));
+      continue;
+    }
+
+    try {
+      const stat = await fs.lstat(legacyDir);
+      if (stat.isSymbolicLink()) {
+        await fs.unlink(legacyDir);
+      } else {
+        await rmDirWithRetry(legacyDir);
+      }
+      console.log(
+        `${C.green}✓${C.reset} ${t.warnLegacyNameRemoved(spec.id, legacyName, legacyDir)}`,
+      );
+    } catch (error) {
+      if (isWindowsLockError(error)) {
+        console.warn(
+          `${C.yellow}⚠${C.reset} ${t.warnStagingLocked(legacyDir)}`,
+        );
+        continue;
+      }
+      console.warn(
+        `${C.yellow}⚠${C.reset} ${spec.id}: failed to remove legacy "${legacyName}" at ${legacyDir}: ${error.message}`,
+      );
+    }
+  }
+}
+
+/**
+ * Remove stale .disabled/{skillId}/ residue after a skill is successfully installed/updated.
+ * When a skill was previously disabled and then reinstalled, the old disabled copy should
+ * not linger alongside the active version.
+ *
+ * @param {string} runtimeHome - The runtime home directory (e.g. ~/.codex)
+ * @param {string} skillId - The skill identifier
+ */
+async function cleanupDisabledSkillResidue(runtimeHome, skillId) {
+  const installSegments = ["skills", "plugins"];
+
+  for (const segment of installSegments) {
+    const disabledDir = path.join(runtimeHome, segment, ".disabled", skillId);
+    if (!(await pathExists(disabledDir))) {
+      continue;
+    }
+
+    if (dryRun) {
+      console.log(t.dryRun(`remove disabled residue: ${disabledDir}`));
+      continue;
+    }
+
+    try {
+      const stat = await fs.lstat(disabledDir);
+      if (stat.isSymbolicLink()) {
+        await fs.unlink(disabledDir);
+      } else {
+        await rmDirWithRetry(disabledDir);
+      }
+      console.log(
+        `${C.green}✓${C.reset} ${t.warnDisabledResidueRemoved(skillId, disabledDir)}`,
+      );
+    } catch (error) {
+      if (isWindowsLockError(error)) {
+        console.warn(
+          `${C.yellow}⚠${C.reset} ${t.warnStagingLocked(disabledDir)}`,
+        );
+        continue;
+      }
+      console.warn(
+        `${C.yellow}⚠${C.reset} ${skillId}: failed to remove .disabled/ residue at ${disabledDir}: ${error.message}`,
+      );
+    }
+  }
+}
+
+/**
+ * Sweep .disabled/ directories under skills/ and plugins/ for any entries
+ * that have an active counterpart (same name exists in the parent segment).
+ * This catches residue from skills deployed outside the manifest (e.g. meta-theory
+ * via sync:runtimes) that would not be covered by per-skill cleanup.
+ */
+async function sweepStaleDisabledDirs(runtimeHome) {
+  const segments = ["skills", "plugins"];
+
+  for (const segment of segments) {
+    const disabledRoot = path.join(runtimeHome, segment, ".disabled");
+    if (!(await pathExists(disabledRoot))) continue;
+
+    let entries;
+    try {
+      entries = await fs.readdir(disabledRoot);
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const activeDir = path.join(runtimeHome, segment, entry);
+      const disabledDir = path.join(disabledRoot, entry);
+
+      if (!(await pathExists(activeDir))) continue;
+
+      if (dryRun) {
+        console.log(t.dryRun(`remove stale disabled: ${disabledDir}`));
+        continue;
+      }
+
+      try {
+        const stat = await fs.lstat(disabledDir);
+        if (stat.isSymbolicLink()) {
+          await fs.unlink(disabledDir);
+        } else if (stat.isDirectory()) {
+          await rmDirWithRetry(disabledDir);
+        }
+        console.log(
+          `${C.green}✓${C.reset} ${t.warnDisabledResidueRemoved(entry, disabledDir)}`,
+        );
+      } catch (error) {
+        if (isWindowsLockError(error)) {
+          console.warn(
+            `${C.yellow}⚠${C.reset} ${t.warnStagingLocked(disabledDir)}`,
+          );
+          continue;
+        }
+        console.warn(
+          `${C.yellow}⚠${C.reset} ${entry}: failed to sweep .disabled/ at ${disabledDir}: ${error.message}`,
+        );
+      }
+    }
+
+    // Remove .disabled/ dir itself if now empty
+    try {
+      const remaining = await fs.readdir(disabledRoot);
+      if (remaining.length === 0 && !dryRun) {
+        await fs.rmdir(disabledRoot);
+      }
+    } catch {
+      // non-fatal
+    }
+  }
+}
+
 /**
  * Clone a skill repo to the staging directory, skipping download if the skill
  * already exists at preExistingPath (first target runtime's install location).
@@ -2502,6 +2681,8 @@ async function installSkillsToMultipleRuntimes(
         const staged = stagedSkills.get(spec.id);
         const targetDir = resolveSkillTargetDir(runtimeHome, spec);
 
+        await cleanupLegacySkillNames(runtimeHome, spec);
+
         // staged?.success can be true even when stagedPath is empty (skip-clone
         // when skill already exists at first runtime). In that case fall through
         // to direct install so "already exists" output is printed.
@@ -2535,6 +2716,7 @@ async function installSkillsToMultipleRuntimes(
 
         await sanitizeCompatibilityRoots(runtimeId, skillsRoot, spec);
         await ensureHookLayoutAliases(runtimeHome, spec);
+        await cleanupDisabledSkillResidue(runtimeHome, spec.id);
       }
 
       // skill-creator fallback (if not in manifest)
@@ -2788,6 +2970,14 @@ async function main() {
     }
   }
 
+  // Sweep stale .disabled/ entries (covers skills deployed outside the manifest,
+  // e.g. meta-theory via sync:runtimes)
+  for (const rid of activeTargets) {
+    if (homes[rid]) {
+      await sweepStaleDisabledDirs(homes[rid]);
+    }
+  }
+
   console.log(`\n${t.done}`);
   console.log(t.noteCodexOpenclaw);
   console.log(t.activeTargets(activeTargets));
@@ -2801,14 +2991,14 @@ async function main() {
 
 // ========== Hook Co-Deployment ==========
 
-async function deployHookSubdirs(spec, targetDir, runtimeId) {
+async function deployHookSubdirs(spec, runtimeHome, runtimeId) {
   const hookSubdirs = spec.hookSubdirs;
   if (!hookSubdirs || !hookSubdirs[runtimeId]) return;
 
   const subdirs = hookSubdirs[runtimeId];
   if (!Array.isArray(subdirs) || subdirs.length === 0) return;
 
-  const hooksDir = path.join(targetDir, "hooks");
+  const hooksDir = path.join(runtimeHome, "hooks");
   if (!dryRun) {
     await fs.mkdir(hooksDir, { recursive: true });
   }
@@ -2862,7 +3052,7 @@ async function deployHookSubdirs(spec, targetDir, runtimeId) {
   }
 }
 
-async function deployHookConfigFiles(spec, targetDir, runtimeId) {
+async function deployHookConfigFiles(spec, runtimeHome, runtimeId) {
   const hookConfigFiles = spec.hookConfigFiles;
   if (!hookConfigFiles || !hookConfigFiles[runtimeId]) return;
 
@@ -2870,7 +3060,7 @@ async function deployHookConfigFiles(spec, targetDir, runtimeId) {
   if (dryRun) {
     console.log(
       t.dryRun(
-        `git sparse-checkout ${spec.repo}:${configFile} -> ${targetDir}`,
+        `git sparse-checkout ${spec.repo}:${configFile} -> ${runtimeHome}`,
       ),
     );
     return;
@@ -2897,10 +3087,10 @@ async function deployHookConfigFiles(spec, targetDir, runtimeId) {
     });
     const srcPath = path.join(tmp, ...configFile.split("/").filter(Boolean));
     if (await pathExists(srcPath)) {
-      const destPath = path.join(targetDir, path.basename(configFile));
+      const destPath = path.join(runtimeHome, path.basename(configFile));
       await fs.copyFile(srcPath, destPath);
       console.log(
-        `${C.green}✓${C.reset} ${spec.id} ${path.basename(configFile)} -> ${targetDir} ${C.dim}(from ${configFile})${C.reset}`,
+        `${C.green}✓${C.reset} ${spec.id} ${path.basename(configFile)} -> ${runtimeHome} ${C.dim}(from ${configFile})${C.reset}`,
       );
     }
   } catch {
@@ -2908,6 +3098,123 @@ async function deployHookConfigFiles(spec, targetDir, runtimeId) {
   } finally {
     await fs.rm(tmp, { recursive: true, force: true });
   }
+}
+
+// ========== Hook Extra Files Deployment ==========
+
+async function deployHookExtraFiles(spec, runtimeHome, runtimeId) {
+  const hookExtraFiles = spec.hookExtraFiles;
+  if (!hookExtraFiles || !hookExtraFiles[runtimeId]) return;
+
+  const entries = hookExtraFiles[runtimeId];
+  if (!Array.isArray(entries) || entries.length === 0) return;
+
+  for (const entry of entries) {
+    if (!entry.src || !entry.dest) continue;
+    if (dryRun) {
+      console.log(
+        t.dryRun(
+          `deploy extra file ${spec.repo}:${entry.src} -> ${path.join(runtimeHome, entry.dest)}`,
+        ),
+      );
+      continue;
+    }
+
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "meta-kim-hextra-"));
+    try {
+      const parentDir = path.dirname(entry.src).replace(/\\/g, "/");
+      await runGitAsync(
+        [
+          "clone",
+          "--depth",
+          "1",
+          "--filter=blob:none",
+          "--sparse",
+          spec.repo,
+          tmp,
+        ],
+        { skillLabel: `${spec.id}-extra (${runtimeId})` },
+      );
+      await runGitAsync(["sparse-checkout", "set", parentDir || "."], {
+        cwd: tmp,
+      });
+      const srcPath = path.join(tmp, ...entry.src.split("/").filter(Boolean));
+      if (await pathExists(srcPath)) {
+        const destPath = path.join(runtimeHome, entry.dest);
+        await fs.mkdir(path.dirname(destPath), { recursive: true });
+        await fs.copyFile(srcPath, destPath);
+        console.log(
+          `${C.green}✓${C.reset} ${spec.id} ${path.basename(entry.src)} -> ${destPath}`,
+        );
+      }
+    } catch {
+      // extra file absent — non-fatal
+    } finally {
+      await fs.rm(tmp, { recursive: true, force: true });
+    }
+  }
+}
+
+// ========== Hook Settings Merge ==========
+
+async function mergeHookSettings(spec, runtimeHome, runtimeId) {
+  const hookSettingsMerge = spec.hookSettingsMerge;
+  if (!hookSettingsMerge || !hookSettingsMerge[runtimeId]) return;
+
+  const cfg = hookSettingsMerge[runtimeId];
+  if (!cfg.event || !cfg.hookFile) return;
+
+  const settingsPath = path.join(runtimeHome, "settings.json");
+  const hookScriptPath = path.join(runtimeHome, "hooks", cfg.hookFile);
+
+  if (dryRun) {
+    console.log(
+      t.dryRun(`merge hook ${cfg.event} -> ${settingsPath} (${cfg.hookFile})`),
+    );
+    return;
+  }
+
+  if (!(await pathExists(hookScriptPath))) return;
+
+  let settings = {};
+  if (await pathExists(settingsPath)) {
+    try {
+      settings = JSON.parse(await fs.readFile(settingsPath, "utf8"));
+    } catch {
+      return;
+    }
+  }
+
+  if (!settings.hooks) settings.hooks = {};
+  const existingEntries = settings.hooks[cfg.event] || [];
+
+  const normalizedPath = hookScriptPath.replace(/\\/g, "/");
+  const alreadyRegistered = existingEntries.some((group) =>
+    (group.hooks || []).some((h) => {
+      const cmd = (h.command || "").replace(/\\/g, "/");
+      return cmd.includes(cfg.hookFile);
+    }),
+  );
+
+  if (alreadyRegistered) return;
+
+  const newEntry = {
+    hooks: [
+      {
+        type: "command",
+        command: `node "${hookScriptPath.replace(/\\/g, "\\\\")}"`,
+        ...(cfg.timeout ? { timeout: cfg.timeout } : {}),
+      },
+    ],
+  };
+
+  existingEntries.push(newEntry);
+  settings.hooks[cfg.event] = existingEntries;
+
+  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), "utf8");
+  console.log(
+    `${C.green}✓${C.reset} ${spec.id} hook registered: ${cfg.event} -> ${cfg.hookFile}`,
+  );
 }
 
 main().catch((err) => {
