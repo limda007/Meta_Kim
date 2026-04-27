@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import path from "node:path";
 
 import {
+  buildCodexGraphifyContextHook,
+  buildCodexProjectHooksJson,
   inferProjectCategory,
   inferProjectPurpose,
 } from "../../scripts/sync-runtimes.mjs";
@@ -142,5 +144,25 @@ describe("sync-runtimes / inferProjectPurpose", () => {
     assert.equal(inferProjectPurpose(null), null);
     assert.equal(inferProjectPurpose(undefined), null);
     assert.equal(inferProjectPurpose("Z"), null);
+  });
+});
+
+describe("sync-runtimes / Codex project hooks", () => {
+  test("uses a cross-platform Node command instead of Unix shell syntax", () => {
+    const config = buildCodexProjectHooksJson();
+    const command =
+      config.hooks.PreToolUse[0].hooks[0].command;
+
+    assert.match(command, /node(\.exe)?/);
+    assert.match(command, /\.codex\/hooks\/graphify-context\.mjs/);
+    assert.doesNotMatch(command, /\[ -f|\|\| true|2>\/dev\/null/);
+  });
+
+  test("graphify hook script exits cleanly when no graph exists", () => {
+    const source = buildCodexGraphifyContextHook();
+
+    assert.match(source, /existsSync\(graphPath\)/);
+    assert.match(source, /systemMessage/);
+    assert.doesNotMatch(source, /\[ -f|\|\| true|2>\/dev\/null/);
   });
 });

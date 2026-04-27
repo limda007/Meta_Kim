@@ -374,6 +374,8 @@ const runtimeProjectionLayouts = {
       legacySkillFile: [".codex", "skills", "meta-theory.md"],
       legacySkillReferencesDir: [".codex", "skills", "references"],
       projectSkillRoot: [".agents", "skills", "meta-theory"],
+      hooksDir: [".codex", "hooks"],
+      hooksFile: [".codex", "hooks.json"],
       configExampleFile: ["codex", "config.toml.example"],
     },
     global: {
