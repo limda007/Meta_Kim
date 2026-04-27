@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 
 import {
+  buildCursorAgent,
   buildCodexGraphifyContextHook,
   buildCodexProjectHooksJson,
   inferProjectCategory,
@@ -38,6 +39,13 @@ describe("sync-runtimes / inferProjectCategory", () => {
   test("maps any .codex/ config file to category G", () => {
     assert.equal(
       inferProjectCategory(p(".codex/config.toml"), REPO),
+      CATEGORIES.G,
+    );
+  });
+
+  test("maps Codex slash commands to project settings category", () => {
+    assert.equal(
+      inferProjectCategory(p(".codex/commands/meta-theory.md"), REPO),
       CATEGORIES.G,
     );
   });
@@ -164,5 +172,24 @@ describe("sync-runtimes / Codex project hooks", () => {
     assert.match(source, /existsSync\(graphPath\)/);
     assert.match(source, /systemMessage/);
     assert.doesNotMatch(source, /\[ -f|\|\| true|2>\/dev\/null/);
+  });
+});
+
+describe("sync-runtimes / Cursor agents", () => {
+  test("emits Cursor-required YAML frontmatter", () => {
+    const rendered = buildCursorAgent({
+      id: "meta-warden",
+      title: "Meta-Warden",
+      summary: "Coordinates the team",
+      sourceFile: "canonical/agents/meta-warden.md",
+      description: "Coordinates dispatch and final synthesis",
+      body: "Body instructions",
+    });
+
+    assert.match(rendered, /^---\nname: meta-warden\n/);
+    assert.match(
+      rendered,
+      /description: "Coordinates dispatch and final synthesis"\n---\n\n# Meta-Warden/,
+    );
   });
 });

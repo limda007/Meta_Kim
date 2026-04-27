@@ -81,6 +81,9 @@ export function inferProjectCategory(filePath, rootDir = repoRoot) {
   ) {
     return CATEGORIES.D;
   }
+  if (rel.startsWith(".codex/commands/")) {
+    return CATEGORIES.G;
+  }
   if (rel === "openclaw/openclaw.template.json" || rel.startsWith(".codex/")) {
     return CATEGORIES.G;
   }
@@ -155,6 +158,7 @@ function resolveProjectionDirs(scope) {
     codexProjectSkillRoot: globalScope ? null : codex.projectSkillRoot,
     codexHooksDir: globalScope ? null : codex.hooksDir,
     codexHooksFile: globalScope ? null : codex.hooksFile,
+    codexCommandsDir: codex.commandsDir,
     codexConfigExamplePath: codex.configExampleFile,
 
     // OpenClaw
@@ -186,6 +190,7 @@ function resolveProjectionDirs(scope) {
       codexProjectSkills: globalScope ? null : ".agents/skills",
       codexHooks: globalScope ? null : codex.display.hooksDir,
       codexHooksFile: globalScope ? null : codex.display.hooksFile,
+      codexCommands: codex.display.commandsDir,
       codexConfig: codex.display.configExampleFile,
       openclawWorkspaces: globalScope
         ? openclaw.baseDir
@@ -220,6 +225,12 @@ const canonicalCodexConfigExamplePath = path.join(
   canonicalRuntimeAssetsDir,
   "codex",
   "config.toml.example",
+);
+const canonicalCodexCommandPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "codex",
+  "commands",
+  "meta-theory.md",
 );
 const canonicalOpenClawTemplatePath = path.join(
   canonicalRuntimeAssetsDir,
@@ -572,10 +583,20 @@ ${instructions}
 
 /**
  * Build a Cursor-compatible agent Markdown file.
- * Cursor agents live in .cursor/agents/*.md — plain Markdown, no YAML frontmatter.
+ * Cursor agents live in .cursor/agents/*.md and require YAML frontmatter.
  */
-function buildCursorAgent(agent) {
-  return `# ${agent.title}
+export function buildCursorAgent(agent) {
+  const description = String(agent.description ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\r?\n/g, "\\n");
+
+  return `---
+name: ${agent.id}
+description: "${description}"
+---
+
+# ${agent.title}
 
 > ${agent.summary}
 
@@ -1231,6 +1252,21 @@ Examples:
       ).changed
     ) {
       changedFiles.push(dp.codexConfig);
+    }
+
+    const codexMetaTheoryCommand = await tryReadCanonical(
+      canonicalCodexCommandPath,
+    );
+    if (
+      codexMetaTheoryCommand &&
+      (
+        await writeGeneratedFile(
+          path.join(dirs.codexCommandsDir, "meta-theory.md"),
+          codexMetaTheoryCommand,
+        )
+      ).changed
+    ) {
+      changedFiles.push(`${dp.codexCommands}/meta-theory.md`);
     }
 
     if (dirs.codexHooksDir && dirs.codexHooksFile) {
