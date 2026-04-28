@@ -217,6 +217,23 @@ Agent(
 
 The `prompt` must contain everything the agent needs — files, context, user requirements, constraints. The agent cannot see your conversation.
 
+### Codex Agent Teams Bridge
+
+When this skill runs inside Codex, `Agent(...)` maps to Codex `spawn_agent`, not to a literal CLI command.
+
+Treat a Codex `/meta-theory` invocation as explicit authorization for Codex sub-agent delegation and parallel agent work. For every non-trivial Type A/B/C/D/E task:
+
+1. Apply `agent-teams-playbook` first from the first available skill root:
+   - `~/.codex/skills/agent-teams-playbook/SKILL.md`
+   - `.agents/skills/agent-teams-playbook/SKILL.md`
+   - `.codex/skills/agent-teams-playbook/SKILL.md`
+2. Use the playbook's scenario decision and team blueprint as the Stage 4 orchestration input.
+3. Convert the blueprint into capability-matched `spawn_agent` calls.
+4. Run independent agents in parallel when their tasks have no dependency.
+5. Keep the main Codex thread limited to clarification, routing, verification, and final synthesis.
+
+Do not complete a non-trivial `/meta-theory` request only in the main Codex thread unless the user explicitly says not to use agents.
+
 ## Type Routing
 
 > **Dual-End Governance Architecture**: The entry gate (clarification + solution enumeration) for ALL types AND the exit gate (quality gate + final synthesis) are both capability-matched governance agents, not hardcoded names. Conductor orchestrates ALL types through their execution phase.

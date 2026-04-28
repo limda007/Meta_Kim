@@ -6,6 +6,20 @@ All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
+## [2.0.18] - 2026-04-28
+
+### Fixed
+
+- **Codex `/meta-theory` agent-team execution** — `/meta-theory` now explicitly authorizes Codex sub-agent delegation, applies `agent-teams-playbook` for non-trivial tasks, and maps capability-matched execution to Codex `spawn_agent` calls instead of leaving complex work on the main thread.
+- **Quick deploy root guide files** — `setup.mjs` now copies `CLAUDE.md` for Claude deployments and `AGENTS.md` for Codex, OpenClaw, and Cursor deployments. The `all` path copies `AGENTS.md` once, avoiding redundant file operations while preserving every runtime's required project entrypoint.
+- **Planning hook phase counting** — Planning-with-files hook patching now covers shell and PowerShell stop/check scripts across runtimes, and the Codex adapter template also counts both `## Phase` and `### Phase` headings. This prevents false `7/0 phases done` stop-hook reports after reinstall.
+- **Claude Code smoke validation** — `eval-meta-agents` now handles Claude Code versions that no longer expose an `agents` subcommand by validating `.claude/agents/*.md` directly. Windows CLI resolution also prefers the npm-style `~/.local/claude.cmd` shim before the native `~/.local/bin/claude.exe` binary.
+
+### Tests
+
+- Added setup tests for quick-deploy guide-file coverage, Codex planning hook phase parsing, and Claude smoke fallback behavior.
+- Verified release readiness with `npm run meta:verify:all` on 2026-04-28.
+
 ## [2.0.17] - 2026-04-27
 
 ### Added

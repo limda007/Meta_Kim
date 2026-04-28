@@ -2630,6 +2630,18 @@ function deployPlatformFiles(platformId, targetDir) {
   };
 
   if (platformId === "claude" || platformId === "all") {
+    copyIfExists("CLAUDE.md", "CLAUDE.md");
+  }
+  if (
+    platformId === "openclaw" ||
+    platformId === "codex" ||
+    platformId === "cursor" ||
+    platformId === "all"
+  ) {
+    copyIfExists("AGENTS.md", "AGENTS.md");
+  }
+
+  if (platformId === "claude" || platformId === "all") {
     copyIfExists(".claude", ".claude");
     if (existsSync(join(PROJECT_DIR, ".mcp.json")))
       copyIfExists(".mcp.json", ".mcp.json");
