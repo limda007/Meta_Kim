@@ -63,7 +63,14 @@ export function inferProjectCategory(filePath, rootDir = repoRoot) {
   if (rel === ".claude/settings.json" || rel === ".mcp.json") {
     return CATEGORIES.G;
   }
-  if (rel.startsWith(".claude/hooks/")) return CATEGORIES.E;
+  if (
+    rel.startsWith(".claude/hooks/") ||
+    rel.startsWith(".codex/hooks/") ||
+    rel.startsWith(".cursor/hooks/") ||
+    rel.startsWith("openclaw/hooks/")
+  ) {
+    return CATEGORIES.E;
+  }
   if (
     rel.startsWith(".claude/agents/") ||
     rel.startsWith(".codex/agents/") ||
@@ -81,7 +88,11 @@ export function inferProjectCategory(filePath, rootDir = repoRoot) {
   ) {
     return CATEGORIES.D;
   }
-  if (rel.startsWith(".codex/commands/")) {
+  if (
+    rel.startsWith(".codex/commands/") ||
+    rel === ".codex/hooks.json" ||
+    rel === ".cursor/hooks.json"
+  ) {
     return CATEGORIES.G;
   }
   if (rel === "openclaw/openclaw.template.json" || rel.startsWith(".codex/")) {
@@ -169,11 +180,14 @@ function resolveProjectionDirs(scope) {
     openclawLegacySkillReferencesDir: globalScope
       ? null
       : openclaw.legacySkillReferencesDir,
+    openclawHooksDir: openclaw.hooksDir,
     openclawTemplateConfigPath: openclaw.templateConfigFile,
 
     // Cursor
     cursorAgentsDir: cursor.agentsDir,
     cursorSkillRoot: cursor.skillRoot,
+    cursorHooksDir: cursor.hooksDir,
+    cursorHooksFile: cursor.hooksFile,
     cursorMcpPath: cursor.mcpFile,
 
     // Allowed roots for safety assertion
@@ -197,8 +211,11 @@ function resolveProjectionDirs(scope) {
         : "openclaw/workspaces",
       openclawTemplate: openclaw.display.templateConfigFile,
       openclawSkills: openclaw.display.skillRoot,
+      openclawHooks: openclaw.display.hooksDir,
       cursorAgents: cursor.display.agentsDir,
       cursorSkill: cursor.display.skillRoot,
+      cursorHooks: cursor.display.hooksDir,
+      cursorHooksFile: cursor.display.hooksFile,
       cursorMcp: cursor.display.mcpFile,
     },
   };
@@ -232,10 +249,22 @@ const canonicalCodexCommandPath = path.join(
   "commands",
   "meta-theory.md",
 );
+const canonicalSharedMemoryHookPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "shared",
+  "hooks",
+  "meta-kim-memory-save.mjs",
+);
 const canonicalOpenClawTemplatePath = path.join(
   canonicalRuntimeAssetsDir,
   "openclaw",
   "openclaw.template.json",
+);
+const canonicalOpenClawMemoryHookDir = path.join(
+  canonicalRuntimeAssetsDir,
+  "openclaw",
+  "hooks",
+  "mcp-memory-service",
 );
 
 const preferredOrder = [
@@ -743,8 +772,8 @@ function buildRuntimeSkillMap(targetId) {
       { pattern: /canonical\/skills\//g, replacement: ".codex/skills/" },
       // Agent definitions: canonical/ → .codex/agents/
       { pattern: /canonical\/agents\//g, replacement: ".codex/agents/" },
-      // Hooks: Codex doesn't have hooks — strip to safe fallback
-      { pattern: /\.claude\/hooks\//g, replacement: ".codex/" },
+      // Hooks: Codex uses .codex/hooks/ plus .codex/hooks.json
+      { pattern: /\.claude\/hooks\//g, replacement: ".codex/hooks/" },
       // Capability index: preserve subdirectory structure
       {
         pattern: /\.claude\/capability-index\//g,
@@ -767,8 +796,8 @@ function buildRuntimeSkillMap(targetId) {
         pattern: /canonical\/agents\//g,
         replacement: "openclaw/workspaces/{workspace}/AGENTS.md#",
       },
-      // Hooks: OpenClaw doesn't have hooks — strip
-      { pattern: /\.claude\/hooks\//g, replacement: "openclaw/" },
+      // Hooks: OpenClaw uses Plugin SDK hooks under openclaw/hooks/
+      { pattern: /\.claude\/hooks\//g, replacement: "openclaw/hooks/" },
       // Capability index: preserve subdirectory structure
       {
         pattern: /\.claude\/capability-index\//g,
@@ -787,8 +816,8 @@ function buildRuntimeSkillMap(targetId) {
       { pattern: /canonical\/skills\//g, replacement: ".cursor/skills/" },
       // Agent definitions: canonical/ → .cursor/agents/
       { pattern: /canonical\/agents\//g, replacement: ".cursor/agents/" },
-      // Hooks: Cursor doesn't have hooks
-      { pattern: /\.claude\/hooks\//g, replacement: ".cursor/" },
+      // Hooks: Cursor uses .cursor/hooks/ plus .cursor/hooks.json
+      { pattern: /\.claude\/hooks\//g, replacement: ".cursor/hooks/" },
       // Capability index: preserve subdirectory structure
       {
         pattern: /\.claude\/capability-index\//g,
@@ -847,21 +876,87 @@ export function buildCodexGraphifyContextHook() {
   ].join("\n");
 }
 
-export function buildCodexProjectHooksJson() {
+function commandToken(value) {
+  return /[\s"]/u.test(value) ? JSON.stringify(value) : value;
+}
+
+function nodeHookCommand(scriptPath, args = []) {
   const nodePath = process.execPath;
-  const shellToken = (value) =>
-    /[\s"]/u.test(value) ? JSON.stringify(value) : value;
+  return [nodePath, scriptPath, ...args].map(commandToken).join(" ");
+}
+
+export function buildCodexProjectHooksJson({
+  graphifyHookPath = ".codex/hooks/graphify-context.mjs",
+  memoryHookPath = ".codex/hooks/meta-kim-memory-save.mjs",
+} = {}) {
   return {
     hooks: {
+      SessionStart: [
+        {
+          matcher: "startup|resume",
+          hooks: [
+            {
+              type: "command",
+              command: nodeHookCommand(memoryHookPath, ["--event", "session-start"]),
+              timeout: 10,
+              statusMessage: "Loading Meta_Kim memory",
+            },
+          ],
+        },
+      ],
+      UserPromptSubmit: [
+        {
+          hooks: [
+            {
+              type: "command",
+              command: nodeHookCommand(memoryHookPath, ["--event", "user-prompt"]),
+              timeout: 10,
+            },
+          ],
+        },
+      ],
       PreToolUse: [
         {
           matcher: "Bash",
           hooks: [
             {
               type: "command",
-              command: `${shellToken(nodePath)} ".codex/hooks/graphify-context.mjs"`,
+              command: nodeHookCommand(graphifyHookPath),
             },
           ],
+        },
+      ],
+      Stop: [
+        {
+          hooks: [
+            {
+              type: "command",
+              command: nodeHookCommand(memoryHookPath, ["--event", "stop"]),
+              timeout: 10,
+            },
+          ],
+        },
+      ],
+    },
+  };
+}
+
+export function buildCursorProjectHooksJson({
+  memoryHookPath = ".cursor/hooks/meta-kim-memory-save.mjs",
+} = {}) {
+  return {
+    version: 1,
+    hooks: {
+      beforeSubmitPrompt: [
+        {
+          command: nodeHookCommand(memoryHookPath, ["--event", "user-prompt"]),
+          timeout: 10,
+        },
+      ],
+      stop: [
+        {
+          command: nodeHookCommand(memoryHookPath, ["--event", "stop"]),
+          timeout: 10,
         },
       ],
     },
@@ -1131,6 +1226,35 @@ Examples:
     ) {
       changedFiles.push(dp.openclawTemplate);
     }
+
+    let openclawHookEntries = [];
+    try {
+      openclawHookEntries = await fs.readdir(canonicalOpenClawMemoryHookDir, {
+        withFileTypes: true,
+      });
+    } catch {
+      openclawHookEntries = [];
+    }
+    for (const hookEntry of openclawHookEntries) {
+      if (!hookEntry.isFile()) continue;
+      const hookContent = await tryReadCanonical(
+        path.join(canonicalOpenClawMemoryHookDir, hookEntry.name),
+      );
+      if (
+        hookContent &&
+        (
+          await writeGeneratedFile(
+            path.join(dirs.openclawHooksDir, "mcp-memory-service", hookEntry.name),
+            hookContent,
+          )
+        ).changed
+      ) {
+        changedFiles.push(
+          `${dp.openclawHooks}/mcp-memory-service/${hookEntry.name}`,
+        );
+      }
+    }
+
     if ((await removeGeneratedPath(dirs.openclawLegacySkillFile)).changed) {
       changedFiles.push("openclaw/skills/meta-theory.md");
     }
@@ -1280,11 +1404,31 @@ Examples:
       ) {
         changedFiles.push(`${dp.codexHooks}/graphify-context.mjs`);
       }
+      const memoryHookContent = await tryReadCanonical(canonicalSharedMemoryHookPath);
+      if (
+        memoryHookContent &&
+        (
+          await writeGeneratedFile(
+            path.join(dirs.codexHooksDir, "meta-kim-memory-save.mjs"),
+            memoryHookContent,
+          )
+        ).changed
+      ) {
+        changedFiles.push(`${dp.codexHooks}/meta-kim-memory-save.mjs`);
+      }
+      const graphifyHookPath =
+        scope === "global"
+          ? path.join(dirs.codexHooksDir, "graphify-context.mjs")
+          : ".codex/hooks/graphify-context.mjs";
+      const memoryHookPath =
+        scope === "global"
+          ? path.join(dirs.codexHooksDir, "meta-kim-memory-save.mjs")
+          : ".codex/hooks/meta-kim-memory-save.mjs";
       if (
         (
           await writeGeneratedJson(
             dirs.codexHooksFile,
-            buildCodexProjectHooksJson(),
+            buildCodexProjectHooksJson({ graphifyHookPath, memoryHookPath }),
           )
         ).changed
       ) {
@@ -1345,6 +1489,35 @@ Examples:
         ).changed
       ) {
         changedFiles.push(`${dp.cursorSkill}/references/${reference.name}`);
+      }
+    }
+
+    if (dirs.cursorHooksDir && dirs.cursorHooksFile) {
+      const memoryHookContent = await tryReadCanonical(canonicalSharedMemoryHookPath);
+      if (
+        memoryHookContent &&
+        (
+          await writeGeneratedFile(
+            path.join(dirs.cursorHooksDir, "meta-kim-memory-save.mjs"),
+            memoryHookContent,
+          )
+        ).changed
+      ) {
+        changedFiles.push(`${dp.cursorHooks}/meta-kim-memory-save.mjs`);
+      }
+      const memoryHookPath =
+        scope === "global"
+          ? path.join(dirs.cursorHooksDir, "meta-kim-memory-save.mjs")
+          : ".cursor/hooks/meta-kim-memory-save.mjs";
+      if (
+        (
+          await writeGeneratedJson(
+            dirs.cursorHooksFile,
+            buildCursorProjectHooksJson({ memoryHookPath }),
+          )
+        ).changed
+      ) {
+        changedFiles.push(dp.cursorHooksFile);
       }
     }
 
@@ -1451,16 +1624,27 @@ Examples:
     codexProjectSkill: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.codexProjectSkills),
     ).length,
+    codexHooks: changedFiles.filter((f) =>
+      hasDisplayPrefix(f, dirs.displayPaths.codexHooks),
+    ).length,
     codexConfig: changedFiles.filter(
       (f) =>
         normalizeDisplayPath(f) ===
         normalizeDisplayPath(dirs.displayPaths.codexConfig),
+    ).length,
+    codexHooksFile: changedFiles.filter(
+      (f) =>
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.codexHooksFile),
     ).length,
     openclawWorkspace: changedFiles.filter((f) =>
       normalizeDisplayPath(f).startsWith(openclawWorkspacePrefix),
     ).length,
     openclawSkill: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.openclawSkills),
+    ).length,
+    openclawHooks: changedFiles.filter((f) =>
+      hasDisplayPrefix(f, dirs.displayPaths.openclawHooks),
     ).length,
     openclawTemplate: changedFiles.filter(
       (f) =>
@@ -1472,6 +1656,14 @@ Examples:
     ).length,
     cursorSkill: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.cursorSkill),
+    ).length,
+    cursorHooks: changedFiles.filter((f) =>
+      hasDisplayPrefix(f, dirs.displayPaths.cursorHooks),
+    ).length,
+    cursorHooksFile: changedFiles.filter(
+      (f) =>
+        normalizeDisplayPath(f) ===
+        normalizeDisplayPath(dirs.displayPaths.cursorHooksFile),
     ).length,
     cursorMcp: changedFiles.filter(
       (f) =>
@@ -1531,6 +1723,16 @@ Examples:
           summaryKind: "files",
         },
         {
+          label: dirs.displayPaths.codexHooks,
+          count: layerCounts.codexHooks,
+          summaryKind: "files",
+        },
+        {
+          label: dirs.displayPaths.codexHooksFile,
+          count: layerCounts.codexHooksFile,
+          summaryKind: "files",
+        },
+        {
           label: dirs.displayPaths.codexConfig,
           count: layerCounts.codexConfig,
           summaryKind: "files",
@@ -1551,6 +1753,11 @@ Examples:
           summaryKind: "files",
         },
         {
+          label: dirs.displayPaths.openclawHooks,
+          count: layerCounts.openclawHooks,
+          summaryKind: "files",
+        },
+        {
           label: dirs.displayPaths.openclawTemplate,
           count: layerCounts.openclawTemplate,
           summaryKind: "files",
@@ -1568,6 +1775,16 @@ Examples:
         {
           label: dirs.displayPaths.cursorSkill,
           count: layerCounts.cursorSkill,
+          summaryKind: "files",
+        },
+        {
+          label: dirs.displayPaths.cursorHooks,
+          count: layerCounts.cursorHooks,
+          summaryKind: "files",
+        },
+        {
+          label: dirs.displayPaths.cursorHooksFile,
+          count: layerCounts.cursorHooksFile,
           summaryKind: "files",
         },
         {

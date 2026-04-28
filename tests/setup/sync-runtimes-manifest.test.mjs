@@ -4,6 +4,7 @@ import path from "node:path";
 
 import {
   buildCursorAgent,
+  buildCursorProjectHooksJson,
   buildCodexGraphifyContextHook,
   buildCodexProjectHooksJson,
   inferProjectCategory,
@@ -53,6 +54,18 @@ describe("sync-runtimes / inferProjectCategory", () => {
   test("maps .claude/hooks/*.mjs to category E", () => {
     assert.equal(
       inferProjectCategory(p(".claude/hooks/stop-compaction.mjs"), REPO),
+      CATEGORIES.E,
+    );
+    assert.equal(
+      inferProjectCategory(p(".codex/hooks/meta-kim-memory-save.mjs"), REPO),
+      CATEGORIES.E,
+    );
+    assert.equal(
+      inferProjectCategory(p(".cursor/hooks/meta-kim-memory-save.mjs"), REPO),
+      CATEGORIES.E,
+    );
+    assert.equal(
+      inferProjectCategory(p("openclaw/hooks/mcp-memory-service/HOOK.md"), REPO),
       CATEGORIES.E,
     );
   });
@@ -166,6 +179,23 @@ describe("sync-runtimes / Codex project hooks", () => {
     assert.doesNotMatch(command, /\[ -f|\|\| true|2>\/dev\/null/);
   });
 
+  test("wires MCP memory across start, prompt, and stop", () => {
+    const config = buildCodexProjectHooksJson();
+
+    assert.match(
+      config.hooks.SessionStart[0].hooks[0].command,
+      /meta-kim-memory-save\.mjs.*session-start/,
+    );
+    assert.match(
+      config.hooks.UserPromptSubmit[0].hooks[0].command,
+      /meta-kim-memory-save\.mjs.*user-prompt/,
+    );
+    assert.match(
+      config.hooks.Stop[0].hooks[0].command,
+      /meta-kim-memory-save\.mjs.*stop/,
+    );
+  });
+
   test("graphify hook script exits cleanly when no graph exists", () => {
     const source = buildCodexGraphifyContextHook();
 
@@ -190,6 +220,21 @@ describe("sync-runtimes / Cursor agents", () => {
     assert.match(
       rendered,
       /description: "Coordinates dispatch and final synthesis"\n---\n\n# Meta-Warden/,
+    );
+  });
+});
+
+describe("sync-runtimes / Cursor project hooks", () => {
+  test("wires MCP memory before prompt submit and stop", () => {
+    const config = buildCursorProjectHooksJson();
+
+    assert.match(
+      config.hooks.beforeSubmitPrompt[0].command,
+      /meta-kim-memory-save\.mjs.*user-prompt/,
+    );
+    assert.match(
+      config.hooks.stop[0].command,
+      /meta-kim-memory-save\.mjs.*stop/,
     );
   });
 });

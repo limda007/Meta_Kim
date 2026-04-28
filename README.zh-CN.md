@@ -634,12 +634,14 @@ Meta_Kim 的记忆不是单一的。它有三层，各有分工，共同保障 a
   - 跨会话连续性——上次聊到哪了，这次能接上
   • 向量级检索——不是关键词匹配，而是语义理解
   - 精准召回——从历史会话中找到最相关的上下文
-- **激活方式**：`node setup.mjs` 安装并配置 MCP Memory Service（第三层）；安装后需手动启动服务器。
-  - **Claude Code**：SessionStart Hook 和 Stop 记忆保存 Hook 在 `node setup.mjs` 时自动注册；会话启动时通过 `mcp_memory_global.py --mode session` 写入项目状态
-  - **其他工具**（Codex、OpenClaw、Cursor）：参见 `mcp-memory-service/claude-hooks/` 手动安装
+- **激活方式**：`node setup.mjs` 安装并配置 MCP Memory Service（第三层），同时安装各运行时记忆 hook，并尝试在后台启动 HTTP 服务。
+  - **Claude Code**：SessionStart Hook 和 Stop 记忆保存 Hook 在 `node setup.mjs` 时自动注册；会话启动时通过 `mcp_memory_global.py --mode session` 写入项目状态。
+  - **Codex**：`~/.codex/hooks.json` 自动写入 SessionStart、UserPromptSubmit、Stop 桥接，调用 `meta-kim-memory-save.mjs`，覆盖开始 / 提示提交 / 结束。
+  - **OpenClaw**：`~/.openclaw/hooks/mcp-memory-service` 自动安装 managed hook，覆盖 `command:new`、`command:reset`、`session:compact:after`、`command:stop`。
+  - **Cursor**：`~/.cursor/hooks.json` 自动写入 `beforeSubmitPrompt` 和 `stop` 桥接，复用共享记忆 hook。
 - **启动服务器**：`npm start`（在 mcp-memory-service 目录下）或 `python -m mcp_memory_service`，然后访问 `http://localhost:8000`
 - **端口覆盖**：服务器遵循 `MCP_HTTP_PORT`（默认 `8000`，与上游一致）；Meta_Kim 的 SessionStart hook 读取 `MCP_MEMORY_URL`，可指向任意可达端点。若你是从旧版 Meta_Kim（硬编码 `8888`）升级而来，请按 CHANGELOG 的 `Migration Notes` 中给出的一行方案修正 `~/.claude/hooks/config.json`。
-- **Hook**：Claude Code 自动注册（SessionStart 写入项目状态，Stop 保存会话摘要到 MCP Memory）；其他工具参见 mcp-memory-service 文档
+- **Hook**：Claude Code、Codex、OpenClaw、Cursor 都会自动注册；各运行时使用自己的 hook 格式，但共享同一个 MCP Memory HTTP 端点。
 - **查询**：`npm run meta:query:runs -- --owner <agent>`——按 agent 查找历史 run，或 `npm run meta:index:runs -- <artifact>` 手动索引 run 产物
 
 ### 三层协同

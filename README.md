@@ -635,12 +635,14 @@ For multi-platform setups, run `node setup.mjs` — it loops through all selecte
   - Cross-session continuity - pick up where the last conversation left off
   - Vector-level retrieval - semantic understanding instead of keyword matching
   - Precise recall - find the most relevant context from historical sessions
-- **Activation**: `node setup.mjs` installs and configures the MCP Memory Service (Layer 3); the server must be started manually after installation.
-  - For **Claude Code**: SessionStart and Stop memory-save hooks are auto-registered during `node setup.mjs`; session-start writes project state via `mcp_memory_global.py --mode session`
-  - For **other tools** (Codex, OpenClaw, Cursor): check `mcp-memory-service/claude-hooks/` for manual hook setup
+- **Activation**: `node setup.mjs` installs and configures the MCP Memory Service (Layer 3), installs runtime memory hooks, then attempts to start the HTTP service in the background.
+  - For **Claude Code**: SessionStart and Stop memory-save hooks are auto-registered during `node setup.mjs`; session-start writes project state via `mcp_memory_global.py --mode session`.
+  - For **Codex**: `~/.codex/hooks.json` receives SessionStart, UserPromptSubmit, and Stop bridges to `meta-kim-memory-save.mjs`, so start/prompt/end checkpoints are automatic.
+  - For **OpenClaw**: `~/.openclaw/hooks/mcp-memory-service` receives a managed hook for `command:new`, `command:reset`, `session:compact:after`, and `command:stop`.
+  - For **Cursor**: `~/.cursor/hooks.json` receives `beforeSubmitPrompt` and `stop` bridges to the shared memory hook.
 - **Start server**: `npm start` in the mcp-memory-service directory (or `python -m mcp_memory_service`), then access at `http://localhost:8000`
 - **Port override**: the server honors `MCP_HTTP_PORT` (default `8000`, matching upstream); Meta_Kim reads `MCP_MEMORY_URL` in the SessionStart hook so point it at any reachable endpoint. If you are upgrading from an older Meta_Kim install that hard-coded `8888`, see the CHANGELOG's `Migration Notes` for the one-line `~/.claude/hooks/config.json` fix.
-- **Hooks**: auto-registered for Claude Code (SessionStart writes project context, Stop saves session summary to MCP Memory); for other tools see the mcp-memory-service documentation
+- **Hooks**: auto-registered for Claude Code, Codex, OpenClaw, and Cursor; each runtime uses its native hook format while sharing the same MCP Memory HTTP endpoint.
 - **Query**: `npm run meta:query:runs -- --owner <agent>` — find past runs by agent, or `npm run meta:index:runs -- <artifact>` for manual indexing of validated run artifacts
 
 ### How the three layers work together

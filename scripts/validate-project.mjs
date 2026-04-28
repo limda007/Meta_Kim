@@ -37,6 +37,18 @@ const canonicalOpenClawTemplatePath = path.join(
   "openclaw",
   "openclaw.template.json",
 );
+const canonicalSharedMemoryHookPath = path.join(
+  canonicalRuntimeAssetsDir,
+  "shared",
+  "hooks",
+  "meta-kim-memory-save.mjs",
+);
+const canonicalOpenClawMemoryHookDir = path.join(
+  canonicalRuntimeAssetsDir,
+  "openclaw",
+  "hooks",
+  "mcp-memory-service",
+);
 
 /** Must match config/contracts/workflow-contract.json runDiscipline.publicDisplayRequires (set equality). */
 const EXPECTED_PUBLIC_DISPLAY_REQUIRES = [
@@ -1229,6 +1241,19 @@ async function validateOpenClawArtifacts(agentIds) {
   assert(
     extraSkillDirs.includes("__REPO_ROOT__\\openclaw\\skills"),
     "canonical OpenClaw template must register repo-local openclaw/skills via skills.load.extraDirs.",
+  );
+
+  for (const fileName of ["HOOK.md", "handler.ts"]) {
+    await fs.access(path.join(canonicalOpenClawMemoryHookDir, fileName));
+  }
+  const sharedMemoryHook = await fs.readFile(
+    canonicalSharedMemoryHookPath,
+    "utf8",
+  );
+  assert(
+    sharedMemoryHook.includes("--event") &&
+      sharedMemoryHook.includes("/api/memories/search"),
+    "canonical shared memory hook must support lifecycle events and MCP memory search.",
   );
 }
 

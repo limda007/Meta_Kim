@@ -6,6 +6,15 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 发布新版本时，请在顶部（旧版本之前）添加新的 **`## [版本号] - YYYY-MM-DD`** 部分。
 
+## [2.0.19] - 2026-04-28
+
+### 修复
+
+- **跨运行时 MCP Memory 持久化** — `install-mcp-memory-hooks.mjs` 现在除 Claude Code 外，也会为 Codex、Cursor、OpenClaw 安装 MCP Memory 生命周期钩子。Codex 写入 `~/.codex/hooks.json` 的 SessionStart / UserPromptSubmit / Stop；Cursor 写入 `~/.cursor/hooks.json` 的 beforeSubmitPrompt / stop；OpenClaw 写入 `~/.openclaw/hooks/mcp-memory-service` managed hook。
+- **MCP Memory Service API 对齐** — Claude 的 SessionStart 记忆查询改用上游 `POST /api/memories/search`，同时兼容旧的 `results[].memory` 返回结构。跨运行时保存钩子使用 `POST /api/memories`，并按上游建议带上 `X-Agent-ID` 和 `conversation_id`。
+- **MCP Memory 端点兼容性** — 跨运行时记忆 hook 现在同时支持 `http://` 和 `https://` 形式的 `MCP_MEMORY_URL`。
+- **记忆服务健康检查表述** — 安装器不再在当前 shell 无法访问 `localhost:8000`、但 `memory.exe` 正在运行时直接误报服务 down；现在会区分“不可响应”和“当前 shell 无法验证但进程存在”。
+
 ## [2.0.18] - 2026-04-28
 
 ### 修复

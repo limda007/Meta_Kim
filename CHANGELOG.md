@@ -6,6 +6,15 @@ All notable changes to Meta_Kim are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 When you tag a release, add a new **`## [version] - YYYY-MM-DD`** section at the top (above older entries) and list changes there.
 
+## [2.0.19] - 2026-04-28
+
+### Fixed
+
+- **Cross-runtime MCP Memory persistence** — `install-mcp-memory-hooks.mjs` now installs MCP Memory lifecycle hooks for Codex, Cursor, and OpenClaw in addition to Claude Code. Codex receives SessionStart / UserPromptSubmit / Stop hooks in `~/.codex/hooks.json`; Cursor receives beforeSubmitPrompt / stop hooks in `~/.cursor/hooks.json`; OpenClaw receives a managed hook under `~/.openclaw/hooks/mcp-memory-service`.
+- **MCP Memory Service API parity** — Claude's SessionStart memory lookup now uses upstream `POST /api/memories/search` while remaining compatible with older `results[].memory` response shapes. Cross-runtime save hooks write to `POST /api/memories` with `X-Agent-ID` and `conversation_id`, matching upstream guidance.
+- **MCP Memory endpoint compatibility** — Cross-runtime memory hooks now honor both `http://` and `https://` `MCP_MEMORY_URL` endpoints.
+- **Memory health check wording** — The hook installer no longer reports the service as down when the current shell cannot verify `localhost:8000` but a `memory.exe` process is running. It now distinguishes "not responding" from "running but unverifiable from this shell".
+
 ## [2.0.18] - 2026-04-28
 
 ### Fixed
