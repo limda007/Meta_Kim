@@ -395,16 +395,7 @@ function resolveHomes() {
 }
 
 function resolveCompatibilitySkillRoots(runtimeId, primarySkillsRoot) {
-  if (runtimeId !== "codex") {
-    return [];
-  }
-
-  const legacyCodexSkillsRoot = path.join(os.homedir(), ".agents", "skills");
-  if (path.resolve(legacyCodexSkillsRoot) === path.resolve(primarySkillsRoot)) {
-    return [];
-  }
-
-  return [legacyCodexSkillsRoot];
+  return [];
 }
 
 /** Primary deploy segment under each runtime home: skills/ (default) or plugins/ (rare). */

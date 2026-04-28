@@ -40,7 +40,6 @@
       ".codex/hooks",
       ".codex/hooks.json",
       ".codex/commands",
-      ".agents/skills",
       "codex/config.toml.example"
     ],
     "openclaw": [

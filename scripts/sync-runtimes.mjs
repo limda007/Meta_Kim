@@ -82,7 +82,6 @@ export function inferProjectCategory(filePath, rootDir = repoRoot) {
     rel.startsWith(".claude/skills/") ||
     rel.startsWith(".codex/skills/") ||
     rel.startsWith(".cursor/skills/") ||
-    rel.startsWith(".agents/skills/") ||
     rel.startsWith("openclaw/skills/") ||
     rel.startsWith("openclaw/workspaces/")
   ) {
@@ -166,7 +165,6 @@ function resolveProjectionDirs(scope) {
       : codex.legacySkillReferencesDir,
     codexUsesDirectorySkill: true,
     codexAgentsDir: codex.agentsDir,
-    codexProjectSkillRoot: globalScope ? null : codex.projectSkillRoot,
     codexHooksDir: globalScope ? null : codex.hooksDir,
     codexHooksFile: globalScope ? null : codex.hooksFile,
     codexCommandsDir: codex.commandsDir,
@@ -201,7 +199,6 @@ function resolveProjectionDirs(scope) {
       claudeMcp: claude.display.mcpFile,
       codexAgents: codex.display.agentsDir,
       codexSkills: codex.display.skillRoot,
-      codexProjectSkills: globalScope ? null : ".agents/skills",
       codexHooks: globalScope ? null : codex.display.hooksDir,
       codexHooksFile: globalScope ? null : codex.display.hooksFile,
       codexCommands: codex.display.commandsDir,
@@ -641,18 +638,6 @@ Use the portable meta-theory skill when it helps, but do not claim ownership of 
 ---
 
 ${agent.body}
-`;
-}
-
-function buildCodexSkillMetadata() {
-  return `interface:
-  display_name: "Meta Theory"
-  short_description: "Meta_Kim cross-runtime meta-theory and collaboration method"
-policy:
-  allow_implicit_invocation: true
-dependencies:
-  mcp_servers:
-    - meta_kim_runtime
 `;
 }
 
@@ -1321,47 +1306,15 @@ Examples:
         changedFiles.push(`${dp.codexSkills}/references/${reference.name}`);
       }
     }
-    if (dirs.codexProjectSkillRoot && dp.codexProjectSkills) {
-      if (
-        (
-          await writeGeneratedFile(
-            path.join(dirs.codexProjectSkillRoot, "SKILL.md"),
-            applyRuntimePaths(portableSkill, "codex"),
-          )
-        ).changed
-      ) {
-        changedFiles.push(`${dp.codexProjectSkills}/meta-theory/SKILL.md`);
-      }
-      if (
-        (
-          await writeGeneratedFile(
-            path.join(dirs.codexProjectSkillRoot, "agents", "openai.yaml"),
-            buildCodexSkillMetadata(),
-          )
-        ).changed
-      ) {
-        changedFiles.push(
-          `${dp.codexProjectSkills}/meta-theory/agents/openai.yaml`,
-        );
-      }
-      for (const reference of skillReferences) {
-        if (
-          (
-            await writeGeneratedFile(
-              path.join(
-                dirs.codexProjectSkillRoot,
-                "references",
-                reference.name,
-              ),
-              applyRuntimePaths(reference.content, "codex"),
-            )
-          ).changed
-        ) {
-          changedFiles.push(
-            `${dp.codexProjectSkills}/meta-theory/references/${reference.name}`,
-          );
-        }
-      }
+    if (
+      scope !== "global" &&
+      (
+        await removeGeneratedPath(
+          path.join(repoRoot, ".agents", "skills", "meta-theory"),
+        )
+      ).changed
+    ) {
+      changedFiles.push(".agents/skills/meta-theory");
     }
     const codexConfigExample = await tryReadCanonical(
       canonicalCodexConfigExamplePath,
@@ -1621,9 +1574,6 @@ Examples:
     codexSkill: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.codexSkills),
     ).length,
-    codexProjectSkill: changedFiles.filter((f) =>
-      hasDisplayPrefix(f, dirs.displayPaths.codexProjectSkills),
-    ).length,
     codexHooks: changedFiles.filter((f) =>
       hasDisplayPrefix(f, dirs.displayPaths.codexHooks),
     ).length,
@@ -1715,11 +1665,6 @@ Examples:
         {
           label: dirs.displayPaths.codexSkills,
           count: layerCounts.codexSkill,
-          summaryKind: "files",
-        },
-        {
-          label: dirs.displayPaths.codexProjectSkills,
-          count: layerCounts.codexProjectSkill,
           summaryKind: "files",
         },
         {

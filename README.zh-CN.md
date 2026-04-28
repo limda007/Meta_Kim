@@ -500,7 +500,7 @@ flowchart TB
 | 能力面 | Claude Code | Codex | OpenClaw | Cursor |
 | --- | --- | --- | --- | --- |
 | **agent** | 原生 agents/subagents，项目级与用户级都成熟 | custom agents/subagents 很强 | workspace 型 agent，支持 agent-to-agent | agent 投影可用，较轻 |
-| **skill/references** | 原生 skill、references、全局技能生态完整 | `.agents/skills/` 兼容很好 | workspace skill + installable skill | skill/references 接入较轻 |
+| **skill/references** | 原生 skill、references、全局技能生态完整 | `.codex/skills/` 兼容很好 | workspace skill + installable skill | skill/references 接入较轻 |
 | **hook/自动化** | 项目级 hooks + settings.json + 插件生态（12 events） | hooks.json 原生支持（5 events, v0.117.0+） | Plugin SDK hooks（28 hooks） | hooks.json 原生支持（4 events） |
 | **MCP/配置** | 原生 MCP 与配置面完整 | 可接 runtime adapter 与 MCP | workspace config 明确 | 可接 MCP，但整体较轻 |
 | **治理闭环承载力** | **最高** | 高，但低于 Claude Code | 高，但形态不同 | 最轻 |
@@ -512,7 +512,7 @@ flowchart TB
 | 层 | 位置 | 作用 |
 | --- | --- | --- |
 | **canonical 主源** | `canonical/`、`config/contracts/workflow-contract.json` | 长期维护优先改这里 |
-| **运行时投影** | `.claude/`、`.codex/`、`.agents/skills/`、`openclaw/`、`.cursor/` | 同一能力投到不同运行时 |
+| **运行时投影** | `.claude/`、`.codex/`、`openclaw/`、`.cursor/` | 同一能力投到不同运行时 |
 | **本地状态** | `.meta-kim/state/{profile}/`、`.meta-kim/local.overrides.json` | profile 级状态、run index、continuity |
 | **脚本与校验** | `scripts/`、`npm run *` | 同步、校验、发现、验收 |
 

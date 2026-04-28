@@ -501,7 +501,7 @@ But there is an important caveat: the four runtimes are not equal. Claude Code c
 | Capability surface | Claude Code | Codex | OpenClaw | Cursor |
 | --- | --- | --- | --- | --- |
 | **Agents** | Native agents/subagents, mature at both project and user scope | Strong custom agents/subagents | Workspace-style agents, supports agent-to-agent | Lightweight agent projection |
-| **Skills / references** | Native skills, references, and a mature global ecosystem | `.agents/skills/` works well | Workspace skills and installable skills | Lighter skill/reference support |
+| **Skills / references** | Native skills, references, and a mature global ecosystem | `.codex/skills/` works well | Workspace skills and installable skills | Lighter skill/reference support |
 | **Hooks / automation** | Project hooks + settings.json + plugin ecosystem | No repo-level native hook file surface | Workspace boot/hook-style capabilities | Weakest native governance hooks |
 | **MCP / configuration** | Full native MCP and config surface | Can connect via runtime adapters and MCP | Clear workspace config | Can use MCP, but the surface is lighter |
 | **Governance loop capacity** | **Highest** | High, but below Claude Code | High, but different in form | Lightest |
@@ -513,7 +513,7 @@ The reason is not sentiment. Claude Code natively supports agents, skills, refer
 | Layer | Location | Purpose |
 | --- | --- | --- |
 | **Canonical source** | `canonical/`, `config/contracts/workflow-contract.json` | Preferred place for long-term edits |
-| **Runtime projections** | `.claude/`, `.codex/`, `.agents/skills/`, `openclaw/`, `.cursor/` | Same capability projected into different runtimes |
+| **Runtime projections** | `.claude/`, `.codex/`, `openclaw/`, `.cursor/` | Same capability projected into different runtimes |
 | **Local state** | `.meta-kim/state/{profile}/`, `.meta-kim/local.overrides.json` | Profile-level state, run index, continuity |
 | **Scripts and checks** | `scripts/`, `npm run *` | Sync, validate, discover, and accept |
 

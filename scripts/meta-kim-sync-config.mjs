@@ -74,7 +74,6 @@ const runtimeProfileCatalog = {
       outputPaths: {
         agentsDir: ".codex/agents",
         skillRoot: ".codex/skills/meta-theory",
-        projectSkillsDir: ".agents/skills",
         commandsDir: ".codex/commands",
         configExampleFile: "codex/config.toml.example",
       },
@@ -374,7 +373,6 @@ const runtimeProjectionLayouts = {
       skillRoot: [".codex", "skills", "meta-theory"],
       legacySkillFile: [".codex", "skills", "meta-theory.md"],
       legacySkillReferencesDir: [".codex", "skills", "references"],
-      projectSkillRoot: [".agents", "skills", "meta-theory"],
       hooksDir: [".codex", "hooks"],
       hooksFile: [".codex", "hooks.json"],
       commandsDir: [".codex", "commands"],

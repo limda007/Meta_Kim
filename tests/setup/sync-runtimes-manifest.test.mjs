@@ -99,10 +99,6 @@ describe("sync-runtimes / inferProjectCategory", () => {
       CATEGORIES.D,
     );
     assert.equal(
-      inferProjectCategory(p(".agents/skills/meta-theory/SKILL.md"), REPO),
-      CATEGORIES.D,
-    );
-    assert.equal(
       inferProjectCategory(p("openclaw/skills/meta-theory/SKILL.md"), REPO),
       CATEGORIES.D,
     );

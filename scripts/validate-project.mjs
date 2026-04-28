@@ -1360,7 +1360,7 @@ async function validateCodexArtifacts() {
     "sandbox_mode",
     "[agents]",
     "[mcp_servers.meta_kim_runtime]",
-    ".agents/skills/",
+    ".codex/skills/",
   ]) {
     assert(
       configExample.includes(expected),
@@ -1377,7 +1377,7 @@ async function validateCodexArtifacts() {
   for (const expected of [
     "name: meta-theory",
     "~/.codex/skills/meta-theory/SKILL.md",
-    ".agents/skills/meta-theory/SKILL.md",
+    ".codex/skills/meta-theory/SKILL.md",
   ]) {
     assert(
       command.includes(expected),

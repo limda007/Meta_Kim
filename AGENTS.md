@@ -39,7 +39,7 @@ When this repository is opened in Codex:
 
 - `AGENTS.md` is the project guide you are reading now
 - `.codex/agents/*.toml` contains the 8 Codex custom-agent mirrors
-- `.agents/skills/meta-theory/` is the project skill mirror (directory layout); `.codex/skills/` may hold the portable skill surface depending on sync scope
+- `.codex/skills/meta-theory/` is the Codex project skill mirror (directory layout)
 - `codex/config.toml.example` is generated from `canonical/runtime-assets/codex/config.toml.example` and shows how user-global Codex can wire MCP and skills
 
 **Cursor parity (same repo, fourth runtime):** `.cursor/agents/*.md`, `.cursor/skills/meta-theory/`, `.cursor/mcp.json` — all refreshed by `npm run meta:sync` per `config/sync.json`.
@@ -48,7 +48,7 @@ Important maintenance rule:
 
 - `canonical/agents/*.md` and `canonical/skills/meta-theory/SKILL.md` are the canonical sources
 - `config/contracts/workflow-contract.json` is the canonical run-discipline and gate contract (not overwritten by agent/skill sync)
-- `.codex/agents/*`, `.codex/skills/*`, `.agents/skills/*`, and Cursor/OpenClaw projection trees are derived runtime assets unless explicitly stated otherwise
+- `.codex/agents/*`, `.codex/skills/*`, and Cursor/OpenClaw projection trees are derived runtime assets unless explicitly stated otherwise
 
 ## Capability-First Rule
 
@@ -233,8 +233,7 @@ Files that should usually be treated as mirrors or adapters:
 - `.mcp.json`
 - `.claude/capability-index/` (including `meta-kim-capabilities.json` and `global-capabilities.json` from `discover:global`)
 - `.codex/agents/*.toml`
-- `.codex/skills/` (e.g. `meta-theory.md` and `references/` when present)
-- `.agents/skills/meta-theory/`
+- `.codex/skills/` (e.g. `meta-theory/SKILL.md` and `references/` when present)
 - `.cursor/agents/*.md`
 - `.cursor/skills/meta-theory/`
 - `.cursor/mcp.json`
